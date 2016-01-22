@@ -1,4 +1,4 @@
-# AMP Drupal module
+# AMP Drupal module, D8 version
 
 This repository has two branches, D8 and D7. Work on each version of the AMP module
 should take place in the respective branch. Tickets will be worked on in feature branches,

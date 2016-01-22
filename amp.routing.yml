@@ -1,0 +1,7 @@
+amp.node_amp_page:
+  path: '/node/{node}/amp'
+  defaults:
+    _controller: '\Drupal\amp\Controller\ampPage::amp'
+    _title: 'AMP Page'
+  requirements:
+    _permission: 'access content'

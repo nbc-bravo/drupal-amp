@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Contains amp.module..
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function amp_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the amp module.
+    case 'help.page.amp':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Google AMP integration') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function amp_theme() {
+  $theme = [];
+
+  return $theme;
+}
