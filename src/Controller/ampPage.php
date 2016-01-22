@@ -10,7 +10,7 @@ namespace Drupal\amp\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityManager;
-use Drupal\node\NodeInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\node\Controller\NodeViewController;
 
 /**
