@@ -77,7 +77,7 @@ class AmpNegotiator implements ThemeNegotiatorInterface {
    * {@inheritdoc}
    */
   public function determineActiveTheme(RouteMatchInterface $route_match) {
-    return $this->configFactory->get('system.theme')->get('amp');
+    return $this->configFactory->get('amp.theme')->get('amptheme');
   }
 
 }
