@@ -5,3 +5,5 @@ amp.node_amp_page:
     _title: 'AMP Page'
   requirements:
     _permission: 'access content'
+  options:
+    _amp_route: TRUE
