@@ -7,6 +7,7 @@
 
 namespace Drupal\amp\Routing;
 
+use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\Routing\Route;
 
 /**
