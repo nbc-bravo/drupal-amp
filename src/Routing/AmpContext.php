@@ -5,7 +5,7 @@
  * Contains \Drupal\amp\Routing\AmpContext.
  */
 
-namespace Drupal\Core\Routing;
+namespace Drupal\amp\Routing;
 
 use Symfony\Component\Routing\Route;
 

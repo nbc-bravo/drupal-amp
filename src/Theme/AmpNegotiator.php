@@ -5,26 +5,17 @@
  * Contains \Drupal\amp\Theme\AmpNegotiator.
  */
 
-namespace Drupal\user\Theme;
+namespace Drupal\amp\Theme;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Entity\EntityManagerInterface;
 use Drupal\amp\Routing\AmpContext;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Theme\ThemeNegotiatorInterface;
 
 /**
  * Sets the active theme on amp pages.
  */
 class AmpNegotiator implements ThemeNegotiatorInterface {
-
-  /**
-   * The current user.
-   *
-   * @var \Drupal\Core\Session\AccountInterface
-   */
-  protected $user;
 
   /**
    * The config factory.
@@ -34,35 +25,22 @@ class AmpNegotiator implements ThemeNegotiatorInterface {
   protected $configFactory;
 
   /**
-   * The entity manager.
-   *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
-   */
-  protected $entityManager;
-
-  /**
    * The route amp context to determine whether a route is an amp one.
    *
-   * @var \Drupal\Core\Routing\AmpContext
+   * @var \Drupal\amp\Routing\AmpContext
    */
   protected $ampContext;
 
   /**
    * Creates a new AmpNegotiator instance.
    *
-   * @param \Drupal\Core\Session\AccountInterface $user
-   *   The current user.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
-   *   The entity manager.
-   * @param \Drupal\Core\Routing\AmpContext $amp_context
+   * @param \Drupal\amp\Routing\AmpContext $amp_context
    *   The route amp context to determine whether the route is an amp one.
    */
-  public function __construct(AccountInterface $user, ConfigFactoryInterface $config_factory, EntityManagerInterface $entity_manager, AmpContext $amp_context) {
-    $this->user = $user;
+  public function __construct(ConfigFactoryInterface $config_factory, AmpContext $amp_context) {
     $this->configFactory = $config_factory;
-    $this->entityManager = $entity_manager;
     $this->ampContext = $amp_context;
   }
 
