@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains amp.module..
+ * Contains amp.module.
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
