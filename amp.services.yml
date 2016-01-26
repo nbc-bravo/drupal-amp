@@ -1,0 +1,9 @@
+services:
+  router.amp_context:
+    class: Drupal\amp\Routing\AmpContext
+    arguments: ['@current_route_match']
+  theme.negotiator.amp_theme:
+    class: Drupal\amp\Theme\AmpNegotiator
+    arguments: ['@config.factory', '@router.amp_context']
+    tags:
+      - { name: theme_negotiator, priority: -50 }
