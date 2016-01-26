@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Contains \Drupal\amp\Plugin\Field\FieldFormatter\AmpImgFormatter.
+ * Contains \Drupal\amp\Plugin\Field\FieldFormatter\AmpImageFormatter.
  */
 
 namespace Drupal\amp\Plugin\Field\FieldFormatter;
@@ -11,10 +11,10 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
 
 /**
- * Plugin implementation of the 'amp_img' formatter.
+ * Plugin implementation of the 'amp_image' formatter.
  *
  * @FieldFormatter(
- *   id = "amp_img",
+ *   id = "amp_image",
  *   label = @Translation("AMP Image"),
  *   description = @Translation("Display an AMP Image file."),
  *   field_types = {
@@ -22,7 +22,7 @@ use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
  *   }
  * )
  */
-class AmpImgFormatter extends ImageFormatter {
+class AmpImageFormatter extends ImageFormatter {
 
   /**
    * {@inheritdoc}
