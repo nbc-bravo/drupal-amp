@@ -5,6 +5,8 @@
  * Contains amp.module.
  */
 
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
@@ -20,6 +22,31 @@ function amp_help($route_name, RouteMatchInterface $route_match) {
       return $output;
 
     default:
+  }
+}
+
+function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  if ($entity->getEntityType()->id() == 'node') {
+    if (!empty($build['#attached']['html_head_link'])) {
+      foreach ($build['#attached']['html_head_link'] as $key => $config) {
+        if ($build['#view_mode'] == 'amp') {
+          if ($config[0]['rel'] != 'canonical' && $config[0]['rel'] != 'shortlink') {
+            unset($build['#attached']['html_head_link'][$key]);
+          }
+        }
+        else {
+          if ($config[0]['rel'] == 'canonical') {
+            $build['#attached']['html_head_link'][] = array(
+              array(
+                'rel' => 'amphtml',
+                'href' => $config[0]['href'] . '/amp',
+              ),
+              TRUE,
+            );
+          }
+        }
+      }
+    }
   }
 }
 
