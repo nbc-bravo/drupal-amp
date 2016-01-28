@@ -34,7 +34,7 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
             unset($build['#attached']['html_head_link'][$key]);
           }
         }
-        else {
+        else if ($build['#view_mode'] == 'full') {
           if ($config[0]['rel'] == 'canonical') {
             $build['#attached']['html_head_link'][] = array(
               array(
