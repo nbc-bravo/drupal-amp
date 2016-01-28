@@ -58,3 +58,21 @@ function amp_theme() {
 
   return $theme;
 }
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
+function amp_form_node_type_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $enabled = \Drupal::config('amp.settings')->get('node_types');
+  $node_type = $form['type']['#default_value'];
+
+  $form['workflow']['amp'] = array(
+    '#type' => 'select',
+    '#title' => t('Enable AMP pages for this content type'),
+    '#options' => array(
+      0 => t('No'),
+      1 => t('Yes'),
+    ),
+    '#default_value' => !empty($enabled[$node_type]) ? 1 : 0,
+  );
+}
