@@ -7,3 +7,11 @@ amp.node_amp_page:
     _permission: 'access content'
   options:
     _amp_route: TRUE
+
+amp.test_library_hello:
+  path: 'amp/library/test'
+  defaults:
+    _controller: '\Drupal\amp\Controller\AMPTestLibrary::hello'
+    _title: 'Test Library'
+  requirements:
+    _permission: 'access content'

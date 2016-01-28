@@ -7,3 +7,7 @@ services:
     arguments: ['@config.factory', '@router.amp_context']
     tags:
       - { name: theme_negotiator, priority: -50 }
+  amp.utilities:
+    class: Drupal\amp\AMPService
+    arguments: []
+
