@@ -1,3 +1,11 @@
+amp.settings:
+  path: '/admin/config/content/amp'
+  defaults:
+    _form: '\Drupal\amp\Form\AmpSettingsForm'
+    _title: 'Configure the AMP module'
+  requirements:
+    _permission: 'administer site configuration'
+
 amp.node_amp_page:
   path: '/node/{node}/amp'
   defaults:
