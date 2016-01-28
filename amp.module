@@ -75,4 +75,17 @@ function amp_form_node_type_edit_form_alter(&$form, FormStateInterface $form_sta
     ),
     '#default_value' => !empty($enabled[$node_type]) ? 1 : 0,
   );
+
+  $form['actions']['submit']['#submit'][] = 'amp_node_settings_submit';
+}
+
+function amp_node_settings_submit(&$form, FormStateInterface $form_state) {
+  $amp_enabled = $form_state->getValue('amp');
+  $config = \Drupal::service('config.factory')->getEditable('amp.settings');
+  $config->setData(array(
+    'node_types' => array(
+      $form['type']['#default_value'] => $amp_enabled
+    )
+  ));
+  $config->save();
 }
