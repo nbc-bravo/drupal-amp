@@ -36,15 +36,15 @@ class AmpSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('amp.settings');
 
-    // Get a list of all node types
     $node_types = node_type_get_names();
 
-    $form['amp_settings'] = array(
-        '#type' => 'select',
-        '#title' => $this->t('Select nodes that have AMP versions.'),
-        '#default_value' => $config->get('element'),
-        '#options' => $node_types,
-        );
+    $form['node_types'] = array(
+      '#type' => 'checkboxes',
+      '#multiple' => TRUE,
+      '#title' => $this->t('Select nodes that have AMP versions.'),
+      '#default_value' => $config->get('node_types'),
+      '#options' => $node_types,
+    );
 
     return parent::buildForm($form, $form_state);
   }
@@ -53,8 +53,9 @@ class AmpSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    if ($form_state->hasValue('amp_settings')) {
-      $node_types = $form_state->get('amp_settings');
+
+    if ($form_state->hasValue('node_types')) {
+      $node_types = $form_state->getValue('node_types');
       $config = $this->config('amp.settings');
       $config->setData(['node_types' => $node_types]);
       $config->save();
