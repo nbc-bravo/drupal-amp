@@ -104,7 +104,7 @@ class AmpSettingsForm extends ConfigFormBase {
       '#type' => 'checkboxes',
       '#multiple' => TRUE,
       '#title' => $this->t('Select nodes that have AMP versions by default:'),
-      '#default_value' => $nodetype_config->get('node_types'),
+      '#default_value' => !empty($nodetype_config->get('node_types')) ? $nodetype_config->get('node_types') : [],
       '#options' => $node_types,
     );
 
