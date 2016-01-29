@@ -60,18 +60,6 @@ function amp_theme() {
 }
 
 /**
- * Implements hook_form_BASE_FORM_ID_alter().
- */
-function amp_form_node_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
-  // AMP information about the node for administrators.
-  $form['amp'] = array(
-    '#type' => 'details',
-    '#title' => t('AMP Configuration'),
-    '#group' => 'advanced',
-  );
-}
-
-/**
 * Implements hook_form_BASE_FORM_ID_alter().
 */
 function amp_form_node_type_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
