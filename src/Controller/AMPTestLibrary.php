@@ -44,12 +44,19 @@ class AMPTestLibrary extends ControllerBase {
    * Hello.
    *
    * @return string
-   *   Return Hello string.
    */
   public function hello() {
+    $html =
+      '<p><a href="javascript:run();">Run</a></p>' .
+      '<p><a style="margin: 2px;" href="http://www.cnn.com" target="_parent">CNN</a></p>' .
+      '<p><a href="http://www.bbcnews.com" target="_blank">BBC</a></p>' .
+      '<p><INPUT type="submit" value="submit"></p>' .
+      '<p>This is a <!-- test comment --> <!-- [if IE9] --> sample <div onmouseover="hello();">sample</div> paragraph</p>';
+
+    $this->amp->loadHTML($html);
     return [
         '#type' => 'markup',
-        '#markup' => $this->amp->convertToAMP('<p>Hello from the AMP Library</p>')
+        '#markup' => $this->amp->convertToAMP() . $this->amp->warnings_human()
     ];
   }
 
