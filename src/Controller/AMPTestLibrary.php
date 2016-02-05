@@ -28,7 +28,7 @@ class AMPTestLibrary extends ControllerBase {
    * {@inheritdoc}
    */
   public function __construct(AMPService $amp_utilities) {
-    $this->amp = $amp_utilities->getAMP();
+    $this->amp = $amp_utilities->createAMPConverter();
   }
 
   /**
@@ -47,16 +47,18 @@ class AMPTestLibrary extends ControllerBase {
    */
   public function hello() {
     $html =
-      '<p><a href="javascript:run();">Run</a></p>' .
-      '<p><a style="margin: 2px;" href="http://www.cnn.com" target="_parent">CNN</a></p>' .
-      '<p><a href="http://www.bbcnews.com" target="_blank">BBC</a></p>' .
-      '<p><INPUT type="submit" value="submit"></p>' .
+      '<p><a href="javascript:run();">Run</a></p>' . PHP_EOL .
+      '<p><a style="margin: 2px;" href="http://www.cnn.com" target="_parent">CNN</a></p>' . PHL_EOL .
+      '<p><a href="http://www.bbcnews.com" target="_blank">BBC</a></p>' . PHP_EOL .
+      '<p><INPUT type="submit" value="submit"></p>' . PHP_EOL .
       '<p>This is a <!-- test comment --> <!-- [if IE9] --> sample <div onmouseover="hello();">sample</div> paragraph</p>';
 
-    $this->amp->loadHTML($html);
+    $this->amp->loadHtml($html);
+    $this->amp->convertToAmpHtml();
+    $diff = $this->amp->getInputOutputHtmlDiff();
     return [
         '#type' => 'markup',
-        '#markup' => $this->amp->convertToAMP() . $this->amp->warnings_human()
+        '#markup' => "<pre>$diff</pre>" . $this->amp->warningsHuman()
     ];
   }
 
