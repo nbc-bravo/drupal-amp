@@ -136,13 +136,13 @@ class AmpSettingsForm extends ConfigFormBase {
       // Get a list of changes.
       $changes = array_diff_assoc($node_types, $nodetype_config->get('node_types'));
       foreach ($changes as $type => $value) {
-        // For nodes that have added AMP versions, create the AMP view.
+        // For nodes that have added AMP versions, create the AMP view mode.
         if (!empty($value)) {
-          drupal_set_message(t('The content type !type is now AMP enabled.', array('!type' => $type)), 'status');
+          drupal_set_message(t('The content type <strong>!type</strong> is now AMP enabled.', array('!type' => $type)), 'status');
         }
-        // For nodes that have removed AMP versions, disable the AMP view.
+        // For nodes that have removed AMP versions, disable the AMP view mode.
         else {
-          drupal_set_message(t('The content type !type is no longer AMP enabled.', array('!type' => $type)), 'status');
+          drupal_set_message(t('The content type <strong>!type</strong> is no longer AMP enabled.', array('!type' => $type)), 'status');
         }
       }
 
