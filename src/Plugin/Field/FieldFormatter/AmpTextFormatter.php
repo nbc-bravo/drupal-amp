@@ -9,6 +9,8 @@ namespace Drupal\amp\Plugin\Field\FieldFormatter;
 
 use Drupal\text\Plugin\Field\FieldFormatter\TextDefaultFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
+use Lullabot\AMP\AMP;
+use Drupal;
 
 /**
  * Plugin implementation of the 'amp_text' formatter.
@@ -26,12 +28,22 @@ use Drupal\Core\Field\FieldItemListInterface;
  * )
  */
 class AmpTextFormatter extends TextDefaultFormatter {
-
   /**
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
+    /** @var Drupal\amp\AMPService $amp_service */
+    $amp_service = Drupal::getContainer()->get('amp.utilities');
+
+    /** @var AMP $amp */
+    $amp = $amp_service->getAMPConverter();
     $elements = parent::viewElements($items);
+    foreach ($elements as &$element) {
+      $amp->loadHtml($element['#text']);
+      $element['#text'] = $amp->convertToAmpHtml();
+    }
+
+    $amp->clear();
     return $elements;
   }
 
