@@ -135,24 +135,29 @@ class AmpSettingsForm extends ConfigFormBase {
       // Get a list of changes.
       $changes = array_diff_assoc($node_types, $nodetype_config->get('node_types'));
       foreach ($changes as $bundle => $value) {
+        $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $bundle);
         // For nodes that have added AMP versions, create the AMP view mode.
         if (!empty($value)) {
           // Get a list of view modes for the bundle.
-          $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $bundle);
-          if (empty($view_modes['amp'])) {
-            if (empty($this->config('node.' . $bundle . '.amp'))) {
+          if (!isset($view_modes['amp'])) {
+            if (empty($this->config('core.entity_view_display.node.' . $bundle . '.amp'))) {
+              \Drupal::configFactory()->getEditable('core.entity_view_display.node.' . $bundle . '.amp')->set('status', TRUE)->save();
+            }
+            else {
               \Drupal\Core\Entity\Entity\EntityViewDisplay::create(array(
                 'targetEntityType' => 'node',
                 'bundle' => $bundle,
                 'mode' => 'amp',
               ))->setStatus(TRUE)->save();
             }
+            drupal_set_message(t('The content type <strong>!bundle</strong> is now AMP enabled.', array('!bundle' => $bundle)), 'status');
           }
-          drupal_set_message(t('The content type <strong>!bundle</strong> is now AMP enabled.', array('!bundle' => $bundle)), 'status');
         }
         // For nodes that have removed AMP versions, disable the AMP view mode.
         else {
-          drupal_set_message(t('The content type <strong>!bundle</strong> is no longer AMP enabled.', array('!bundle' => $bundle)), 'status');
+          if (\Drupal::configFactory()->getEditable('core.entity_view_display.node.' . $bundle . '.amp')->delete()) {
+            drupal_set_message(t('The content type <strong>!bundle</strong> is no longer AMP enabled.', array('!bundle' => $bundle)), 'status');
+          }
         }
       }
 
