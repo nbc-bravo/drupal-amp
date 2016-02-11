@@ -33,7 +33,6 @@ class AmpSettingsForm extends ConfigFormBase {
    */
   private $themeOptions;
 
-
   /**
    * {@inheritdoc}
    */
@@ -135,10 +134,20 @@ class AmpSettingsForm extends ConfigFormBase {
 
       // Get a list of changes.
       $changes = array_diff_assoc($node_types, $nodetype_config->get('node_types'));
-      foreach ($changes as $type => $value) {
+      foreach ($changes as $bundle => $value) {
         // For nodes that have added AMP versions, create the AMP view mode.
         if (!empty($value)) {
-          drupal_set_message(t('The content type <strong>!type</strong> is now AMP enabled.', array('!type' => $type)), 'status');
+          // Get a list of view modes for the bundle.
+          $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $bundle);
+          dpm($view_modes);
+          if (empty($view_modes['amp']) && empty($this->config('node.' . $bundle . '.amp'))) {
+            \Drupal\Core\Entity\Entity\EntityViewDisplay::create(array(
+              'targetEntityType' => 'node',
+              'bundle' => $bundle,
+              'mode' => 'amp',
+            ))->setStatus(TRUE)->save();
+          }
+          drupal_set_message(t('The content type <strong>!bundle</strong> is now AMP enabled.', array('!bundle' => $bundle)), 'status');
         }
         // For nodes that have removed AMP versions, disable the AMP view mode.
         else {
