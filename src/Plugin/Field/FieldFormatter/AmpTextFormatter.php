@@ -34,13 +34,14 @@ class AmpTextFormatter extends TextDefaultFormatter {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     /** @var Drupal\amp\AMPService $amp_service */
     $amp_service = Drupal::getContainer()->get('amp.utilities');
-
+    $warning_title = '<strong>(For debugging purposes only. These warnings are for the body text of the node and will not ' .
+        'appear in production version of module. Developers will still be able to see this in a smart way, yet not implemented)</strong>';
     /** @var AMP $amp */
     $amp = $amp_service->getAMPConverter();
     $elements = parent::viewElements($items);
     foreach ($elements as &$element) {
       $amp->loadHtml($element['#text']);
-      $element['#text'] = $amp->convertToAmpHtml();
+      $element['#text'] = $amp->convertToAmpHtml() . '<div class="warnings">'. $warning_title . '<strong></strong>' . $amp->warningsHuman() . '</div>';
     }
 
     $amp->clear();
