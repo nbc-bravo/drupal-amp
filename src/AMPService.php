@@ -15,7 +15,13 @@ use Lullabot\AMP\AMP;
  * @package Drupal\amp
  */
 class AMPService  {
-  public function createAMPConverter() {
-    return new AMP();
+  /** @var AMP */
+  protected $amp;
+
+  public function __construct() {
+    $this->amp = new AMP();
+  }
+  public function getAMPConverter() {
+    return $this->amp;
   }
 }

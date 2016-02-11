@@ -28,7 +28,7 @@ class AMPTestLibrary extends ControllerBase {
    * {@inheritdoc}
    */
   public function __construct(AMPService $amp_utilities) {
-    $this->amp = $amp_utilities->createAMPConverter();
+    $this->amp = $amp_utilities->getAMPConverter();
   }
 
   /**
@@ -60,6 +60,8 @@ class AMPTestLibrary extends ControllerBase {
         '#type' => 'markup',
         '#markup' => "<pre>$diff</pre>" . $this->amp->warningsHuman()
     ];
+    // Clear any state on the amp object; this is optional but good to clean up.
+    $this->amp->clear();
   }
 
 }
