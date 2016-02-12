@@ -33,6 +33,15 @@ class AmpImageFormatter extends ImageFormatter {
     return $elements;
   }
 
+ /**
+   * {@inheritdoc}
+   */
+  public static function defaultSettings() {
+    return array(
+      'amp_layout' => '',
+    ) + parent::defaultSettings();
+  }
+
   /**
    * {@inheritdoc}
    */
