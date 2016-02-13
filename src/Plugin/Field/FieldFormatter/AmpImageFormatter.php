@@ -62,17 +62,13 @@ class AmpImageFormatter extends ImageFormatter {
 
     // This information should only appear when 'fixed-height' is selected.
     // TODO: figure out why amp_layout_height always shows.
-    $element['amp_display'] = array(
-      '#type' => 'container',
-      '#states' => array(
-        'visible' => array(':input[name="amp_layout"]' => array(
-          'value' => 'fixed-height'
-        )),
-      ),
-    );
-    $element['amp_display']['amp_fixed_height'] = array(
+    $element['amp_fixed_height'] = array(
       '#type' => 'textfield',
       '#title' => t('Layout Height (used for fixed-height only)'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name="amp_layout"]' => array('value' => 'fixed-height'))
+        ),
       '#size' => 10,
       '#default_value' => 0,
     );
