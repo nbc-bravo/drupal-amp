@@ -138,7 +138,7 @@ class AmpSettingsForm extends ConfigFormBase {
         $changes = array_diff_assoc($node_types, $nodetype_config->get('node_types'));
       }
       else {
-        $changes = $node_types;
+        $changes = array_filter($node_types);
       }
       foreach ($changes as $bundle => $value) {
         // Get a list of view modes for the bundle.
