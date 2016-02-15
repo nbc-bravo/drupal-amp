@@ -145,7 +145,6 @@ class AmpSettingsForm extends ConfigFormBase {
         $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $bundle);
         // For nodes that have added AMP versions, create the AMP view mode.
         if (!empty($value)) {
-          // First, check to see if the amp view mode is enabled.
           if (!isset($view_modes['amp'])) {
             if (\Drupal\Core\Entity\Entity\EntityViewDisplay::create(array(
                 'targetEntityType' => 'node',
@@ -154,10 +153,10 @@ class AmpSettingsForm extends ConfigFormBase {
               ))->setStatus(TRUE)->save()) {
               drupal_set_message(t('The content type <strong>!bundle</strong> is now AMP enabled.', array('!bundle' => $bundle)), 'status');
             }
-            elseif (\Drupal::configFactory()->getEditable('core.entity_view_display.node.' . $bundle . '.amp')->delete()) {
-              drupal_set_message(t('The content type <strong>!bundle</strong> is no longer AMP enabled.', array('!bundle' => $bundle)), 'status');
-            }
           }
+        }
+        elseif (\Drupal::configFactory()->getEditable('core.entity_view_display.node.' . $bundle . '.amp')->delete()) {
+          drupal_set_message(t('The content type <strong>!bundle</strong> is no longer AMP enabled.', array('!bundle' => $bundle)), 'status');
         }
       }
 
