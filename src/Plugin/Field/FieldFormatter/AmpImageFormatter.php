@@ -29,7 +29,16 @@ class AmpImageFormatter extends ImageFormatter {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = parent::viewElements($items);
+    $elements = parent::viewElements($items, $langcode);
+
+    foreach ($elements as $delta => $element) {
+      $elements[$delta]['#item_attributes']['layout'] = $this->getSetting('amp_layout');
+      if ($this->getSetting('amp_layout') == 'fixed-height') {
+        $elements[$delta]['#item_attributes']['height'] = $this->getSetting('amp_fixed_height');
+        $elements[$delta]['#item_attributes']['width'] = 'auto';
+      }
+    }
+
     return $elements;
   }
 
@@ -38,8 +47,8 @@ class AmpImageFormatter extends ImageFormatter {
    */
   public static function defaultSettings() {
     return array(
-      'amp_layout' => '',
-      'amp_fixed_height' => '',
+      'amp_layout' => 'responsive',
+      'amp_fixed_height' => '300',
     ) + parent::defaultSettings();
   }
 
