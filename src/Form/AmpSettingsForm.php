@@ -132,8 +132,14 @@ class AmpSettingsForm extends ConfigFormBase {
       $node_types = $form_state->getValue('node_types');
       $nodetype_config = $this->config('amp.settings');
 
-      // Get a list of changes.
-      $changes = array_diff_assoc($node_types, $nodetype_config->get('node_types'));
+      // Get a list of changes. The first time this form is accessed, this will
+      // be empty because we will not know all of the node types.
+      if (!empty($nodetype_config->get('node_types'))) {
+        $changes = array_diff_assoc($node_types, $nodetype_config->get('node_types'));
+      }
+      else {
+        $changes = $node_types;
+      }
       foreach ($changes as $bundle => $value) {
         // Get a list of view modes for the bundle.
         $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $bundle);
