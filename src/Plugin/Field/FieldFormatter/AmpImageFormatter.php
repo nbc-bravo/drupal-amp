@@ -49,6 +49,7 @@ class AmpImageFormatter extends ImageFormatter {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
 
+    //dpm($element);
     $layout_url = 'https://www.ampproject.org/docs/guides/responsive/control_layout.html#size-and-position-elements';
     // Add configuration options for layout.
     $element['amp_layout'] = [
@@ -67,8 +68,9 @@ class AmpImageFormatter extends ImageFormatter {
       '#title' => t('Layout Height (used for fixed-height only)'),
       '#states' => array(
         'visible' => array(
-          ':input[name="amp_layout"]' => array('value' => 'fixed-height'))
-        ),
+          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][amp_layout]"]' =>
+          array('value' => 'fixed-height'))
+      ),
       '#size' => 10,
       '#default_value' => 0,
     );
