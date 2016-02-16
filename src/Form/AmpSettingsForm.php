@@ -138,16 +138,31 @@ class AmpSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+
+    // Validate the Google Analytics ID.
+    $form_state->setValue('google_analytics_id', trim($form_state->getValue('google_analytics_id')));
+    // Replace all type of dashes (n-dash, m-dash, minus) with normal dashes.
+    $form_state->setValue('google_analytics_id', str_replace(['–', '—', '−'], '-', $form_state->getValue('google_analytics_id')));
+    if (!preg_match('/^UA-\d+-\d+$/', $form_state->getValue('google_analytics_id'))) {
+      $form_state->setErrorByName('google_analytics_id', t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.'));
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
     if ($form_state->hasValue('node_types') && $form_state->hasValue('amptheme')) {
       $node_types = $form_state->getValue('node_types');
-      $nodetype_config = $this->config('amp.settings');
+      $amp_config = $this->config('amp.settings');
 
       // Get a list of changes. The first time this form is accessed, this will
       // be empty because we will not know all of the node types.
-      if (!empty($nodetype_config->get('node_types'))) {
-        $changes = array_diff_assoc($node_types, $nodetype_config->get('node_types'));
+      if (!empty($amp_config->get('node_types'))) {
+        $changes = array_diff_assoc($node_types, $amp_config->get('node_types'));
       }
       else {
         $changes = array_filter($node_types);
@@ -172,13 +187,14 @@ class AmpSettingsForm extends ConfigFormBase {
         }
       }
 
-      $nodetype_config->setData(['node_types' => $node_types]);
-      $nodetype_config->save();
+      $amp_config->setData(['node_types' => $node_types])->save();
 
       $amptheme = $form_state->getValue('amptheme');
       $amptheme_config = $this->config('amp.theme');
       $amptheme_config->setData(['amptheme' => $amptheme]);
       $amptheme_config->save();
+
+      $amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
 
       parent::submitForm($form, $form_state);
     }
