@@ -11,6 +11,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\node\Entity\NodeType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -100,13 +101,13 @@ class AmpSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $nodetype_config = $this->config('amp.settings');
+    $amp_config = $this->config('amp.settings');
     $node_types = node_type_get_names();
     $form['node_types'] = array(
       '#type' => 'checkboxes',
       '#multiple' => TRUE,
       '#title' => $this->t('Enable and disable content types (and their configuration) that have AMP versions by default:'),
-      '#default_value' => !empty($nodetype_config->get('node_types')) ? $nodetype_config->get('node_types') : [],
+      '#default_value' => !empty($amp_config->get('node_types')) ? $amp_config->get('node_types') : [],
       '#options' => $node_types,
     );
 
@@ -119,6 +120,17 @@ class AmpSettingsForm extends ConfigFormBase {
       '#description' => $this->t('Choose a theme to use for AMP pages.'),
       '#default_value' => $amptheme_config->get('amptheme'),
     );
+
+    $google_analytics_id = $amp_config->get('google_analytics_id');
+    $form['google_analytics_id'] = [
+      '#type' => 'textfield',
+      '#default_value' => $amp_config->get('google_analytics_id'),
+      '#title' => $this->t('Google Anlalytics Web Property ID'),
+      '#description' => $this->t('This ID is unique to each site you want to track separately, and is in the form of UA-xxxxxxx-yy. To get a Web Property ID, <a href=":analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href=":webpropertyid">Find more information in the documentation</a>.', [':analytics' => 'http://www.google.com/analytics/', ':webpropertyid' => Url::fromUri('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', ['fragment' => 'webProperty'])->toString()]),
+      '#maxlength' => 20,
+      '#placeholder' => 'UA-',
+      '#size' => 15,
+    ];
 
     return parent::buildForm($form, $form_state);
   }
