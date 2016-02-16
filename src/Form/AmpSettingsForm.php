@@ -138,6 +138,7 @@ class AmpSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Google AdSense Publisher ID'),
       '#default_value' => $amp_config->get('google_adsense_id'),
       '#maxlength' => 25,
+      '#placeholder' => 'pub-',
       '#size' => 20,
       '#description' => $this->t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to %id.', ['%id' => 'pub-9999999999999']),
     );
