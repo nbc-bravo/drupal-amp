@@ -1,0 +1,17 @@
+{#
+/**
+ * @file
+ * Template for an amp-video.
+ *
+ * Available variables:
+ * - attributes: The HTML attributes for the containing element.
+ * - src: A URL for a video file.
+ *
+ * @see template_preprocess_amp_video()
+ */
+#}
+<amp-video{{ attributes }} src="{{ src }}">
+  <div fallback>
+    <p>Your browser doesn’t support HTML5 video</p>
+  </div>
+</amp-video>

@@ -1,0 +1,9 @@
+amp.iframe:
+  remote: https://cdn.ampproject.org
+  version: 0.1
+  license:
+    name: apache
+    url: https://github.com/ampproject/amphtml/blob/master/LICENSE
+    gpl-compatible: false
+  js:
+    https://cdn.ampproject.org/v0/amp-iframe-0.1.js: { type: external, minified: true }

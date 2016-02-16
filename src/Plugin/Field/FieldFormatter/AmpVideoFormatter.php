@@ -29,6 +29,11 @@ class AmpVideoFormatter extends GenericFileFormatter {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = parent::viewElements($items, $langcode);
+
+    foreach ($elements as $delta => $element) {
+      $elements[$delta]['#theme'] = 'amp_video';
+    }
+
     return $elements;
   }
 }
