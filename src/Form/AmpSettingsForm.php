@@ -132,6 +132,16 @@ class AmpSettingsForm extends ConfigFormBase {
       '#size' => 15,
     ];
 
+    $google_adsense_id = $amp_config->get('google_adsense_id');
+    $form['google_adsense_id'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Google AdSense Publisher ID'),
+      '#default_value' => $amp_config->get('google_adsense_id'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#description' => $this->t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to %id.', ['%id' => 'pub-9999999999999']),
+    );
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -147,6 +157,12 @@ class AmpSettingsForm extends ConfigFormBase {
     $form_state->setValue('google_analytics_id', str_replace(['–', '—', '−'], '-', $form_state->getValue('google_analytics_id')));
     if (!preg_match('/^UA-\d+-\d+$/', $form_state->getValue('google_analytics_id'))) {
       $form_state->setErrorByName('google_analytics_id', t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.'));
+    }
+
+    // Validate the Google Adsense ID.
+    $form_state->setValue('google_adsense_id', trim($form_state->getValue('google_adsense_id')));
+    if (!preg_match('/^pub-[0-9]+$/', $form_state->getValue('google_adsense_id'))) {
+      $form_state->setErrorByName('google_adsense_id', t('A valid Google AdSense Publisher ID is case sensitive and formatted like pub-9999999999999'));
     }
   }
 
@@ -195,9 +211,9 @@ class AmpSettingsForm extends ConfigFormBase {
       $amptheme_config->save();
 
       $amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
+      $amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
 
       parent::submitForm($form, $form_state);
     }
   }
-
 }
