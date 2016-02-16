@@ -24,7 +24,7 @@ class AmpGoogleAdsenseBlock extends BlockBase {
       );
     }
     return array(
-      '#markup' => $this->t('It works.')
+      '#markup' => $this->t('<!-- google_ad_section_start -->')
     );
   }
 }
