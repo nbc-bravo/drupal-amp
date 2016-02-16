@@ -128,8 +128,9 @@ class AmpSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Google Anlalytics Web Property ID'),
       '#description' => $this->t('This ID is unique to each site you want to track separately, and is in the form of UA-xxxxxxx-yy. To get a Web Property ID, <a href=":analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href=":webpropertyid">Find more information in the documentation</a>.', [':analytics' => 'http://www.google.com/analytics/', ':webpropertyid' => Url::fromUri('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', ['fragment' => 'webProperty'])->toString()]),
       '#maxlength' => 20,
-      '#placeholder' => 'UA-',
       '#size' => 15,
+      '#placeholder' => 'UA-',
+      '#required' => FALSE,
     ];
 
     $google_adsense_id = $amp_config->get('google_adsense_id');
@@ -138,8 +139,9 @@ class AmpSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Google AdSense Publisher ID'),
       '#default_value' => $amp_config->get('google_adsense_id'),
       '#maxlength' => 25,
-      '#placeholder' => 'pub-',
       '#size' => 20,
+      '#placeholder' => 'pub-',
+      '#required' => FALSE,
       '#description' => $this->t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to %id.', ['%id' => 'pub-9999999999999']),
     );
 
@@ -153,17 +155,21 @@ class AmpSettingsForm extends ConfigFormBase {
     parent::validateForm($form, $form_state);
 
     // Validate the Google Analytics ID.
-    $form_state->setValue('google_analytics_id', trim($form_state->getValue('google_analytics_id')));
-    // Replace all type of dashes (n-dash, m-dash, minus) with normal dashes.
-    $form_state->setValue('google_analytics_id', str_replace(['–', '—', '−'], '-', $form_state->getValue('google_analytics_id')));
-    if (!preg_match('/^UA-\d+-\d+$/', $form_state->getValue('google_analytics_id'))) {
-      $form_state->setErrorByName('google_analytics_id', t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.'));
+    if (!empty($form_state->getValue('google_analytics_id'))) {
+      $form_state->setValue('google_analytics_id', trim($form_state->getValue('google_analytics_id')));
+      // Replace all type of dashes (n-dash, m-dash, minus) with normal dashes.
+      $form_state->setValue('google_analytics_id', str_replace(['–', '—', '−'], '-', $form_state->getValue('google_analytics_id')));
+      if (!preg_match('/^UA-\d+-\d+$/', $form_state->getValue('google_analytics_id'))) {
+        $form_state->setErrorByName('google_analytics_id', t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.'));
+      }
     }
 
     // Validate the Google Adsense ID.
-    $form_state->setValue('google_adsense_id', trim($form_state->getValue('google_adsense_id')));
-    if (!preg_match('/^pub-[0-9]+$/', $form_state->getValue('google_adsense_id'))) {
-      $form_state->setErrorByName('google_adsense_id', t('A valid Google AdSense Publisher ID is case sensitive and formatted like pub-9999999999999'));
+    if (!empty($form_state->getValue('google_adsense_id'))) {
+      $form_state->setValue('google_adsense_id', trim($form_state->getValue('google_adsense_id')));
+      if (!preg_match('/^pub-[0-9]+$/', $form_state->getValue('google_adsense_id'))) {
+        $form_state->setErrorByName('google_adsense_id', t('A valid Google AdSense Publisher ID is case sensitive and formatted like pub-9999999999999'));
+      }
     }
   }
 
