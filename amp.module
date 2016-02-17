@@ -7,6 +7,7 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\file\Entity\File;
@@ -89,6 +90,13 @@ function template_preprocess_amp_video(&$variables) {
   // Create attributes object.
   $variables['attributes'] = new Attribute($variables['attributes']);
 
+  // Get width and height of video.
+  $video = Drupal::service('image.factory')->get($file_entity->getFileUri());
+  $width = $video->getWidth();
+  $height = $video->getHeight();
+  $variables['attributes']['width'] = $width;
+  $variables['attributes']['height'] = $height;
+
   // Use the description as the title text if available.
   if (empty($variables['description'])) {
     $title_text = $file_entity->getFilename();
@@ -97,19 +105,6 @@ function template_preprocess_amp_video(&$variables) {
     $title_text = $variables['description'];
   }
   $variables['attributes']['title'] = $title_text;
-}
-
-/**
- * Prepares variables for amp iframe templates.
- *
- * Default template: amp-iframe.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - iframe: AMP-processed text that contains the iframe code.
- */
-function template_preprocess_amp_iframe(&$variables) {
-  $variables['iframe'] = $variables['text'];
 }
 
 /**

@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains \Drupal\amp\Render\Element\AmpIframe.
+ * Contains \Drupal\amp\Element\AmpIframe.
  */
 
-namespace Drupal\amp\Render\Element;
+namespace Drupal\amp\Element;
 
 use Drupal\filter\Element\ProcessedText;
 
@@ -20,8 +20,6 @@ use Drupal\filter\Element\ProcessedText;
  * Properties:
  * - #iframe: An array with iframe details. See template_preprocess_amp_iframe()
  *   for documentation of the properties in this array.
- *
- * @see \Drupal\Core\Render\Element\Operations
  *
  * @RenderElement("amp_iframe")
  */
@@ -48,9 +46,9 @@ class AmpIframe extends ProcessedText {
   /**
    * Pre-render callback: Attaches the amp-iframe library and required markup.
    */
-  public static function preRenderIframe($element) {
+  public static function preRenderAmpIframe($element) {
     $element['#attached']['library'][] = 'amp/amp.iframe';
-
+    $element['#iframe'] = $element['#markup'];
     return $element;
   }
 }
