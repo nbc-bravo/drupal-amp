@@ -58,9 +58,12 @@ class AmpContext {
     $enabled_types = \Drupal::config('amp.settings')->get('node_types');
     // Load the current node.
     $node = \Drupal\node\Entity\Node::load($this->routeMatch->getParameter('node'));
-    $type = $node->getType();
-    // Only show AMP routes for content that is AMP enabled.
-    return empty($enabled_types[$type]) ? FALSE : TRUE;
+    if (!empty($node)) {
+      $type = $node->getType();
+      // Only show AMP routes for content that is AMP enabled.
+      return empty($enabled_types[$type]) ? FALSE : TRUE;
+    }
+    return FALSE;
   }
 
 }
