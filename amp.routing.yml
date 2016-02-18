@@ -14,7 +14,7 @@ amp.node_amp_page:
   requirements:
     _permission: 'access content'
   options:
-    _amp_route: FALSE
+    _amp_route: TRUE
 
 amp.test_library_hello:
   path: 'amp/library/test'

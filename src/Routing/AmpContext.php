@@ -49,32 +49,6 @@ class AmpContext {
         return FALSE;
       }
     }
-    // Check if the globally-defined AMP status has been changed to TRUE (it
-    // is FALSE by default).
-    if ($route->getOption('_amp_route')) {
-      return TRUE;
-    }
-
-    // We only want to consider URLs that end with 'amp'.
-    $current_path = \Drupal::service('path.current')->getPath();
-    if (substr($current_path, -3) != 'amp') {
-      return FALSE;
-    }
-
-    // Get a list of content types that are AMP enabled.
-    $enabled_types = \Drupal::config('amp.settings')->get('node_types');
-    // Load the current node.
-    $node = $this->routeMatch->getParameter('node');
-    // If we only got back the node ID, load the node.
-    if (!is_object($node)) {
-      $node = \Drupal\node\Entity\Node::load($node);
-    }
-    $type = $node->getType();
-    // Only show AMP routes for content that is AMP enabled.
-    if ($enabled_types[$type] === $type) {
-      return TRUE;
-    }
-    return FALSE;
+    return (bool) $route->getOption('_amp_route');
   }
-
 }
