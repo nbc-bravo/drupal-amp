@@ -188,7 +188,7 @@ class AmpSettingsForm extends ConfigFormBase {
     $form['adsense']['google_adsense_dataadslot'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Data ad slot'),
-      '#default_value' => $amp_config->get('google_adsense_dataslot'),
+      '#default_value' => $amp_config->get('google_adsense_dataadslot'),
       '#maxlength' => 25,
       '#size' => 20,
       '#states' => array('visible' => array(
