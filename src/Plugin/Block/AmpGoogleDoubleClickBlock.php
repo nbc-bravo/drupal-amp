@@ -23,8 +23,9 @@ class AmpGoogleDoubleClickBlock extends BlockBase {
         '#markup' => $this->t('This block requires a Google DoubleClick Network ID.')
       );
     }
+    $doubleclick_id = \Drupal::config('amp.settings')->get('google_doubleclick_id');
     return array(
-      '#markup' => $this->t('<!-- google_doubleclick_section_start -->')
+      '#markup' => $this->t('<!-- google_doubleclick_id is @dfpid -->', array('@dfpid' => $doubleclick_id))
     );
   }
 }

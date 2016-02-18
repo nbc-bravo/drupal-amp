@@ -23,8 +23,9 @@ class AmpGoogleAdsenseBlock extends BlockBase {
         '#markup' => $this->t('This block requires a Google Adsense ID.')
       );
     }
+    $adsense_id = \Drupal::config('amp.settings')->get('google_adsense_id');
     return array(
-      '#markup' => $this->t('<!-- google_ad_section_start -->')
+      '#markup' => $this->t('<!-- google_adsense_id is @adsense -->', array('@adsense' => $adsense_id))
     );
   }
 }
