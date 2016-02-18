@@ -55,6 +55,13 @@ class AmpContext {
     if ($route->getOption('_amp_route')) {
       return TRUE;
     }
+
+    // We only want to consider URLs that end with 'amp'.
+    $current_path = \Drupal::service('path.current')->getPath();
+    if (substr($current_path, -3) != 'amp') {
+      return FALSE;
+    }
+
     // Get a list of content types that are AMP enabled.
     $enabled_types = \Drupal::config('amp.settings')->get('node_types');
     // Load the current node.
