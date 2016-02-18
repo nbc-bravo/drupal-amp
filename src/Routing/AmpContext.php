@@ -49,7 +49,21 @@ class AmpContext {
         return FALSE;
       }
     }
-    return (bool) $route->getOption('_amp_route');
+    // Check if the globally-defined AMP status has been changed to TRUE (it
+    // is FALSE by default).
+    if ($route->getOption('_amp_route')) {
+      return TRUE;
+    }
+    // Get a list of content types that are AMP enabled.
+    $enabled_types = \Drupal::config('amp.settings')->get('node_types');
+    // Load the current node.
+    $node = \Drupal\node\Entity\Node::load($this->routeMatch->getParameter('node'));
+    if (!empty($node)) {
+      $type = $node->getType();
+      // Only show AMP routes for content that is AMP enabled.
+      return empty($enabled_types[$type]) ? FALSE : TRUE;
+    }
+    return FALSE;
   }
 
 }
