@@ -322,9 +322,19 @@ class AmpSettingsForm extends ConfigFormBase {
       $amptheme_config->setData(['amptheme' => $amptheme]);
       $amptheme_config->save();
 
+      // Submit Analytics configuration.
       $amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
+      // Submit Adsense configuration.
       $amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
+      $amp_config->set('google_adsense_width', $form_state->getValue('google_adsense_width'))->save();
+      $amp_config->set('google_adsense_height', $form_state->getValue('google_adsense_height'))->save();
+      $amp_config->set('google_adsense_dataadclient', $form_state->getValue('google_adsense_dataadclient'))->save();
+      $amp_config->set('google_adsense_dataadslot', $form_state->getValue('google_adsense_dataadslot'))->save();
+      // Submit DoubleClick configuration.
       $amp_config->set('google_doubleclick_id', $form_state->getValue('google_doubleclick_id'))->save();
+      $amp_config->set('google_doubleclick_width', $form_state->getValue('google_doubleclick_width'))->save();
+      $amp_config->set('google_doubleclick_height', $form_state->getValue('google_doubleclick_height'))->save();
+      $amp_config->set('google_doubleclick_dataslot', $form_state->getValue('google_doubleclick_dataslot'))->save();
 
       parent::submitForm($form, $form_state);
     }
