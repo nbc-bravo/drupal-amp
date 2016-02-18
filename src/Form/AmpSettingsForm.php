@@ -130,31 +130,124 @@ class AmpSettingsForm extends ConfigFormBase {
       '#maxlength' => 20,
       '#size' => 15,
       '#placeholder' => 'UA-',
-      '#required' => FALSE,
     ];
 
+    // Adsense configuration.
+    $form['adsense'] = array(
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+    $form['adsense']['adsense_checkbox'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Google Adsense'),
+    );
     $google_adsense_id = $amp_config->get('google_adsense_id');
-    $form['google_adsense_id'] = array(
+    $form['adsense']['google_adsense_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Google AdSense Publisher ID'),
       '#default_value' => $amp_config->get('google_adsense_id'),
       '#maxlength' => 25,
       '#size' => 20,
       '#placeholder' => 'pub-',
-      '#required' => FALSE,
       '#description' => $this->t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to pub-9999999999999'),
+      '#states' => array('visible' => array(
+        ':input[name="adsense_checkbox"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['adsense']['google_adsense_width'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Width'),
+      '#default_value' => $amp_config->get('google_adsense_width'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#states' => array('visible' => array(
+        ':input[name="adsense_checkbox"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['adsense']['google_adsense_height'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Height'),
+      '#default_value' => $amp_config->get('google_adsense_height'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#states' => array('visible' => array(
+        ':input[name="adsense_checkbox"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['adsense']['google_adsense_dataadclient'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Data ad client'),
+      '#default_value' => $amp_config->get('google_adsense_dataadclient'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#states' => array('visible' => array(
+        ':input[name="adsense_checkbox"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['adsense']['google_adsense_dataadslot'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Data ad slot'),
+      '#default_value' => $amp_config->get('google_adsense_dataslot'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#states' => array('visible' => array(
+        ':input[name="adsense_checkbox"]' => array('checked' => TRUE))
+      ),
     );
 
+    // DoubleClick configuration.
+    $form['doubleclick'] = array(
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+    $form['doubleclick']['doubleclick_checkbox'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('DoubleClick for Publishers'),
+    );
     $google_doubleclick_id = $amp_config->get('google_doubleclick_id');
-    $form['google_doubleclick_id'] = array(
+    $form['doubleclick']['google_doubleclick_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Google DoubleClick for Publishers Network ID'),
       '#default_value' => $amp_config->get('google_doubleclick_id'),
       '#maxlength' => 25,
       '#size' => 20,
       '#placeholder' => '/',
-      '#required' => FALSE,
       '#description' => $this->t('The Network ID to use on all tags. This value should begin with a /.'),
+      '#states' => array('visible' => array(
+        ':input[name="doubleclick_checkbox"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['doubleclick']['google_doubleclick_width'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Width'),
+      '#default_value' => $amp_config->get('google_doubleclick_width'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#states' => array('visible' => array(
+        ':input[name="doubleclick_checkbox"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['doubleclick']['google_doubleclick_height'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Height'),
+      '#default_value' => $amp_config->get('google_doubleclick_height'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#states' => array('visible' => array(
+        ':input[name="doubleclick_checkbox"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['doubleclick']['google_doubleclick_dataslot'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Data-slot'),
+      '#default_value' => $amp_config->get('google_doubleclick_dataslot'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#states' => array('visible' => array(
+        ':input[name="doubleclick_checkbox"]' => array('checked' => TRUE))
+      ),
     );
 
     return parent::buildForm($form, $form_state);
