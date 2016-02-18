@@ -231,6 +231,7 @@ class AmpSettingsForm extends ConfigFormBase {
 
       $amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
       $amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
+      $amp_config->set('google_doubleclick_id', $form_state->getValue('google_doubleclick_id'))->save();
 
       parent::submitForm($form, $form_state);
     }
