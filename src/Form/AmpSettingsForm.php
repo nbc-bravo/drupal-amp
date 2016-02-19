@@ -271,6 +271,11 @@ class AmpSettingsForm extends ConfigFormBase {
       $amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
       $amp_config->set('google_doubleclick_id', $form_state->getValue('google_doubleclick_id'))->save();
 
+      $amp_config->set('amp_pixel', $form_state->getValue('amp_pixel'))->save();
+      $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
+      $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
+      $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
+
       parent::submitForm($form, $form_state);
     }
   }
