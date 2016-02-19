@@ -31,12 +31,20 @@ class AmpGoogleDoubleClickBlock extends BlockBase {
     // Retrieve existing configuration for this block.
     $config = $this->getConfiguration();
 
-    $width = $config['width'];
-    $height = $config['height'];
     $data_slot = $config['data_slot'];
+    $height = $config['height'];
+    $width = $config['width'];
+
     return array(
-      '#markup' => $this->t('<!-- google_doubleclick_id is @dfpid -->', array('@dfpid' => $doubleclick_id))
+      '#theme' => 'amp_ad',
+      '#type' => 'doubleclick',
+      '#attributes' => array(
+        'height' => $height,
+        'width' => $width,
+        'data-slot' => '/' . $doubleclick_id . '/' . $data_slot
+      )
     );
+
   }
 
   /**
