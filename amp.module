@@ -69,6 +69,9 @@ function amp_theme() {
     'amp_iframe' => array(
       'variables' => array('iframe' => NULL),
     ),
+    'amp_ad' => array(
+      'variables' => array('type' => NULL, 'attributes' => array()),
+    ),
   ];
 
   return $theme;
