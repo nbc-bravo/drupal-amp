@@ -34,16 +34,19 @@ class AmpGoogleAdsenseBlock extends BlockBase {
     $height = $config['height'];
     $width = $config['width'];
 
-    return array(
-      '#theme' => 'amp_ad',
-      '#type' => 'adsense',
-      '#attributes' => array(
-        'height' => $height,
-        'width' => $width,
-        'data-ad-client' => $adsense_id,
-        'data-ad-slot' => $data_ad_slot
-      )
-    );
+    return [
+      'inside' => [
+        '#theme' => 'amp_ad',
+        '#type' => 'adsense',
+        '#attributes' => [
+          'height' => $height,
+          'width' => $width,
+          'data-ad-client' => $adsense_id,
+          'data-ad-slot' => $data_ad_slot
+        ]
+      ]
+    ];
+
   }
 
   /**

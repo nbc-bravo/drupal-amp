@@ -35,15 +35,17 @@ class AmpGoogleDoubleClickBlock extends BlockBase {
     $height = $config['height'];
     $width = $config['width'];
 
-    return array(
-      '#theme' => 'amp_ad',
-      '#type' => 'doubleclick',
-      '#attributes' => array(
-        'height' => $height,
-        'width' => $width,
-        'data-slot' => '/' . $doubleclick_id . '/' . $data_slot
-      )
-    );
+    return [
+      'inside' => [
+        '#theme' => 'amp_ad',
+        '#type' => 'doubleclick',
+        '#attributes' => [
+          'height' => $height,
+          'width' => $width,
+          'data-slot' => $doubleclick_id . '/' . $data_slot
+        ]
+      ]
+    ];
 
   }
 

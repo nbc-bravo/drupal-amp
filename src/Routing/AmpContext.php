@@ -70,11 +70,15 @@ class AmpContext {
     if (!is_object($node)) {
       $node = \Drupal\node\Entity\Node::load($node);
     }
-    $type = $node->getType();
-    // Only show AMP routes for content that is AMP enabled.
-    if ($enabled_types[$type] === $type) {
-      return TRUE;
+    // Check if we have a node. Will not be true on admin pages for example.
+    if (is_object($node)) {
+      $type = $node->getType();
+      // Only show AMP routes for content that is AMP enabled.
+      if ($enabled_types[$type] === $type) {
+        return TRUE;
+      }
     }
+
     return FALSE;
   }
 }

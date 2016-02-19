@@ -78,6 +78,21 @@ function amp_theme() {
 }
 
 /**
+ * Prepares variables for amp ad templates.
+ *
+ * Default template: amp-ad.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - type: The ad network.
+ *   - attributes: An associative array of attributes to be placed on the
+ *     amp-ad tag.
+ */
+function template_preprocess_amp_ad(&$variables) {
+  var_dump($variables);
+}
+
+/**
  * Prepares variables for amp video templates.
  *
  * Default template: amp-video.html.twig.
