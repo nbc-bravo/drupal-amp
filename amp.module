@@ -104,6 +104,9 @@ function amp_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function amp_entity_update(EntityInterface $entity) {
+  // Delete any old AMP aliases.
+  amp_delete_amp_alias($entity);
+  // Create a new AMP alias.
   amp_create_amp_alias($entity);
 }
 
@@ -111,6 +114,7 @@ function amp_entity_update(EntityInterface $entity) {
  * Implements hook_entity_delete().
  */
 function amp_entity_delete(EntityInterface $entity) {
+  amp_delete_amp_alias($entity);
 }
 
 /**
@@ -133,4 +137,12 @@ function amp_create_amp_alias(EntityInterface $entity) {
       \Drupal::service('path.alias_storage')->save($path . "/amp", $alias . "/amp", $langcode);
     }
   }
+}
+
+/**
+ * Helper function to delete an alias.
+ */
+function amp_delete_amp_alias(EntityInterface $entity) {
+  $amp_path = '/' . $entity->toUrl()->getInternalPath() . "/amp";
+  \Drupal::service('path.alias_storage')->delete(array('source' => $amp_path));
 }
