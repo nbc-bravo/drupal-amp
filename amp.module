@@ -90,13 +90,6 @@ function template_preprocess_amp_video(&$variables) {
   // Create attributes object.
   $variables['attributes'] = new Attribute($variables['attributes']);
 
-  // Get width and height of video.
-  $video = Drupal::service('image.factory')->get($file_entity->getFileUri());
-  $width = $video->getWidth();
-  $height = $video->getHeight();
-  $variables['attributes']['width'] = $width;
-  $variables['attributes']['height'] = $height;
-
   // Use the description as the title text if available.
   if (empty($variables['description'])) {
     $title_text = $file_entity->getFilename();
