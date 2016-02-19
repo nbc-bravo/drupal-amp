@@ -25,23 +25,6 @@ use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
  */
 class AmpImageFormatter extends ImageFormatter {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = parent::viewElements($items, $langcode);
-
-    foreach ($elements as $delta => $element) {
-      $elements[$delta]['#item_attributes']['layout'] = $this->getSetting('amp_layout');
-      if ($this->getSetting('amp_layout') == 'fixed-height') {
-        $elements[$delta]['#item_attributes']['height'] = $this->getSetting('amp_fixed_height');
-        $elements[$delta]['#item_attributes']['width'] = 'auto';
-      }
-    }
-
-    return $elements;
-  }
-
  /**
    * {@inheritdoc}
    */
@@ -119,5 +102,23 @@ class AmpImageFormatter extends ImageFormatter {
       'fill' => 'fill',
       'container' => 'container',
     ];
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function viewElements(FieldItemListInterface $items, $langcode) {
+    $elements = parent::viewElements($items, $langcode);
+
+    foreach ($elements as $delta => $element) {
+      $elements[$delta]['#item_attributes']['layout'] = $this->getSetting('amp_layout');
+      if ($this->getSetting('amp_layout') == 'fixed-height') {
+        $elements[$delta]['#item_attributes']['height'] = $this->getSetting('amp_fixed_height');
+        $elements[$delta]['#item_attributes']['width'] = 'auto';
+      }
+    }
+
+    return $elements;
   }
 }
