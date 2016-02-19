@@ -61,7 +61,7 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
 function amp_theme() {
   $theme = [
     'amp_video' => array(
-      'variables' => array('file' => NULL, 'description' => NULL, 'attributes' => array()),
+      'variables' => array('file' => NULL, 'description' => NULL, 'schema' => NULL, 'attributes' => array()),
     ),
     'amp_iframe' => array(
       'variables' => array('iframe' => NULL),
@@ -86,6 +86,9 @@ function template_preprocess_amp_video(&$variables) {
   $file = $variables['file'];
   $file_entity = ($file instanceof File) ? $file : File::load($file->fid);
   $variables['src'] = file_create_url($file_entity->getFileUri());
+
+  // amp-video can only be displayed if the src for the video is https.
+  $variables['scheme'] = \Drupal::service('file_system')->uriScheme($file_entity->getFileUri());
 
   // Create attributes object.
   $variables['attributes'] = new Attribute($variables['attributes']);
