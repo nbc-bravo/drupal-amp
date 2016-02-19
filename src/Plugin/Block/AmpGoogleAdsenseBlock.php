@@ -30,11 +30,19 @@ class AmpGoogleAdsenseBlock extends BlockBase {
 
     // Retrieve existing configuration for this block.
     $config = $this->getConfiguration();
-    $width = $config['width'];
-    $height = $config['height'];
     $data_ad_slot = $config['data_ad_slot'];
+    $height = $config['height'];
+    $width = $config['width'];
+
     return array(
-      '#markup' => $this->t('<!-- google_adsense_id is @adsense -->', array('@adsense' => $adsense_id))
+      '#theme' => 'amp_ad',
+      '#type' => 'adsense',
+      '#attributes' => array(
+        'height' => $height,
+        'width' => $width,
+        'data-ad-client' => $adsense_id,
+        'data-ad-slot' => $data_ad_slot
+      )
     );
   }
 
