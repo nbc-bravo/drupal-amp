@@ -111,17 +111,15 @@ class AmpSettingsForm extends ConfigFormBase {
       '#options' => $node_types,
     );
 
-    $amp_theme_options = $this->themeOptions;
     $amptheme_config = $this->config('amp.theme');
     $form['amptheme'] = array(
       '#type' => 'select',
-      '#options' => $amp_theme_options,
+      '#options' => $this->themeOptions,
       '#title' => $this->t('AMP theme'),
       '#description' => $this->t('Choose a theme to use for AMP pages.'),
       '#default_value' => $amptheme_config->get('amptheme'),
     );
 
-    $google_analytics_id = $amp_config->get('google_analytics_id');
     $form['google_analytics_id'] = [
       '#type' => 'textfield',
       '#default_value' => $amp_config->get('google_analytics_id'),
@@ -130,10 +128,8 @@ class AmpSettingsForm extends ConfigFormBase {
       '#maxlength' => 20,
       '#size' => 15,
       '#placeholder' => 'UA-',
-      '#required' => FALSE,
     ];
 
-    $google_adsense_id = $amp_config->get('google_adsense_id');
     $form['google_adsense_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Google AdSense Publisher ID'),
@@ -141,11 +137,9 @@ class AmpSettingsForm extends ConfigFormBase {
       '#maxlength' => 25,
       '#size' => 20,
       '#placeholder' => 'pub-',
-      '#required' => FALSE,
       '#description' => $this->t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to pub-9999999999999'),
     );
 
-    $google_doubleclick_id = $amp_config->get('google_doubleclick_id');
     $form['google_doubleclick_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Google DoubleClick for Publishers Network ID'),
@@ -153,9 +147,9 @@ class AmpSettingsForm extends ConfigFormBase {
       '#maxlength' => 25,
       '#size' => 20,
       '#placeholder' => '/',
-      '#required' => FALSE,
       '#description' => $this->t('The Network ID to use on all tags. This value should begin with a /.'),
     );
+
 
     return parent::buildForm($form, $form_state);
   }

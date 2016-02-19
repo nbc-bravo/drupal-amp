@@ -49,6 +49,7 @@ class AmpContext {
         return FALSE;
       }
     }
+
     // Check if the globally-defined AMP status has been changed to TRUE (it
     // is FALSE by default).
     if ($route->getOption('_amp_route')) {
@@ -76,5 +77,4 @@ class AmpContext {
     }
     return FALSE;
   }
-
 }
