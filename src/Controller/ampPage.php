@@ -63,7 +63,19 @@ class ampPage extends ControllerBase {
     // The node_view_controller also sets the canonical link to the primary node.
     $node = $this->entity_manager->getStorage('node')->load($node);
     $node_view_controller = new NodeViewController($this->entity_manager, $this->renderer);
-    $page = $node_view_controller->view($node, 'amp');
+
+    // Get a list of content types that are AMP enabled.
+    $enabled_types = \Drupal::config('amp.settings')->get('node_types');
+    $type = $node->getType();
+
+    // Only use the AMP view mode for content that is AMP enabled.
+    if ($enabled_types[$type] === $type) {
+      $page = $node_view_controller->view($node, 'amp');
+    }
+    // Otherwise return the default view mode.
+    else {
+      $page = $node_view_controller->view($node, 'full');
+    }
     unset($page['nodes'][$node->id()]['#cache']);
     return $page;
   }
