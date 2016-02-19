@@ -81,7 +81,7 @@ class AmpImageFormatter extends ImageFormatter {
           array('value' => 'fixed-height'))
       ),
       '#size' => 10,
-      '#default_value' => 0,
+      '#default_value' => $this->getSetting('amp_fixed_height'),
     );
 
     return $element;
@@ -98,6 +98,10 @@ class AmpImageFormatter extends ImageFormatter {
     $layout_setting = $this->getSetting('amp_layout');
     if (isset($layout_options[$layout_setting])) {
       $summary[] = t('Layout: @setting', array('@setting' => $layout_options[$layout_setting]));
+
+      if ($layout_options[$layout_setting] === 'fixed-height') {
+        $summary[] = t('Fixed height: @height', array('@height' => $this->getSetting('amp_fixed_height')));
+      }
     }
 
     return $summary;
