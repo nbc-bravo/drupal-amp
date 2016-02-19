@@ -92,3 +92,33 @@ function amp_node_settings_submit(&$form, FormStateInterface $form_state) {
   $config->set('node_types.' . $content_type, !empty($amp_enabled) ? $content_type : 0);
   $config->save();
 }
+
+/**
+ * Implements hook_entity_insert().
+ */
+function amp_entity_insert(EntityInterface $entity) {
+  // Only act on content entities.
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+}
+
+/**
+ * Implements hook_entity_update().
+ */
+function amp_entity_update(EntityInterface $entity) {
+  // Only act on content entities.
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function amp_entity_delete(EntityInterface $entity) {
+  // Only act on content entities.
+  if (!($entity instanceof FieldableEntityInterface)) {
+    return;
+  }
+}
