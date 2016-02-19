@@ -123,7 +123,7 @@ class AmpSettingsForm extends ConfigFormBase {
     $form['google_analytics_id'] = [
       '#type' => 'textfield',
       '#default_value' => $amp_config->get('google_analytics_id'),
-      '#title' => $this->t('Google Anlalytics Web Property ID'),
+      '#title' => $this->t('Google Analytics Web Property ID'),
       '#description' => $this->t('This ID is unique to each site you want to track separately, and is in the form of UA-xxxxxxx-yy. To get a Web Property ID, <a href=":analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href=":webpropertyid">Find more information in the documentation</a>.', [':analytics' => 'http://www.google.com/analytics/', ':webpropertyid' => Url::fromUri('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', ['fragment' => 'webProperty'])->toString()]),
       '#maxlength' => 20,
       '#size' => 15,
