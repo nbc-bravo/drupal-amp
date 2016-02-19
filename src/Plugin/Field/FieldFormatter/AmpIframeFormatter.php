@@ -35,7 +35,9 @@ class AmpIframeFormatter extends TextDefaultFormatter {
     $amp_service = Drupal::getContainer()->get('amp.utilities');
     $amp = $amp_service->getAMPConverter();
     $elements = parent::viewElements($items, $langcode);
+
     foreach ($elements as &$element) {
+      $element['#type'] = 'amp_iframe';
       $amp->loadHtml($element['#text']);
       $element['#text'] = $amp->convertToAmpHtml();
     }
