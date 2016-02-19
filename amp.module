@@ -107,9 +107,23 @@ function amp_entity_insert(EntityInterface $entity) {
  * Implements hook_entity_update().
  */
 function amp_entity_update(EntityInterface $entity) {
-  // Only act on content entities.
-  if (!($entity instanceof FieldableEntityInterface)) {
-    return;
+
+  $path = '/' . $entity->toUrl()->getInternalPath();
+  $langcode = $entity->language()->getId();
+
+  // First check to see if there is an alias for the node.
+  if ($alias = \Drupal::service('path.alias_storage')->lookupPathAlias($path, $langcode)) {
+
+
+    // Get a list of all AMP-enabled node types.
+    $enabled_types = \Drupal::config('amp.settings')->get('node_types');
+    $type = $entity->getType();
+
+    // Check if the content is AMP enabled.
+    if ($enabled_types[$type] === $type) {
+      // Save an AMP version of the alias.
+      \Drupal::service('path.alias_storage')->save($path . "/amp", $alias . "/amp", $langcode);
+    }
   }
 }
 
