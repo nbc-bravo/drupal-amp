@@ -157,6 +157,44 @@ class AmpSettingsForm extends ConfigFormBase {
       '#description' => $this->t('The Network ID to use on all tags. This value should begin with a /.'),
     );
 
+    $form['pixel_group'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('amp-pixel'),
+    );
+    $form['pixel_group']['amp_pixel'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable amp-pixel'),
+      '#default_value' => $amp_config->get('amp_pixel'),
+      '#description' => $this->t('The amp-pixel element is meant to be used as a typical tracking pixel -- to count page views. Find more information in the <a href="https://www.ampproject.org/docs/reference/amp-pixel.html">amp-pixel documentation</a>.'),
+    );
+    $form['pixel_group']['amp_pixel_domain_name'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('amp-pixel domain name'),
+      '#default_value' => $amp_config->get('amp_pixel_domain_name'),
+      '#description' => $this->t('A simple URL to send a GET request to when the tracking pixel is loaded.'),
+      '#states' => array('visible' => array(
+        ':input[name="amp_pixel"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['pixel_group']['amp_pixel_query_string'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('amp-pixel query string'),
+      '#default_value' => $amp_config->get('amp_pixel_query_string'),
+      '#description' => $this->t('The amp-pixel allows all standard URL variable substitutions.'),
+      '#states' => array('visible' => array(
+        ':input[name="amp_pixel"]' => array('checked' => TRUE))
+      ),
+    );
+    $form['pixel_group']['amp_pixel_random_number'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Random number'),
+      '#default_value' => $amp_config->get('amp_pixel_random_number'),
+      '#description' => $this->t('Use the special string RANDOM to add a random number to the URL if required. Find more information in the <a href="https://github.com/ampproject/amphtml/blob/master/spec/amp-var-substitutions.md#random">amp-pixel documentation</a>.'),
+      '#states' => array('visible' => array(
+        ':input[name="amp_pixel"]' => array('checked' => TRUE))
+      ),
+    );
+
     return parent::buildForm($form, $form_state);
   }
 
