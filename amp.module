@@ -7,8 +7,9 @@
 
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 
 /**
  * Implements hook_help().
@@ -121,7 +122,7 @@ function amp_entity_delete(EntityInterface $entity) {
  * Helper function to create an alias.
  */
 function amp_create_amp_alias(EntityInterface $entity) {
-  $path = '/' . $entity->toUrl()->getInternalPath();
+  $path = '/' . Url::fromRoute('<current>')->getInternalPath();
   $langcode = $entity->language()->getId();
 
   // First check to see if there is an alias for the node.
@@ -143,6 +144,6 @@ function amp_create_amp_alias(EntityInterface $entity) {
  * Helper function to delete an alias.
  */
 function amp_delete_amp_alias(EntityInterface $entity) {
-  $amp_path = '/' . $entity->toUrl()->getInternalPath() . "/amp";
+  $amp_path = '/' . Url::fromRoute('<current>')->getInternalPath() . "/amp";
   \Drupal::service('path.alias_storage')->delete(array('source' => $amp_path));
 }
