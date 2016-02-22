@@ -6,10 +6,13 @@
  */
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\file\Entity\File;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Template\Attribute;
 
 /**
  * Implements hook_help().
@@ -59,9 +62,51 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
  * Implements hook_theme().
  */
 function amp_theme() {
-  $theme = [];
+  $theme = [
+    'amp_video' => array(
+      'variables' => array('file' => NULL, 'description' => NULL, 'schema' => NULL, 'attributes' => array()),
+    ),
+    'amp_iframe' => array(
+      'variables' => array('iframe' => NULL),
+    ),
+    'amp_ad' => array(
+      'variables' => array('type' => NULL, 'attributes' => array()),
+    ),
+  ];
 
   return $theme;
+}
+
+/**
+ * Prepares variables for amp video templates.
+ *
+ * Default template: amp-video.html.twig.
+ *
+ * @param array $variables
+ *   An associative array containing:
+ *   - file: A file object to which the link will be created.
+ *   - attributes: An associative array of attributes to be placed on the
+ *     amp-video tag.
+ */
+function template_preprocess_amp_video(&$variables) {
+  $file = $variables['file'];
+  $file_entity = ($file instanceof File) ? $file : File::load($file->fid);
+  $variables['src'] = file_create_url($file_entity->getFileUri());
+
+  // amp-video can only be displayed if the src for the video is https.
+  $variables['scheme'] = \Drupal::service('file_system')->uriScheme($file_entity->getFileUri());
+
+  // Create attributes object.
+  $variables['attributes'] = new Attribute($variables['attributes']);
+
+  // Use the description as the title text if available.
+  if (empty($variables['description'])) {
+    $title_text = $file_entity->getFilename();
+  }
+  else {
+    $title_text = $variables['description'];
+  }
+  $variables['attributes']['title'] = $title_text;
 }
 
 /**

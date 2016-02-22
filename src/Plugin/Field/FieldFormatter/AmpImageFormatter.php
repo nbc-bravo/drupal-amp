@@ -25,23 +25,6 @@ use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
  */
 class AmpImageFormatter extends ImageFormatter {
 
-  /**
-   * {@inheritdoc}
-   */
-  public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = parent::viewElements($items, $langcode);
-
-    foreach ($elements as $delta => $element) {
-      $elements[$delta]['#item_attributes']['layout'] = $this->getSetting('amp_layout');
-      if ($this->getSetting('amp_layout') == 'fixed-height') {
-        $elements[$delta]['#item_attributes']['height'] = $this->getSetting('amp_fixed_height');
-        $elements[$delta]['#item_attributes']['width'] = 'auto';
-      }
-    }
-
-    return $elements;
-  }
-
  /**
    * {@inheritdoc}
    */
@@ -81,7 +64,7 @@ class AmpImageFormatter extends ImageFormatter {
           array('value' => 'fixed-height'))
       ),
       '#size' => 10,
-      '#default_value' => 0,
+      '#default_value' => $this->getSetting('amp_fixed_height'),
     );
 
     return $element;
@@ -98,6 +81,10 @@ class AmpImageFormatter extends ImageFormatter {
     $layout_setting = $this->getSetting('amp_layout');
     if (isset($layout_options[$layout_setting])) {
       $summary[] = t('Layout: @setting', array('@setting' => $layout_options[$layout_setting]));
+
+      if ($layout_options[$layout_setting] === 'fixed-height') {
+        $summary[] = t('Fixed height: @height', array('@height' => $this->getSetting('amp_fixed_height')));
+      }
     }
 
     return $summary;
@@ -115,5 +102,23 @@ class AmpImageFormatter extends ImageFormatter {
       'fill' => 'fill',
       'container' => 'container',
     ];
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
+  public function viewElements(FieldItemListInterface $items, $langcode) {
+    $elements = parent::viewElements($items, $langcode);
+
+    foreach ($elements as $delta => $element) {
+      $elements[$delta]['#item_attributes']['layout'] = $this->getSetting('amp_layout');
+      if ($this->getSetting('amp_layout') == 'fixed-height') {
+        $elements[$delta]['#item_attributes']['height'] = $this->getSetting('amp_fixed_height');
+        $elements[$delta]['#item_attributes']['width'] = 'auto';
+      }
+    }
+
+    return $elements;
   }
 }
