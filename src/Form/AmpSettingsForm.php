@@ -234,26 +234,49 @@ class AmpSettingsForm extends ConfigFormBase {
         $changes = array_filter($node_types);
       }
       foreach ($changes as $bundle => $value) {
-        // Get a list of view modes for the bundle.
-        $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $bundle);
-        // For nodes that have added AMP versions, create the AMP view mode.
         if (!empty($value)) {
+          // Get a list of view modes for the bundle.
+          $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $bundle);
           if (!isset($view_modes['amp'])) {
+            // Create the AMP view mode.
             if (\Drupal\Core\Entity\Entity\EntityViewDisplay::create(array(
                 'targetEntityType' => 'node',
                 'bundle' => $bundle,
                 'mode' => 'amp',
               ))->setStatus(TRUE)->save()) {
-              drupal_set_message(t('The content type <strong>!bundle</strong> is now AMP enabled.', array('!bundle' => $bundle)), 'status');
+              drupal_set_message(t('The content type <strong>@bundle</strong> is now AMP enabled.', array('@bundle' => $bundle)), 'status');
+
+              // Update logic only after view mode is created, but before
+              // before aliases are created.
+              $amp_config->setData(['node_types' => $node_types])->save();
+
+              // If the view move is created, create AMP path aliases for all
+              // existing content with path aliases.
+              $nids = \Drupal::entityQuery('node')->condition('type', $bundle)->execute();
+              $entities = \Drupal\node\Entity\Node::loadMultiple($nids);
+              foreach ($entities as $entity) {
+                amp_create_amp_alias($entity);
+                drupal_set_message(t('An AMP alias has been created for all @bundle content with an existing path alias.', array('@bundle' => $bundle)), 'status');
+              }
             }
           }
         }
         elseif (\Drupal::configFactory()->getEditable('core.entity_view_display.node.' . $bundle . '.amp')->delete()) {
-          drupal_set_message(t('The content type <strong>!bundle</strong> is no longer AMP enabled.', array('!bundle' => $bundle)), 'status');
+          drupal_set_message(t('The content type <strong>@bundle</strong> is no longer AMP enabled.', array('@bundle' => $bundle)), 'status');
+
+          // Update configuration to match the view mode. 
+          $amp_config->setData(['node_types' => $node_types])->save();
+
+          // Delete all AMP aliases for this content type.
+          $nids = \Drupal::entityQuery('node')->condition('type', $bundle)->execute();
+          $entities = \Drupal\node\Entity\Node::loadMultiple($nids);
+          foreach ($entities as $entity) {
+            amp_delete_amp_alias($entity);
+            drupal_set_message(t('All @bundle AMP aliases have been deleted', array('@bundle' => $bundle)), 'status');
+          }
         }
       }
 
-      $amp_config->setData(['node_types' => $node_types])->save();
 
       $amptheme = $form_state->getValue('amptheme');
       $amptheme_config = $this->config('amp.theme');
