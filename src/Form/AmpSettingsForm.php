@@ -277,7 +277,6 @@ class AmpSettingsForm extends ConfigFormBase {
         }
       }
 
-
       $amptheme = $form_state->getValue('amptheme');
       $amptheme_config = $this->config('amp.theme');
       $amptheme_config->setData(['amptheme' => $amptheme]);
@@ -291,6 +290,11 @@ class AmpSettingsForm extends ConfigFormBase {
       $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
       $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
       $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
+
+      // For now, we use the bazooka approach to make sure everything from
+      // cached nodes to link tags are rebuilt.
+      // TODO: determine if we can be more selective.
+      drupal_flush_all_caches();
 
       parent::submitForm($form, $form_state);
     }
