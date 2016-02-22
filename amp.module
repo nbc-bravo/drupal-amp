@@ -122,9 +122,13 @@ function amp_entity_delete(EntityInterface $entity) {
  * Helper function to create an alias.
  */
 function amp_create_amp_alias(EntityInterface $entity) {
-  $path = '/' . Url::fromRoute('<current>')->getInternalPath();
+  if (!$entity->hasLinkTemplate('canonical')) {
+    dpm('no canon');
+    return;
+  }
+  dpm('canon');
+  $path = '/' . $entity->toUrl()->getInternalPath();
   $langcode = $entity->language()->getId();
-
   // First check to see if there is an alias for the node.
   if ($alias = \Drupal::service('path.alias_storage')->lookupPathAlias($path, $langcode)) {
 
@@ -144,6 +148,6 @@ function amp_create_amp_alias(EntityInterface $entity) {
  * Helper function to delete an alias.
  */
 function amp_delete_amp_alias(EntityInterface $entity) {
-  $amp_path = '/' . Url::fromRoute('<current>')->getInternalPath() . "/amp";
+  $amp_path = '/' . $entity->toUrl()->getInternalPath() . "/amp";
   \Drupal::service('path.alias_storage')->delete(array('source' => $amp_path));
 }
