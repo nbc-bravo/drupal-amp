@@ -63,18 +63,54 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
  */
 function amp_theme() {
   $theme = [
-    'amp_video' => array(
-      'variables' => array('file' => NULL, 'description' => NULL, 'schema' => NULL, 'attributes' => array()),
-    ),
-    'amp_iframe' => array(
-      'variables' => array('iframe' => NULL),
-    ),
-    'amp_ad' => array(
-      'variables' => array('type' => NULL, 'attributes' => array()),
-    ),
+    'amp_video' => [
+      'variables' => [
+        'file' => NULL,
+        'description' => NULL,
+        'schema' => NULL,
+        'attributes' => []
+      ],
+    ],
+    'amp_iframe' => [
+      'variables' => [
+        'iframe' => NULL
+      ],
+    ],
+    'amp_ad' => [
+      'variables' => [
+        'type' => NULL, 'attributes' => []
+      ],
+    ],
+    'amp_analytics' => [
+      'variables' => [
+        'account' => NULL,
+        'attributes' => []
+      ]
+    ]
   ];
 
   return $theme;
+}
+
+/**
+ * Implements hook_page_bottom for page bottom.
+ */
+function amp_page_bottom(array &$page_bottom) {
+
+  $amp_context = \Drupal::service('router.amp_context');
+  if ($amp_context->isAmpRoute()) {
+    $google_analytics_id = \Drupal::config('amp.settings')->get('google_analytics_id');
+    if (!empty($google_analytics_id)) {
+      $amp_analytics = [
+        '#type' => 'amp_analytics',
+        '#attributes' => [
+          'type' => 'googleanalytics'
+        ],
+        '#account' => $google_analytics_id
+      ];
+      $page_bottom['amp_analytics'] = $amp_analytics;
+    }
+  }
 }
 
 /**
