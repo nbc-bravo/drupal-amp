@@ -123,10 +123,8 @@ function amp_entity_delete(EntityInterface $entity) {
  */
 function amp_create_amp_alias(EntityInterface $entity) {
   if (!$entity->hasLinkTemplate('canonical')) {
-    dpm('no canon');
     return;
   }
-  dpm('canon');
   $path = '/' . $entity->toUrl()->getInternalPath();
   $langcode = $entity->language()->getId();
   // First check to see if there is an alias for the node.

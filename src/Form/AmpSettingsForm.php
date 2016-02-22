@@ -246,6 +246,10 @@ class AmpSettingsForm extends ConfigFormBase {
               ))->setStatus(TRUE)->save()) {
               drupal_set_message(t('The content type <strong>@bundle</strong> is now AMP enabled.', array('@bundle' => $bundle)), 'status');
 
+              // Update logic only after view mode is created, but before
+              // before aliases are created.
+              $amp_config->setData(['node_types' => $node_types])->save();
+
               // If the view move is created, create AMP path aliases for all
               // existing content with path aliases.
               $nids = \Drupal::entityQuery('node')->condition('type', $bundle)->execute();
@@ -259,6 +263,10 @@ class AmpSettingsForm extends ConfigFormBase {
         }
         elseif (\Drupal::configFactory()->getEditable('core.entity_view_display.node.' . $bundle . '.amp')->delete()) {
           drupal_set_message(t('The content type <strong>@bundle</strong> is no longer AMP enabled.', array('@bundle' => $bundle)), 'status');
+
+          // Update configuration to match the view mode. 
+          $amp_config->setData(['node_types' => $node_types])->save();
+
           // Delete all AMP aliases for this content type.
           $nids = \Drupal::entityQuery('node')->condition('type', $bundle)->execute();
           $entities = \Drupal\node\Entity\Node::loadMultiple($nids);
@@ -269,7 +277,6 @@ class AmpSettingsForm extends ConfigFormBase {
         }
       }
 
-      $amp_config->setData(['node_types' => $node_types])->save();
 
       $amptheme = $form_state->getValue('amptheme');
       $amptheme_config = $this->config('amp.theme');
