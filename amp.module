@@ -318,6 +318,8 @@ function amp_entity_delete(EntityInterface $entity) {
 
 /**
  * Helper function to create an alias.
+ * TODO: Consider moving amp_create_amp_alias and amp_delete_amp_alias functions
+ * to their own class and determine how that might affect the D7 module.
  */
 function amp_create_amp_alias(EntityInterface $entity) {
   if ($entity instanceof EntityViewDisplay || !$entity->hasLinkTemplate('canonical')) {
