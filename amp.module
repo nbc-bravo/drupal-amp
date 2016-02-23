@@ -275,14 +275,14 @@ function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_
     return;
   }
 
-	// Add another option to go to the AMP page after saving.
-	$form['actions']['save_view_amp'] = array(
-	  '#type' => 'submit',
+  // Add another option to go to the AMP page after saving.
+  $form['actions']['save_view_amp'] = array(
+    '#type' => 'submit',
     '#value' => t('Save and view AMP page'),
     '#submit' => array('::submitForm', '::save'),
     '#access' => TRUE,
-		'#dropbutton' => "save"
-	);
+    '#dropbutton' => "save"
+  );
 
 	// Add a submit handler to redirect to the AMP page.
   $form['actions']['save_view_amp']['#submit'][] = 'amp_node_form_submit';
