@@ -292,10 +292,10 @@ function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_
 * Submit handler for viewing the AMP page.
 */
 function amp_node_form_submit(&$form, FormStateInterface $form_state) {
-	$path = $form_state->getValue('path');
-	// Redirect to the alias if it exists, otherwise use the node URL.
-	$url = !empty($path[0]['alias']) ? $path[0]['alias'] : $path[0]['source'];
-	$amp_path = $url . "/amp";
+  $path = $form_state->getValue('path');
+  // Redirect to the alias if it exists, otherwise use the node URL.
+  $url = !empty($path[0]['alias']) ? $path[0]['alias'] : $path[0]['source'];
+  $amp_path = $url . "/amp";
   $response = new RedirectResponse($amp_path);
   $response->send();
 }
