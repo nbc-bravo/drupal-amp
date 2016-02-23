@@ -40,6 +40,9 @@ class AmpIframeFormatter extends TextDefaultFormatter {
       $element['#type'] = 'amp_iframe';
       $amp->loadHtml($element['#text']);
       $element['#text'] = $amp->convertToAmpHtml();
+      if (!empty($amp->getComponentJs())) {
+        $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
+      }
     }
     $amp->clear();
     return $elements;
