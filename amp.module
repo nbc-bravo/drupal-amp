@@ -14,6 +14,7 @@ use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Template\Attribute;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Implements hook_help().
@@ -274,6 +275,29 @@ function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_
     return;
   }
 
+	// Add another option to go to the AMP page after saving.
+	$form['actions']['save_view_amp'] = array(
+	  '#type' => 'submit',
+    '#value' => t('Save and view AMP page'),
+    '#submit' => array('::submitForm', '::save'),
+    '#access' => TRUE,
+		'#dropbutton' => "save"
+	);
+
+	// Add a submit handler to redirect to the AMP page.
+  $form['actions']['save_view_amp']['#submit'][] = 'amp_node_form_submit';
+}
+
+/**
+* Submit handler for viewing the AMP page.
+*/
+function amp_node_form_submit(&$form, FormStateInterface $form_state) {
+	$path = $form_state->getValue('path');
+	// Redirect to the alias if it exists, otherwise use the node URL.
+	$url = !empty($path[0]['alias']) ? $path[0]['alias'] : $path[0]['source'];
+	$amp_path = $url . "/amp";
+  $response = new RedirectResponse($amp_path);
+  $response->send();
 }
 
 /**
