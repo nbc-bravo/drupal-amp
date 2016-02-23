@@ -164,16 +164,16 @@ class AmpSettingsForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('amp-pixel domain name'),
       '#default_value' => $amp_config->get('amp_pixel_domain_name'),
-      '#description' => $this->t('A simple URL to send a GET request to when the tracking pixel is loaded.'),
+      '#description' => $this->t('The domain name where the tracking pixel will be loaded: do not include http or https.'),
       '#states' => array('visible' => array(
         ':input[name="amp_pixel"]' => array('checked' => TRUE))
       ),
     );
     $form['pixel_group']['amp_pixel_query_string'] = array(
       '#type' => 'textfield',
-      '#title' => $this->t('amp-pixel query string'),
+      '#title' => $this->t('amp-pixel query path'),
       '#default_value' => $amp_config->get('amp_pixel_query_string'),
-      '#description' => $this->t('The amp-pixel allows all standard URL variable substitutions.'),
+      '#description' => $this->t('The path at the domain where the GET request will be received, e.g. "pixel" in example.com/pixel?RANDOM.'),
       '#states' => array('visible' => array(
         ':input[name="amp_pixel"]' => array('checked' => TRUE))
       ),
