@@ -44,14 +44,14 @@ class AmpTextFormatter extends TextDefaultFormatter {
     foreach ($elements as &$element) {
       $amp->loadHtml($element['#text']);
       $element['#text'] = $amp->convertToAmpHtml() . '<div class="warnings">'. $warning_title . '<strong></strong>' . $amp->warningsHuman() . '</div>';
-      // This does not seem to return results.
-      // $components = $amp->getComponentJs();
+      if (!empty($amp->getComponentJs())) {
+        $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
+      }
     }
 
     $amp->clear();
     return $elements;
   }
-
 }
 
 
