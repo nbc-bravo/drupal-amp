@@ -9,8 +9,6 @@ namespace Drupal\amp\Plugin\Field\FieldFormatter;
 
 use Drupal\text\Plugin\Field\FieldFormatter\TextDefaultFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
-use Lullabot\AMP\AMP;
-use Drupal;
 
 /**
  * Plugin implementation of the 'amp_iframe' formatter.
@@ -32,19 +30,21 @@ class AmpIframeFormatter extends TextDefaultFormatter {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $amp_service = Drupal::getContainer()->get('amp.utilities');
-    $amp = $amp_service->getAMPConverter();
-    $elements = parent::viewElements($items, $langcode);
+    $elements = array();
 
-    foreach ($elements as &$element) {
-      $element['#type'] = 'amp_iframe';
-      $amp->loadHtml($element['#text']);
-      $element['#text'] = $amp->convertToAmpHtml();
-      if (!empty($amp->getComponentJs())) {
-        $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
-      }
+    // The ProcessedText element already handles cache context & tag bubbling.
+    // @see \Drupal\filter\Element\ProcessedText::preRenderText()
+    // The AmpIframe text element extends that to pass #markup through the
+    // amp library for processing an iframe into an amp-iframe.
+    foreach ($items as $delta => $item) {
+      $elements[$delta] = array(
+        '#type' => 'amp_iframe',
+        '#text' => $item->value,
+        '#format' => $item->format,
+        '#langcode' => $item->getLangcode(),
+      );
     }
-    $amp->clear();
+
     return $elements;
   }
 
