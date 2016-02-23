@@ -34,7 +34,11 @@ function amp_help($route_name, RouteMatchInterface $route_match) {
  * Implements hook_entity_view_alter().
  */
 function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
-  if ($entity->getEntityType()->id() == 'node') {
+
+  // Git a list of available view modes for the current entity.
+  $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $entity->bundle());
+
+  if ($entity->getEntityType()->id() == 'node' && isset($view_modes['amp'])) {
     if (!empty($build['#attached']['html_head_link'])) {
       foreach ($build['#attached']['html_head_link'] as $key => $config) {
         if ($build['#view_mode'] == 'amp') {
