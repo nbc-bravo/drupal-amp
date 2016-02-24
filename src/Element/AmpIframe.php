@@ -8,6 +8,7 @@
 namespace Drupal\amp\Element;
 
 use Drupal\filter\Element\ProcessedText;
+use Lullabot\AMP\AMP;
 
 /**
  * Provides a render element for an iframe rendered as an amp-iframe.
@@ -47,8 +48,20 @@ class AmpIframe extends ProcessedText {
    * Pre-render callback: Attaches the amp-iframe library and required markup.
    */
   public static function preRenderAmpIframe($element) {
+
+    /** @var Drupal\amp\AMPService $amp_service */
+    $amp_service = \Drupal::getContainer()->get('amp.utilities');
+    /** @var AMP $amp */
+    $amp = $amp_service->getAMPConverter();
+
+    $amp->loadHtml($element['#markup']);
+    $element['#markup'] = $amp->convertToAmpHtml();
+
     $element['#attached']['library'][] = 'amp/amp.iframe';
     $element['#iframe'] = $element['#markup'];
+
+    $amp->clear();
+
     return $element;
   }
 }

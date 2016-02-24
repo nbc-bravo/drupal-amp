@@ -8,11 +8,13 @@
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Template\Attribute;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Implements hook_help().
@@ -264,6 +266,45 @@ function template_preprocess_amp_video(&$variables) {
 /**
 * Implements hook_form_BASE_FORM_ID_alter().
 */
+function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  // Check if the content is AMP enabled.
+  $amp_types = \Drupal::config('amp.settings')->get('node_types');
+  $type = $form_state->getStorage()['form_display']->getTargetBundle();
+  if ($amp_types[$type] !== $type) {
+    return;
+  }
+
+  // Add another option to go to the AMP page after saving.
+  $form['actions']['save_view_amp'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save and view AMP page'),
+    '#submit' => array('::submitForm', '::save'),
+    '#access' => TRUE,
+    '#dropbutton' => "save"
+  );
+
+	// Add a submit handler to redirect to the AMP page.
+  $form['actions']['save_view_amp']['#submit'][] = 'amp_node_form_submit';
+}
+
+/**
+* Submit handler for viewing the AMP page.
+*/
+function amp_node_form_submit(&$form, FormStateInterface $form_state) {
+  $path = $form_state->getValue('path');
+  // Redirect to the alias if it exists, otherwise use the node URL.
+  $url = !empty($path[0]['alias']) ? $path[0]['alias'] : $path[0]['source'];
+  if (isset($url)) {
+    $amp_path = $url . "/amp";
+    $response = new RedirectResponse($amp_path);
+    $response->send();
+  }
+}
+
+/**
+* Implements hook_form_BASE_FORM_ID_alter().
+*/
 function amp_form_node_type_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $enabled = \Drupal::config('amp.settings')->get('node_types');
   $node_type = $form['type']['#default_value'];
@@ -317,12 +358,14 @@ function amp_entity_delete(EntityInterface $entity) {
 
 /**
  * Helper function to create an alias.
+ * TODO: Consider moving amp_create_amp_alias and amp_delete_amp_alias functions
+ * to their own class and determine how that might affect the D7 module.
  */
 function amp_create_amp_alias(EntityInterface $entity) {
-  if (!$entity->hasLinkTemplate('canonical')) {
+  if ($entity instanceof EntityViewDisplay || !$entity->hasLinkTemplate('canonical')) {
     return;
   }
-  $path = '/' . $entity->toUrl()->getInternalPath();
+  $path = '/' . $entity->toUrl('canonical')->getInternalPath();
   $langcode = $entity->language()->getId();
   // First check to see if there is an alias for the node.
   if ($alias = \Drupal::service('path.alias_storage')->lookupPathAlias($path, $langcode)) {
@@ -343,6 +386,9 @@ function amp_create_amp_alias(EntityInterface $entity) {
  * Helper function to delete an alias.
  */
 function amp_delete_amp_alias(EntityInterface $entity) {
-  $amp_path = '/' . $entity->toUrl()->getInternalPath() . "/amp";
+  if ($entity instanceof EntityViewDisplay || !$entity->hasLinkTemplate('canonical')) {
+    return;
+  }
+  $amp_path = '/' . $entity->toUrl('canonical')->getInternalPath() . "/amp";
   \Drupal::service('path.alias_storage')->delete(array('source' => $amp_path));
 }

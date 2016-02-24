@@ -9,8 +9,6 @@ namespace Drupal\amp\Plugin\Field\FieldFormatter;
 
 use Drupal\text\Plugin\Field\FieldFormatter\TextDefaultFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
-use Lullabot\AMP\AMP;
-use Drupal;
 
 /**
  * Plugin implementation of the 'amp_text' formatter.
@@ -32,24 +30,21 @@ class AmpTextFormatter extends TextDefaultFormatter {
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = parent::viewElements($items, $langcode);
+    $elements = array();
 
-    /** @var Drupal\amp\AMPService $amp_service */
-    $amp_service = Drupal::getContainer()->get('amp.utilities');
-    $warning_title = '<strong>(For debugging purposes only. These warnings are for the body text of the node and will not ' .
-        'appear in production version of module. Developers will still be able to see this in a smart way, yet not implemented)</strong>';
-    /** @var AMP $amp */
-    $amp = $amp_service->getAMPConverter();
-
-    foreach ($elements as &$element) {
-      $amp->loadHtml($element['#text']);
-      $element['#text'] = $amp->convertToAmpHtml() . '<div class="warnings">'. $warning_title . '<strong></strong>' . $amp->warningsHuman() . '</div>';
-      if (!empty($amp->getComponentJs())) {
-        $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
-      }
+    // The ProcessedText element already handles cache context & tag bubbling.
+    // @see \Drupal\filter\Element\ProcessedText::preRenderText()
+    // The AmpProcessed text element extends that to pass #markup through the
+    // amp library for processing markup into AMP HTML.
+    foreach ($items as $delta => $item) {
+      $elements[$delta] = array(
+        '#type' => 'amp_processed_text',
+        '#text' => $item->value,
+        '#format' => $item->format,
+        '#langcode' => $item->getLangcode(),
+      );
     }
 
-    $amp->clear();
     return $elements;
   }
 }
