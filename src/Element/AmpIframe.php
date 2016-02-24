@@ -56,9 +56,11 @@ class AmpIframe extends ProcessedText {
 
     $amp->loadHtml($element['#markup']);
     $element['#markup'] = $amp->convertToAmpHtml();
+    $element['#iframe'] = [
+      '#markup' => t($element['#markup'])
+    ];
 
-    $element['#attached']['library'][] = 'amp/amp.iframe';
-    $element['#iframe'] = $element['#markup'];
+    $element['#iframe']['#attached']['library'][] = 'amp/amp.iframe';
 
     $amp->clear();
 
