@@ -67,7 +67,7 @@ class AmpContext {
     // Load the current node.
     $node = $this->routeMatch->getParameter('node');
     // If we only got back the node ID, load the node.
-    if (!is_object($node)) {
+    if (!is_object($node) && is_numeric($node)) {
       $node = \Drupal\node\Entity\Node::load($node);
     }
     // Check if we have a node. Will not be true on admin pages for example.
