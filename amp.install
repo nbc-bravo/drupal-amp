@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Implements hook_requirements().
+ */
+function amp_requirements($phase) {
+  $requirements = [];
+  if ($phase == 'install' || $phase == 'runtime') {
+    if (!class_exists('\Lullabot\AMP\AMP')) {
+      $requirements['amp_library'] = [
+        'title' => t('AMP'),
+        'description' => t('The AMP module requires the PHP <a href="@library">AMP library</a>.', ['@library' => 'https://github.com/Lullabot/amp-library']),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+  }
+  return $requirements;
+}
