@@ -15,9 +15,6 @@ use Lullabot\AMP\AMP;
  * @package Drupal\amp
  */
 class AMPService  {
-  /** @var AMP */
-  protected $amp;
-
   // amp-analytics maps to the amp/amp.analytics library (and so forth) but it could be anything arbitrary in the future
   // This is why we're being extremely explicit. We're not going to employ any tricks to convert amp-xyz to amp/amp.xyz
   protected $library_names = [
@@ -46,12 +43,27 @@ class AMPService  {
       'template' => 'amp/amp.template', // exception to the above pattern
   ];
 
-  public function __construct() {
-    $this->amp = new AMP();
+  /**
+   * @deprecated
+   * This method is deprecated. It is exactly the same as self::createAMPConverter which is better named and
+   * indicates a new AMP object is being created and returned.
+   *
+   * Previously we were re-using the AMP object in the AMPService class and kept returning that. Now AMP object creation
+   * has been made sufficiently cheap and we can simply create a new one each time.
+   *
+   * @return AMP
+   */
+  public function getAMPConverter() {
+    return new AMP();
   }
 
-  public function getAMPConverter() {
-    return $this->amp;
+  /**
+   * Use this method instead of self::getAMPConverter()
+   *
+   * @return AMP
+   */
+  public function createAMPConverter() {
+    return new AMP();
   }
 
   /**
