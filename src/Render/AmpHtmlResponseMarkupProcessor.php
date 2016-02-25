@@ -53,7 +53,7 @@ class AmpHtmlResponseMarkupProcessor {
    */
   public function __construct(AMPService $amp_library_service) {
     $this->ampService = $amp_library_service;
-    $this->ampConverter = $this->ampService->getAMPConverter();
+    $this->ampConverter = $this->ampService->createAMPConverter();
   }
 
   /**

@@ -28,7 +28,7 @@ class AMPTestLibrary extends ControllerBase {
    * {@inheritdoc}
    */
   public function __construct(AMPService $amp_utilities) {
-    $this->amp = $amp_utilities->getAMPConverter();
+    $this->amp = $amp_utilities->createAMPConverter();
   }
 
   /**

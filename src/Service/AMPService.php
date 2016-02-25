@@ -50,7 +50,7 @@ class AMPService  {
     $this->amp = new AMP();
   }
 
-  public function getAMPConverter() {
+  public function createAMPConverter() {
     return $this->amp;
   }
 

@@ -54,7 +54,7 @@ class AmpIframe extends ProcessedText {
     /** @var AMPService $amp_service */
     $amp_service = \Drupal::getContainer()->get('amp.utilities');
     /** @var AMP $amp */
-    $amp = $amp_service->getAMPConverter();
+    $amp = $amp_service->createAMPConverter();
 
     $amp->loadHtml($element['#markup']);
     $element['#markup'] = $amp->convertToAmpHtml();
