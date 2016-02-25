@@ -64,8 +64,6 @@ class AmpIframe extends ProcessedText {
 
     $element['#iframe']['#attached']['library'][] = 'amp/amp.iframe';
 
-    $amp->clear();
-
     return $element;
   }
 }

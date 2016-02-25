@@ -51,8 +51,6 @@ class AmpProcessedText extends ProcessedText {
       $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
     }
 
-    $amp->clear();
-
     return $element;
   }
 }
