@@ -56,8 +56,6 @@ class AMPTestLibrary extends ControllerBase {
     $this->amp->loadHtml($html);
     $this->amp->convertToAmpHtml();
     $diff = $this->amp->getInputOutputHtmlDiff();
-    // Clear any state on the amp object; this is optional but good to clean up.
-    $this->amp->clear();
     return [
         '#type' => 'markup',
         '#markup' => "<pre>$diff</pre>" . $this->amp->warningsHuman()
