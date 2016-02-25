@@ -9,7 +9,7 @@ namespace Drupal\amp\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\amp\AMPService;
+use Drupal\amp\Service\AMPService;
 
 /**
  * Class AMPTestLibrary.
@@ -21,14 +21,14 @@ class AMPTestLibrary extends ControllerBase {
   /**
    * Drupal\amp\AMPService definition.
    *
-   * @var Drupal\amp\AMPService
+   * @var AMPService
    */
   protected $amp;
   /**
    * {@inheritdoc}
    */
   public function __construct(AMPService $amp_utilities) {
-    $this->amp = $amp_utilities->getAMPConverter();
+    $this->amp = $amp_utilities->createAMPConverter();
   }
 
   /**
@@ -60,8 +60,6 @@ class AMPTestLibrary extends ControllerBase {
         '#type' => 'markup',
         '#markup' => "<pre>$diff</pre>" . $this->amp->warningsHuman()
     ];
-    // Clear any state on the amp object; this is optional but good to clean up.
-    $this->amp->clear();
   }
 
 }

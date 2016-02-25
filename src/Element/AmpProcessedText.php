@@ -9,6 +9,7 @@ namespace Drupal\amp\Element;
 
 use Drupal\filter\Element\ProcessedText;
 use Lullabot\AMP\AMP;
+use Drupal\amp\Service\AMPService;
 
 /**
  * Provides an amp-processed text render element.
@@ -39,18 +40,16 @@ class AmpProcessedText extends ProcessedText {
    */
   public static function preRenderAmpText($element) {
 
-    /** @var Drupal\amp\AMPService $amp_service */
+    /** @var AMPService $amp_service */
     $amp_service = \Drupal::getContainer()->get('amp.utilities');
     /** @var AMP $amp */
-    $amp = $amp_service->getAMPConverter();
+    $amp = $amp_service->createAMPConverter();
 
     $amp->loadHtml($element['#markup']);
     $element['#markup'] = $amp->convertToAmpHtml();
     if (!empty($amp->getComponentJs())) {
       $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
     }
-
-    $amp->clear();
 
     return $element;
   }
