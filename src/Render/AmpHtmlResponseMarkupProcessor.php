@@ -9,6 +9,7 @@ namespace Drupal\amp\Render;
 
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\amp\Service\AMPService;
+use Lullabot\AMP\Validate\Scope;
 
 /**
  * Processes markup of HTML responses.
@@ -78,7 +79,7 @@ class AmpHtmlResponseMarkupProcessor {
     // Get a reference to the content.
     $this->content = $response->getContent();
 
-    $this->ampConverter->loadHtml($this->content);
+    $this->ampConverter->loadHtml($this->content, ['scope' => Scope::HTML_SCOPE]);
     $this->ampContent = $this->ampConverter->convertToAmpHtml();
 
     // Return the processed content.
