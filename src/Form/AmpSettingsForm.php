@@ -188,6 +188,11 @@ class AmpSettingsForm extends ConfigFormBase {
       ),
     );
 
+    $form['test_page'] = array(
+      '#type' => 'item',
+      '#markup' => t('<a href="/admin/amp/library/test">Test that AMP is configured properly</a>'),
+    );
+
     return parent::buildForm($form, $form_state);
   }
 
