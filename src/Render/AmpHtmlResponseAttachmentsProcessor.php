@@ -156,7 +156,7 @@ class AmpHtmlResponseAttachmentsProcessor implements AttachmentsResponseProcesso
         // Do not optimize JS.
         $optimize_js = FALSE;
         list($js_assets_header, $js_assets_footer) = $this->assetResolver->getJsAssets($assets, $optimize_js);
-        $variables['scripts'] = $this->jsCollectionRenderer->render($js_assets_footer);
+        $variables['scripts'] = $this->jsCollectionRenderer->render($js_assets_header);
       }
     }
     else {
