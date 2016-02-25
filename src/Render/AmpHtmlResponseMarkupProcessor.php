@@ -81,10 +81,11 @@ class AmpHtmlResponseMarkupProcessor {
 
     $this->ampConverter->loadHtml($this->content, ['scope' => Scope::HTML_SCOPE]);
     $this->ampContent = $this->ampConverter->convertToAmpHtml();
+
     // @todo this is for debugging only. We need to have a better way to check for validation issues though.
     // $this->ampContent .= "<--! FULL DOCUMENT VALIDATION\n " . $this->ampConverter->warningsHumanText() . "-->";
+
     // Return the processed content.
-    // TODO: Uncomment once library is returning full html document.
     // $response->setContent($this->ampContent);
 
     return $response;
