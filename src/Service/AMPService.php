@@ -15,9 +15,6 @@ use Lullabot\AMP\AMP;
  * @package Drupal\amp
  */
 class AMPService  {
-  /** @var AMP */
-  protected $amp;
-
   // amp-analytics maps to the amp/amp.analytics library (and so forth) but it could be anything arbitrary in the future
   // This is why we're being extremely explicit. We're not going to employ any tricks to convert amp-xyz to amp/amp.xyz
   protected $library_names = [
@@ -46,12 +43,15 @@ class AMPService  {
       'template' => 'amp/amp.template', // exception to the above pattern
   ];
 
-  public function __construct() {
-    $this->amp = new AMP();
-  }
-
+  /**
+   * This is your starting point.
+   * Its cheap to create AMP objects now.
+   * Just create a new one every time you're asked for it.
+   *
+   * @return AMP
+   */
   public function createAMPConverter() {
-    return $this->amp;
+    return new AMP();
   }
 
   /**
