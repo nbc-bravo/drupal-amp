@@ -58,7 +58,7 @@ class AMPTestLibrary extends ControllerBase {
     $diff = $this->amp->getInputOutputHtmlDiff();
     return [
         '#type' => 'markup',
-        '#markup' => "<pre>$diff</pre>" . $this->amp->warningsHuman()
+        '#markup' => "<pre>$diff" .  $this->amp->warningsHumanHtml() . "</pre>"
     ];
   }
 
