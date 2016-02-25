@@ -29,27 +29,44 @@ use Drupal;
  */
 class AmpTextTrimmedFormatter extends TextTrimmedFormatter {
   /**
+   * Exactly like TextTrimmedFormatter except
+   * '#type' => 'processed_text' was changed to:
+   * '#type' => 'amp_processed_text'
+   *
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
-    $elements = parent::viewElements($items, $langcode);
+    $elements = array();
 
-    /** @var Drupal\amp\AMPService $amp_service */
-    $amp_service = Drupal::getContainer()->get('amp.utilities');
-    $warning_title = '<strong>(For debugging purposes only. These warnings are for the body text of the node and will not ' .
-        'appear in production version of module. Developers will still be able to see this in a smart way, yet not implemented)</strong>';
-    /** @var AMP $amp */
-    $amp = $amp_service->getAMPConverter();
+    $render_as_summary = function (&$element) {
+      // Make sure any default #pre_render callbacks are set on the element,
+      // because text_pre_render_summary() must run last.
+      $element += \Drupal::service('element_info')->getInfo($element['#type']);
+      // Add the #pre_render callback that renders the text into a summary.
+      $element['#pre_render'][] = '\Drupal\text\Plugin\field\FieldFormatter\TextTrimmedFormatter::preRenderSummary';
+      // Pass on the trim length to the #pre_render callback via a property.
+      $element['#text_summary_trim_length'] = $this->getSetting('trim_length');
+    };
 
-    foreach ($elements as &$element) {
-      $amp->loadHtml($element['#text']);
-      $element['#text'] = $amp->convertToAmpHtml() . '<div class="warnings">'. $warning_title . '<strong></strong>' . $amp->warningsHuman() . '</div>';
-      if (!empty($amp->getComponentJs())) {
-        $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
+    // The ProcessedText element already handles cache context & tag bubbling.
+    // @see \Drupal\filter\Element\ProcessedText::preRenderText()
+    foreach ($items as $delta => $item) {
+      $elements[$delta] = array(
+          '#type' => 'amp_processed_text',
+          '#text' => NULL,
+          '#format' => $item->format,
+          '#langcode' => $item->getLangcode(),
+      );
+
+      if ($this->getPluginId() == 'text_summary_or_trimmed' && !empty($item->summary)) {
+        $elements[$delta]['#text'] = $item->summary;
+      }
+      else {
+        $elements[$delta]['#text'] = $item->value;
+        $render_as_summary($elements[$delta]);
       }
     }
 
-    $amp->clear();
     return $elements;
   }
 }
