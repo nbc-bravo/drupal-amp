@@ -46,7 +46,7 @@ class AmpProcessedText extends ProcessedText {
     $amp = $amp_service->createAMPConverter();
 
     $amp->loadHtml($element['#markup']);
-    $element['#markup'] = $amp->convertToAmpHtml();
+    $element['#markup'] = $amp->convertToAmpHtml() . "<pre>" . $amp->warningsHumanHtml() . "</pre>";
     if (!empty($amp->getComponentJs())) {
       $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
     }
