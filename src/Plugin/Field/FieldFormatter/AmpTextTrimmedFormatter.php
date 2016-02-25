@@ -33,6 +33,8 @@ class AmpTextTrimmedFormatter extends TextTrimmedFormatter {
    * '#type' => 'processed_text' was changed to:
    * '#type' => 'amp_processed_text'
    *
+   * and 'text_summary_or_trimmed' was changed to 'amp_text_summary_or_trimmed'
+   *
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
@@ -58,7 +60,7 @@ class AmpTextTrimmedFormatter extends TextTrimmedFormatter {
           '#langcode' => $item->getLangcode(),
       );
 
-      if ($this->getPluginId() == 'text_summary_or_trimmed' && !empty($item->summary)) {
+      if ($this->getPluginId() == 'amp_text_summary_or_trimmed' && !empty($item->summary)) {
         $elements[$delta]['#text'] = $item->summary;
       }
       else {
