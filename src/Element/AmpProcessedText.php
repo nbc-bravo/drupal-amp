@@ -41,13 +41,11 @@ class AmpProcessedText extends ProcessedText {
 
     /** @var Drupal\amp\AMPService $amp_service */
     $amp_service = \Drupal::getContainer()->get('amp.utilities');
-    $warning_title = '<strong>(For debugging purposes only. These warnings are for the body text of the node and will not ' .
-      'appear in production version of module. Developers will still be able to see this in a smart way, yet not implemented)</strong>';
     /** @var AMP $amp */
     $amp = $amp_service->getAMPConverter();
 
     $amp->loadHtml($element['#markup']);
-    $element['#markup'] = $amp->convertToAmpHtml() . '<div class="warnings">'. $warning_title . '<strong></strong>' . $amp->warningsHuman() . '</div>';
+    $element['#markup'] = $amp->convertToAmpHtml();
     if (!empty($amp->getComponentJs())) {
       $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
     }
