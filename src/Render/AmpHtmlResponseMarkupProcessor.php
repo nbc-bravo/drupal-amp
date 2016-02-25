@@ -86,7 +86,7 @@ class AmpHtmlResponseMarkupProcessor {
     // $this->ampContent .= "<--! FULL DOCUMENT VALIDATION\n " . $this->ampConverter->warningsHumanText() . "-->";
 
     // Return the processed content.
-    $response->setContent($this->ampContent);
+    // $response->setContent($this->ampContent);
 
     return $response;
   }
