@@ -79,8 +79,9 @@ class AmpHtmlResponseMarkupProcessor {
     // Get a reference to the content.
     $this->content = $response->getContent();
 
-    $this->ampConverter->loadHtml($this->content, ['scope' => Scope::HTML_SCOPE]);
-    $this->ampContent = $this->ampConverter->convertToAmpHtml();
+    // Disable this feature for now. We also dont want to run the converter.
+    //$this->ampConverter->loadHtml($this->content, ['scope' => Scope::HTML_SCOPE]);
+    //$this->ampContent = $this->ampConverter->convertToAmpHtml();
 
     // @todo this is for debugging only. We need to have a better way to check for validation issues though.
     // $this->ampContent .= "<--! FULL DOCUMENT VALIDATION\n " . $this->ampConverter->warningsHumanText() . "-->";
