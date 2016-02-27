@@ -250,4 +250,3 @@ amp.template:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-mustache-0.1.js: { type: external, minified: true, attributes: { custom-template: "amp-mustache", async: true } }
->>>>>>> D8
