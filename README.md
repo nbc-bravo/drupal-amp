@@ -32,6 +32,24 @@ for Publisher ad networks, but additional network support is forthcoming.
 Support for additional [extended components](https://www.ampproject.org/docs/reference/extended.html) is forthcoming.
 
 
+## Module Architecture Overview
+
+The module will be responsible for the basic functionality of providing an AMP version of Drupal pages. It will:
+
+- Create an AMP view mode, so users can identify which fields in which order should be displayed on the AMP version of a page.
+- Create an AMP route, which will display the AMP view mode on an AMP path (i.e. node/1/amp).
+- Create AMP formatters for common fields, like text, image, video, and iframe that can be used in the AMP view mode to display AMP-compatible markup for those fields.
+- Create AMP ad blocks that can be placed by the theme.
+- The theme can place AMP pixel items in the page markup where appropriate, based on the configuration options.
+- Create an AMP configuration page where users can identify which ad and analytics systems to use, and identify which theme is the AMP theme.
+- Create a way for users to identify which content types should provide AMP pages, and a way to override individual nodes to prevent them from being displayed as AMP pages (to use for odd pages that wouldn’t transform correctly).
+- Make sure that paths that should not work as AMP pages generate 404s instead of broken pages.
+- Make sure that aliased paths work correctly, so if node/1 has an alias of my-page, node/1/amp has an alias of my-page/amp.
+- Create a system so the user can preview the AMP page.
+
+The body field presents a special problem, since it is likely to contain lots of invalid markup, especially embedded images, videos, tweets, and iframes. There is no easy way to convert a blob of text with invalid markup into AMP-compatible markup. At the same time, this is a common problem that other projects will run into. Our solution is to create a separate, stand-alone, [AMP PHP Library](https://github.com/Lullabot/amp-library) to transform that markup, as best it can, from non-compliant HTML to AMP HTML. The AMP formatter for the body will use that library to render the body in the AMP view mode.
+
+
 ## Current maintainers:
 
 - Matthew Tift - https://www.drupal.org/u/mtift
