@@ -8,8 +8,8 @@
 namespace Drupal\amp\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Entity\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Entity\EntityManager;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\node\Controller\NodeViewController;
 
@@ -20,11 +20,7 @@ use Drupal\node\Controller\NodeViewController;
  */
 class ampPage extends ControllerBase {
 
-  /**
-   * Drupal\Core\Entity\EntityManager definition.
-   *
-   * @var Drupal\Core\Entity\EntityManager
-   */
+  /** @var EntityManagerInterface  */
   protected $entity_manager;
 
   /**
@@ -37,7 +33,7 @@ class ampPage extends ControllerBase {
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityManager $entity_manager, RendererInterface $renderer) {
+  public function __construct(EntityManagerInterface $entity_manager, RendererInterface $renderer) {
     $this->entity_manager = $entity_manager;
     $this->renderer = $renderer;
   }
