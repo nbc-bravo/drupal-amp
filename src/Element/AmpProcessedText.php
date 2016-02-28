@@ -32,7 +32,37 @@ class AmpProcessedText extends ProcessedText {
         array($class, 'preRenderText'),
         array($class, 'preRenderAmpText'),
       ),
+      '#cache' => [
+        'tags' => ['amp-warnings'],
+        // This should be bubbling up but its not
+        // Instead we have to place the #cache setting in src/Controller/ampPage
+        'context' => ['url.query_args:warnfix'],
+      ]
     );
+  }
+
+  /**
+   * Does the user want to see AMP Library warnings?
+   *
+   * @return bool
+   */
+  public static function warningsOn()
+  {
+    // First check the config if library warnings are on
+    $amp_config = self::configFactory()->get('amp.settings');
+    if ($amp_config->get('amp_library_warnings_display')) {
+      return true;
+    }
+
+    // Then check the URL if library warnings are enabled
+    /** @var Request $request */
+    $request = \Drupal::request();
+    $user_wants_amp_library_warnings = $request->get('warnfix');
+    if (isset($user_wants_amp_library_warnings)) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -46,7 +76,13 @@ class AmpProcessedText extends ProcessedText {
     $amp = $amp_service->createAMPConverter();
 
     $amp->loadHtml($element['#markup']);
-    $element['#markup'] = $amp->convertToAmpHtml() . "<pre>" . $amp->warningsHumanHtml() . "</pre>";
+    $element['#markup'] = $amp->convertToAmpHtml();
+    $warning_message = "<pre>" . $amp->warningsHumanHtml() . "</pre></div>";
+
+    if (self::warningsOn()) {
+      $element['#markup'] .= $warning_message;
+    }
+
     if (!empty($amp->getComponentJs())) {
       $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
     }

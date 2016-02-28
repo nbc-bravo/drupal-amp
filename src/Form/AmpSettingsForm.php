@@ -7,12 +7,12 @@
 
 namespace Drupal\amp\Form;
 
+use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Drupal\node\Entity\NodeType;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -33,6 +33,9 @@ class AmpSettingsForm extends ConfigFormBase {
    * @array $themeOptions
    */
   private $themeOptions;
+
+  /** @var CacheTagsInvalidatorInterface */
+  protected $tagInvalidate;
 
   /**
    * {@inheritdoc}
@@ -80,11 +83,12 @@ class AmpSettingsForm extends ConfigFormBase {
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ThemeHandlerInterface $theme_handler) {
+  public function __construct(ConfigFactoryInterface $config_factory, ThemeHandlerInterface $theme_handler, CacheTagsInvalidatorInterface $tag_invalidate) {
     parent::__construct($config_factory);
 
     $this->themeHandler = $theme_handler;
     $this->themeOptions = $this->getThemeOptions();
+    $this->tagInvalidate = $tag_invalidate;
   }
 
   /**
@@ -93,7 +97,8 @@ class AmpSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('theme_handler')
+      $container->get('theme_handler'),
+      $container->get('cache_tags.invalidator')
     );
   }
 
@@ -191,6 +196,13 @@ class AmpSettingsForm extends ConfigFormBase {
     $form['test_page'] = array(
       '#type' => 'item',
       '#markup' => t('<a href="/admin/amp/library/test">Test that AMP is configured properly</a>'),
+    );
+
+    $form['amp_library_warnings_display'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('<em>Debugging</em>: Show AMP Library warnings in all AMP text formatters for all users'),
+      '#default_value' => $amp_config->get('amp_library_warnings_display'),
+      '#description' => $this->t('If you only want to see AMP formatter specific warning for one node add query "warnfix" at end of a node url. e.g. <strong>node/12345/amp?warnfix</strong>'),
     );
 
     return parent::buildForm($form, $form_state);
@@ -295,6 +307,13 @@ class AmpSettingsForm extends ConfigFormBase {
       $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
       $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
       $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
+
+      // This piece of code is redundant because of the drupal_flush_all_caches() below
+      // But its an attempt to be more fine grained and will be useful once drupal_flush_all_caches() call is removed
+      if ($form_state->getValue('amp_library_warnings_display') !== $amp_config->get('amp_library_warnings_display')) {
+        $amp_config->set('amp_library_warnings_display', $form_state->getValue('amp_library_warnings_display'))->save();
+        $this->tagInvalidate->invalidateTags(['amp-warnings']);
+      }
 
       // For now, we use the bazooka approach to make sure everything from
       // cached nodes to link tags are rebuilt.
