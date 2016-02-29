@@ -1,5 +1,0 @@
-name: Accelerated Mobile Pages
-type: module
-description: Make your Drupal site ready for <a href="https://www.ampproject.org">Accelerated Mobile Pages</a>.
-core: 8.x
-package: Other
