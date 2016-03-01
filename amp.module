@@ -19,8 +19,46 @@ function amp_help($path, $arg) {
 }
 
 /**
-* Implements hook_entity_info_alter().
-*/
+ * Implements hook_menu().
+ */
+function amp_menu() {
+  $items = array();
+  $items['admin/config/content/amp'] = array(
+    'title' => 'Configure the AMP module',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('amp_admin'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+  return $items;
+}
+
+/**
+ * Page callbak: Displays AMP configuration options.
+ *
+ * @see amp_menu().
+ */
+function amp_admin() {
+  $form = array();
+
+  // Test link and Notices
+  $form['test_page'] = array(
+    '#type' => 'item',
+    '#markup' => t('<a href="@url">Test that AMP is configured properly</a>', array('@url' => '/admin/amp/library/test')),
+  );
+  $form['amp_library_warnings_display'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('<em>debugging</em>: show amp library warnings in all amp text formatters for all users'),
+    '#default_value' => variable_get('amp_library_warnings_display'),
+    '#description' => t('if you only want to see amp formatter specific warning for one node add query "warnfix" at end of a node url. e.g. <strong>node/12345/amp?warnfix</strong>'),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ */
 function amp_entity_info_alter(&$entity_info) {
   $entity_info['node']['view modes']['amp'] = array(
     'label' => t('AMP'),
