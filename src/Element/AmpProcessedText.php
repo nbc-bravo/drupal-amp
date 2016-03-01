@@ -36,7 +36,7 @@ class AmpProcessedText extends ProcessedText {
         'tags' => ['amp-warnings'],
         // This should be bubbling up but its not
         // Instead we have to place the #cache setting in src/Controller/ampPage
-        'context' => ['url.query_args:warnfix'],
+        // 'context' => ['url.query_args:warnfix'],
       ]
     );
   }

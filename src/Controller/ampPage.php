@@ -7,11 +7,13 @@
 
 namespace Drupal\amp\Controller;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\node\Controller\NodeViewController;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Class ampPage.
@@ -30,12 +32,16 @@ class ampPage extends ControllerBase {
    */
   protected $renderer;
 
+  /** @var ConfigFactoryInterface $configFactory */
+  protected $configFactory;
+
   /**
    * {@inheritdoc}
    */
-  public function __construct(EntityManagerInterface $entity_manager, RendererInterface $renderer) {
+  public function __construct(EntityManagerInterface $entity_manager, RendererInterface $renderer, ConfigFactoryInterface $configFactoryInterface) {
     $this->entity_manager = $entity_manager;
     $this->renderer = $renderer;
+    $this->configFactory = $configFactoryInterface;
   }
 
   /**
@@ -44,8 +50,28 @@ class ampPage extends ControllerBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
-      $container->get('renderer')
+      $container->get('renderer'),
+      $container->get('config.factory')
     );
+  }
+
+  public function warningsOn()
+  {
+    // First check the config if library warnings are on
+    $amp_config = $this->configFactory->get('amp.settings');
+    if ($amp_config->get('amp_library_warnings_display')) {
+      return true;
+    }
+
+    // Then check the URL if library warnings are enabled
+    /** @var Request $request */
+    $request = \Drupal::request();
+    $user_wants_amp_library_warnings = $request->get('warnfix');
+    if (isset($user_wants_amp_library_warnings)) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -74,8 +100,15 @@ class ampPage extends ControllerBase {
     }
 
     // Otherwise adding a ?warnfix query parameter at the end of URL will have no effect
-    $page['#cache'] = ['contexts' => ['url.query_args:warnfix']];
+    $page['#cache']['contexts'] = Cache::mergeContexts($page['#cache']['contexts'], ['url.query_args:warnfix']);
+    if ($this->warningsOn()) {
+      $page['#cache']['keys'][] = 'amp-warnings-on';
+    }
+    else {
+      $page['#cache']['keys'][] = 'amp-warnings-off';
+    }
 
+    // @todo is this required?
     unset($page['nodes'][$node->id()]['#cache']);
     return $page;
   }
