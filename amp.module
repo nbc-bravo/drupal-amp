@@ -17,3 +17,13 @@ function amp_help($path, $arg) {
       return $output;
   }
 }
+
+/**
+* Implements hook_entity_info_alter().
+*/
+function amp_entity_info_alter(&$entity_info) {
+  $entity_info['node']['view modes']['amp'] = array(
+    'label' => t('AMP'),
+    'custom settings' => FALSE,
+  );
+}
