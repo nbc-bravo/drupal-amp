@@ -24,7 +24,8 @@ function amp_help($path, $arg) {
 function amp_menu() {
   $items = array();
   $items['admin/config/content/amp'] = array(
-    'title' => 'Configure the AMP module',
+    'title' => 'AMP Configuration',
+    'description' => 'Configure the AMP module',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('amp_admin_form'),
     'access arguments' => array('administer site configuration'),
