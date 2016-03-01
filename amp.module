@@ -46,3 +46,50 @@ function amp_entity_info_alter(&$entity_info) {
     'custom settings' => FALSE,
   );
 }
+
+/**
+ * Determines whether a request should return amp HTML.
+ *
+ */
+function amp_is_amp_request() {
+
+  // Get current path.
+  $path = current_path();
+
+  // Get current URL.
+  $current_url = url(current_path(), array('absolute' => TRUE));
+
+  // Check if URL ends with '/amp'
+  if (stripos(strrev($current_url), strrev('/amp')) === 0) {
+    // Get system path.
+    $system_path = drupal_lookup_path('source', $path);
+
+    // Load menu item based on system path.
+    $menu_item = menu_get_item($system_path ? $system_path : current_path());
+
+    if($menu_item && isset($menu_item['page_arguments'][0])) {
+      // Load node
+      $node = $menu_item['page_arguments'][0];
+
+      // Get node type.
+      $node_type = node_type_get_type($node);
+
+      // Get view mode settings for node type.
+      $view_mode_settings = field_view_mode_settings('node', $node_type->type);
+      if (isset($view_mode_settings['amp']) && $view_mode_settings['amp']['custom_settings']) {
+        return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_custom_theme().
+ */
+function amp_custom_theme() {
+  if (amp_is_amp_request()) {
+    return 'ampsubtheme_example';
+  }
+}
