@@ -5,27 +5,15 @@
  * Contains amp.module.
  */
 
-use Drupal\Core\Routing\RouteMatchInterface;
-
 /**
  * Implements hook_help().
  */
-function amp_help($route_name, RouteMatchInterface $route_match) {
-  switch ($route_name) {
-    // Main module help for the amp module.
-    case 'help.page.amp':
+function amp_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#amp':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Make your Drupal site ready for &lt;a href=&quot;https://www.ampproject.org&quot;&gt;Accelerated Mobile Pages&lt;/a&gt;.') . '</p>';
+      $output .= '<p>' . t('Google AMP integration') . '</p>';
       return $output;
-
-    default:
   }
-}
-
-/**
- * Implements hook_page_attachments().
- */
-function amp_page_attachments(array &$page) {
-  $page['#attached']['library'][] = 'amp/amp';
 }

@@ -1,9 +1,0 @@
-amp:
-  remote: https://www.ampproject.org/
-  version: 0
-  license:
-    name: Apache 2.0
-    url: https://github.com/ampproject/amphtml/blob/master/LICENSE
-    gpl-compatible: true
-  js:
-    https://cdn.ampproject.org/v0.js: { type: external, minified: true }
