@@ -75,7 +75,9 @@ function amp_is_amp_request() {
       $node_type = node_type_get_type($node);
 
       // Get view mode settings for node type.
-      $view_mode_settings = field_view_mode_settings('node', $node_type->type);
+      if ($node_type) {
+        $view_mode_settings = field_view_mode_settings('node', $node_type->type);
+      }
       if (isset($view_mode_settings['amp']) && $view_mode_settings['amp']['custom_settings']) {
         return TRUE;
       }
