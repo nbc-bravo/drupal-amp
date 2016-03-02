@@ -48,7 +48,7 @@ function amp_entity_info_alter(&$entity_info) {
 }
 
 /**
- * Determines whether a request should return amp HTML.
+ * Determines whether a request should return AMP HTML.
  *
  */
 function amp_is_amp_request() {
@@ -67,8 +67,8 @@ function amp_is_amp_request() {
     // Load menu item based on system path.
     $menu_item = menu_get_item($system_path ? $system_path : current_path());
 
-    if($menu_item && isset($menu_item['page_arguments'][0])) {
-      // Load node
+    if ($menu_item && isset($menu_item['page_arguments'][0])) {
+      // Load the node.
       $node = $menu_item['page_arguments'][0];
 
       // Get node type.
