@@ -121,9 +121,12 @@ function amp_admin_form_validate($form, &$form_state) {
  * Helper function to get available theme options.
  */
 function _amp_get_theme_options() {
+  // Get system_sort_theme_by_info_name from system.admin.inc
+  module_load_include('inc', 'system', 'system.admin');
+
   // Get all available themes.
   $themes = system_rebuild_theme_data();
-  uasort($themes, '_amp_sort_theme_by_info_name');
+  uasort($themes, 'system_sort_modules_by_info_name');
   $theme_options = array();
 
   foreach ($themes as &$theme) {
@@ -139,11 +142,4 @@ function _amp_get_theme_options() {
   }
 
   return $theme_options;
-}
-
-/**
- * Array sorting callback; sorts themes by their name.
- */
-function _amp_sort_theme_by_info_name($a, $b) {
-  return strcasecmp($a->info['name'], $b->info['name']);
 }

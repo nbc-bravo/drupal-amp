@@ -91,7 +91,7 @@ function amp_is_amp_request() {
  */
 function amp_custom_theme() {
   if (amp_is_amp_request()) {
-    return variable_get('amp_theme');
+    return variable_get('amp_theme', 'ampsubtheme_example')
   }
 }
 
