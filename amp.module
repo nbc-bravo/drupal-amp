@@ -92,6 +92,6 @@ function amp_is_amp_request() {
  */
 function amp_custom_theme() {
   if (amp_is_amp_request()) {
-    return 'ampsubtheme_example';
+    return variable_get('amp_theme');
   }
 }

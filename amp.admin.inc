@@ -14,6 +14,14 @@
  */
 function amp_admin_form($form, &$form_state) {
   $form = array();
+  // AMP theme settings.
+  $form['amp_theme'] = array(
+    '#type' => 'select',
+    '#options' => _amp_get_theme_options(),
+    '#title' => t('AMP theme'),
+    '#description' => t('Choose a theme to use for AMP pages.'),
+    '#default_value' => variable_get('amp_theme', 'ampsubtheme_example'),
+  );
   $form['amp_google_analytics_id'] = array(
     '#title' => t('Google Analytics Web Property ID'),
     '#type' => 'textfield',
@@ -107,4 +115,35 @@ function amp_admin_form_validate($form, &$form_state) {
       form_set_error('amp_google_adsense_id', t('A valid Google AdSense Publisher ID is case sensitive and formatted like pub-9999999999999'));
     }
   }
+}
+
+/**
+ * Helper function to get available theme options.
+ */
+function _amp_get_theme_options() {
+  // Get all available themes.
+  $themes = system_rebuild_theme_data();
+  uasort($themes, '_amp_sort_theme_by_info_name');
+  $theme_options = array();
+
+  foreach ($themes as &$theme) {
+    // Do not show hidden themes.
+    if (!empty($theme->info['hidden'])) {
+      continue;
+    }
+
+    // Do not show disabled themes.
+    if (!empty($theme->status)) {
+      $theme_options[$theme->name] = $theme->info['name'];
+    }
+  }
+
+  return $theme_options;
+}
+
+/**
+ * Array sorting callback; sorts themes by their name.
+ */
+function _amp_sort_theme_by_info_name($a, $b) {
+  return strcasecmp($a->info['name'], $b->info['name']);
 }
