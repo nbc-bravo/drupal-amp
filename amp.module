@@ -37,6 +37,111 @@ function amp_menu() {
   return $items;
 }
 
+/**
+ * Implements hook_theme().
+ */
+function amp_theme() {
+  $theme =  array(
+    'amp_pixel' => array(
+      'variables' => array(
+        'domain' => NULL,
+        'query_string' => NULL,
+        'subs' => array(
+          'AMPDOC_HOST' => array(
+            'active' => FALSE
+          ),
+          'AMPDOC_URL' => array(
+            'active' => FALSE
+          ),
+          'CANONICAL_HOST' => array(
+            'active' => FALSE
+          ),
+          'CANONICAL_PATH' => array(
+            'active' => FALSE
+          ),
+          'CANONICAL_URL' => array(
+            'active' => FALSE
+          ),
+          'SOURCE_URL' => array(
+            'active' => FALSE
+          ),
+          'SOURCE_HOST' => array(
+            'active' => FALSE
+          ),
+          'DOCUMENT_CHARSET' => array(
+            'active' => FALSE
+          ),
+          'DOCUMENT_REFERRER' => array(
+            'active' => FALSE
+          ),
+          'TITLE' => array(
+            'active' => FALSE
+          ),
+          'VIEWER' => array(
+            'active' => FALSE
+          ),
+          'CONTENT_LOAD_TIME' => array(
+            'active' => FALSE
+          ),
+          'DOMAIN_LOOKUP_TIME' => array(
+            'active' => FALSE
+          ),
+          'DOM_INTERACTIVE_TIME' => array(
+            'active' => FALSE
+          ),
+          'PAGE_DOWNLOAD_TIME' => array(
+            'active' => FALSE
+          ),
+          'PAGE_LOAD_TIME' => array(
+            'active' => FALSE
+          ),
+          'REDIRECT_TIME' => array(
+            'active' => FALSE
+          ),
+          'SERVER_RESPONSE_TIME' => array(
+            'active' => FALSE
+          ),
+          'TCP_CONNECT_TIME' => array(
+            'active' => FALSE
+          ),
+          'AVAILABLE_SCREEN_HEIGHT' => array(
+            'active' => FALSE
+          ),
+          'AVAILABLE_SCREEN_WIDTH' => array(
+            'active' => FALSE
+          ),
+          'BROWSER_LANGUAGE' => array(
+            'active' => FALSE
+          ),
+          'SCREEN_COLOR_DEPTH' => array(
+            'active' => FALSE
+          ),
+          'VIEWPORT_HEIGHT' => array(
+            'active' => FALSE
+          ),
+          'VIEWPORT_WIDTH' => array(
+            'active' => FALSE
+          ),
+          'PAGE_VIEW_ID' => array(
+            'active' => FALSE
+          ),
+          'RANDOM' => array(
+            'active' => FALSE
+          ),
+          'TIMESTAMP' => array(
+            'active' => FALSE
+          ),
+          'TOTAL_ENGAGED_TIME' => array(
+            'active' => FALSE
+          )
+        )
+      ),
+      'template' => 'amp-pixel'
+    )
+  );
+
+  return $theme;
+}
 
 
 /**
@@ -109,8 +214,8 @@ function amp_entity_view_mode_alter(&$view_mode, $context) {
 }
 
 /**
-* Implements hook_form_BASE_FORM_ID_alter().
-*/
+ * Implements hook_form_BASE_FORM_ID_alter().
+ */
 function amp_form_node_form_alter(&$form, &$form_state, $form_id) {
   $view_mode_settings = field_view_mode_settings('node', $form_state['node']->type);
   // For content type with an AMP view mode, add a "Save and view AMP" button.
@@ -253,5 +358,35 @@ function amp_delete_amp_alias($entity) {
     if (isset($amp_alias) && $amp_alias != $path . '/amp') {
       path_delete(array('alias' => $amp_alias));
     }
+  }
+}
+
+/**
+ * Implements hook_page_alter().
+ */
+function amp_page_alter(array &$page) {
+  if (amp_is_amp_request() && variable_get('amp_pixel')) {
+    $domain = variable_get('amp_pixel_domain_name');
+    $query_string = variable_get('amp_pixel_query_string');
+    $subs_random = FALSE;
+
+    if (!empty($domain) && !empty($query_string)) {
+      $subs_random = variable_get('amp_pixel_random_number');
+    }
+
+    $subs = array(
+      'RANDOM' => array(
+        'active' => $subs_random ? TRUE : FALSE
+      )
+    );
+
+    $amp_pixel = array(
+      '#theme' => 'amp_pixel',
+      '#domain' => $domain,
+      '#query_string' => $query_string,
+      '#subs' => $subs
+    );
+
+    $page['page_bottom'][] = $amp_pixel;
   }
 }
