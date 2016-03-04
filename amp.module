@@ -125,13 +125,48 @@ function amp_form_node_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
-* Submit handler for viewing the AMP page.
-*/
+ * Submit handler for viewing the AMP page.
+ */
 function amp_node_form_submit(&$form, $form_state) {
   if (!empty($form_state['node']->path['alias'])) {
     drupal_goto($form_state['node']->path['alias'] . '/amp');
   }
   elseif (!empty($form_state['node']->path['source'])) {
     drupal_goto($form_state['node']->path['source'] . '/amp');
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function amp_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'field_ui_display_overview_form') {
+    $form['#submit'][] = 'amp_view_modes_submit';
+  }
+}
+
+/**
+ * Submit handler for enabling or disabling AMP view modes.
+ */
+function amp_view_modes_submit(&$form, $form_state) {
+  $new_values = array();
+  $old_values = array();
+  if (isset($form_state['values']['view_modes_custom'])) {
+    $new_values = array_filter($form_state['values']['view_modes_custom']);
+  }
+  if (isset($form_state['complete form']['modes']['view_modes_custom']['#default_value'])) {
+    $old_values = $form_state['complete form']['modes']['view_modes_custom']['#default_value'];
+  }
+  $removed = array_diff($old_values, $new_values);
+  $added = array_diff($new_values, $old_values);
+  if (is_array($remove) && in_array('amp', $removed)) {
+    // TODO: Remove aliases per https://www.drupal.org/node/2678294.
+    // If the AMP view was removed, clear cache of AMP-enabled content.
+    cache_clear_all('amp_enabled_types', 'cache');
+  }
+  if (is_array($added) && in_array('amp', $added)) {
+    // TODO: Create aliases per https://www.drupal.org/node/2678294.
+    // If the AMP view was added, clear cache of AMP-enabled content.
+    cache_clear_all('amp_enabled_types', 'cache');
   }
 }

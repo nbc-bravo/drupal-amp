@@ -14,6 +14,11 @@
  */
 function amp_admin_form($form, &$form_state) {
   $form = array();
+  $form['amp_content_amp_status'] = array(
+    '#title' => 'AMP Status by Content Type',
+    '#theme' => 'item_list',
+    '#items' => amp_get_formatted_status_list(),
+  );
   // AMP theme settings.
   $form['amp_theme'] = array(
     '#type' => 'select',
@@ -142,4 +147,54 @@ function _amp_get_theme_options() {
   }
 
   return $theme_options;
+}
+
+/**
+ * Helper function to retrieve a list of AMP-enabled content types.
+ */
+function amp_get_enabled_types() {
+  $enabled_types = &drupal_static(__FUNCTION__);
+  if (!isset($enabled_types)) {
+    if ($cache = cache_get('amp_enabled_types')) {
+      $enabled_types = $cache->data;
+    }
+    else {
+      $node_types = array_keys(node_type_get_names());
+      foreach ($node_types as $node_type) {
+        $view_mode_settings = field_view_mode_settings('node', $node_type);
+        if (isset($view_mode_settings['amp']) && $view_mode_settings['amp']['custom_settings']) {
+          $enabled_types[] = $node_type;
+        }
+      }
+      cache_set('amp_enabled_types', $enabled_types, 'cache');
+    }
+  }
+  return $enabled_types;
+}
+
+/**
+ * Helper function to retrieve a formatted list of AMP-enabled content types.
+ */
+function amp_get_formatted_status_list() {
+  $enabled_types = null !== amp_get_enabled_types() ? amp_get_enabled_types() : array();
+  $node_types = node_type_get_names();
+  $node_status_list = array();
+  foreach ($node_types as $bundle => $label) {
+    $configure = t('/admin/structure/types/manage/@bundle/display/amp?destination=/admin/config/content/amp', array('@bundle' => $bundle));
+    $enable_disable = t('/admin/structure/types/manage/@bundle/display?destination=/admin/config/content/amp', array('@bundle' => $bundle));
+    if (in_array($bundle, $enabled_types)) {
+      $node_status_list[] = $label .
+        t(' is <em>enabled</em>: <a href="@configure">Configure AMP view mode</a> or <a href="@enable_disable">Disable AMP display</a>', array(
+          '@configure' => $configure,
+          '@enable_disable' => $enable_disable,
+        ));
+    }
+    else {
+      $node_status_list[] = $label .
+        t(' is <em>disabled</em>: <a href="@enable_disable">Enable AMP in Custom Display Settings</a>', array(
+          '@enable_disable' => $enable_disable,
+        ));
+    }
+  }
+  return $node_status_list;
 }
