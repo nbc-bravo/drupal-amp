@@ -68,8 +68,10 @@
         {% set src = src ~ 'lang=' ~ activeSub %}
       {% elseif activeSub == 'SCREEN_COLOR_DEPTH' %}
         {% set src = src ~ 'colorDepth=' ~ activeSub %}
-      {% elseif activeSub == 'REDIRECT_TIME' %}
-        {% set src = src ~ 'redirectTime=' ~ activeSub %}
+      {% elseif activeSub == 'VIEWPORT_HEIGHT' %}
+        {% set src = src ~ 'viewportHeight=' ~ activeSub %}
+        {% elseif activeSub == 'VIEWPORT_WIDTH' %}
+          {% set src = src ~ 'viewportWidth=' ~ activeSub %}
       {% elseif activeSub == 'PAGE_VIEW_ID' %}
         {% set src = src ~ activeSub %}
       {% elseif activeSub == 'RANDOM' %}

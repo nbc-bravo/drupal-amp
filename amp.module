@@ -167,6 +167,12 @@ function amp_theme() {
           'SCREEN_COLOR_DEPTH' => [
             'active' => FALSE
           ],
+          'VIEWPORT_HEIGHT' => [
+            'active' => FALSE
+          ],
+          'VIEWPORT_WIDTH' => [
+            'active' => FALSE
+          ],
           'PAGE_VIEW_ID' => [
             'active' => FALSE
           ],
