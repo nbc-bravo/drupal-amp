@@ -450,3 +450,17 @@ function amp_page_alter(array &$page) {
     }
   }
 }
+
+/**
+ * Implements hook_entity_view_alter().
+ */
+function amp_entity_view_alter(&$build, $type) {
+  $enabled_types = amp_get_enabled_types();
+  // Show amphtml links on AMP-enabled nodes so search engines can find AMP.
+  if ($type == 'node' && in_array($build['#bundle'], $enabled_types)) {
+    if ($build['#view_mode'] == 'full') {
+      $path = '/' . drupal_get_path_alias('node/' . $build['#node']->nid) . "/amp";
+      drupal_add_html_head_link(array('rel' => 'amphtml', 'href' => $path), TRUE);
+    }
+  }
+}
