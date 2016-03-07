@@ -42,6 +42,13 @@ function amp_menu() {
  */
 function amp_theme() {
   $theme =  array(
+    'amp_analytics' => array(
+      'variables' => array(
+        'account' => NULL,
+        'attributes' => array()
+      ),
+      'template' => 'amp-analytics'
+    ),
     'amp_pixel' => array(
       'variables' => array(
         'domain' => NULL,
@@ -143,6 +150,45 @@ function amp_theme() {
   return $theme;
 }
 
+/**
+ * Implements hook_element_info().
+ */
+function amp_element_info() {
+  // AMP Analytics element
+  $types['amp_analytics'] = array(
+    '#account' => NULL,
+    '#attributes' => [],
+    '#pre_render' => array('amp_pre_render_amp_analytics'),
+    '#theme' => 'amp_analytics',
+  );
+
+  return $types;
+}
+
+/**
+ * #pre_render callback to render amp_analytics with js library added to head.
+ *
+ * @param $elements
+ *   A render array for amp analytics elements.
+ *
+ * @return
+ *   The passed-in element with the js library necessary for the amp-analytics
+ *   element added to head.
+ */
+function amp_pre_render_amp_analytics($element) {
+  $head_js = array(
+    '#tag' => 'script',
+    '#type' => 'html_tag',
+    '#attributes' => array(
+      'src' => 'https://cdn.ampproject.org/v0/amp-analytics-0.1.js',
+      'async' => "async",
+      'custom-element' => 'amp-analytics'
+    ),
+  );
+  drupal_add_html_head($head_js, 'amp-analytics');
+
+  return $element;
+}
 
 /**
  * Implements hook_entity_info_alter().
@@ -365,28 +411,42 @@ function amp_delete_amp_alias($entity) {
  * Implements hook_page_alter().
  */
 function amp_page_alter(array &$page) {
-  if (amp_is_amp_request() && variable_get('amp_pixel')) {
-    $domain = variable_get('amp_pixel_domain_name');
-    $query_string = variable_get('amp_pixel_query_string');
-    $subs_random = FALSE;
-
-    if (!empty($domain) && !empty($query_string)) {
-      $subs_random = variable_get('amp_pixel_random_number');
+  if (amp_is_amp_request()) {
+    $google_analytics_id = variable_get('amp_google_analytics_id');
+    if (!empty($google_analytics_id)) {
+      $amp_analytics = array(
+        '#type' => 'amp_analytics',
+        '#attributes' => array(
+          'type' => 'googleanalytics'
+        ),
+        '#account' => $google_analytics_id
+      );
+      $page['page_bottom']['amp_analytics'] = $amp_analytics;
     }
 
-    $subs = array(
-      'RANDOM' => array(
-        'active' => $subs_random ? TRUE : FALSE
-      )
-    );
+    if (variable_get('amp_pixel')) {
+      $domain = variable_get('amp_pixel_domain_name');
+      $query_string = variable_get('amp_pixel_query_string');
+      $subs_random = FALSE;
 
-    $amp_pixel = array(
-      '#theme' => 'amp_pixel',
-      '#domain' => $domain,
-      '#query_string' => $query_string,
-      '#subs' => $subs
-    );
+      if (!empty($domain) && !empty($query_string)) {
+        $subs_random = variable_get('amp_pixel_random_number');
+      }
 
-    $page['page_bottom'][] = $amp_pixel;
+      $subs = array(
+        'RANDOM' => array(
+          'active' => $subs_random ? TRUE : FALSE
+        )
+      );
+
+      $amp_pixel = array(
+        '#theme' => 'amp_pixel',
+        '#domain' => $domain,
+        '#query_string' => $query_string,
+        '#subs' => $subs
+      );
+
+      $page['page_bottom']['amp_pixel'] = $amp_pixel;
+    }
   }
 }
