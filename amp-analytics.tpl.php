@@ -6,13 +6,13 @@
  *
  * Available variables:
  * - account: The analytics account ID.
- * - attributes: The HTML attributes for amp-analytics, primarily:
+ * - analytics_attributes: The HTML attributes for amp-analytics, primarily:
  *   - type: The type of analytics account.
  *
  * @see template_preprocess_amp_analytics()
  */
 ?>
-<amp-analytics <?php print $attributes; ?>>
+<amp-analytics <?php print $analytics_attributes; ?>>
 <script type="application/json">
   {
     "vars": {
