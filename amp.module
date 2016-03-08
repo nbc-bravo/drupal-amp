@@ -42,6 +42,16 @@ function amp_menu() {
  */
 function amp_theme() {
   $theme =  array(
+    'amp_ad' => array(
+      'variables' => array(
+        'adtype' => NULL,
+        'height' => NULL,
+        'width' => NULL,
+        'slot_attributes' => NULL,
+        'slot_attributes_array' => array()
+      ),
+      'template' => 'amp-ad'
+    ),
     'amp_analytics' => array(
       'variables' => array(
         'account' => NULL,
@@ -148,6 +158,13 @@ function amp_theme() {
   );
 
   return $theme;
+}
+
+/**
+ * Implements hook_preprocess_amp_ad().
+ */
+function amp_preprocess_amp_ad(&$variables) {
+  $variables['slot_attributes'] = drupal_attributes($variables['slot_attributes_array']);
 }
 
 /**
@@ -566,14 +583,14 @@ function amp_block_view($delta = '') {
       $height = variable_get('amp_google_adsense_block_height', '');
       $data_ad_slot = variable_get('amp_google_adsense_block_data_ad_slot', '');
       if (!empty($width) && !empty($height) && !empty($data_ad_slot)) {
-        $block['content'] = array(
-          'message' => array(
-            '#type' => 'markup',
-            '#markup' => t('Height: @height, width: @width, ad slot: @adslot', array(
-              '@height'  => $height,
-              '@width'  => $width,
-              '@adslot'  => $data_ad_slot,
-            )),
+        $block['content']['amp_adsense'] = array(
+          '#theme' => 'amp_ad',
+          '#adtype' => 'adsense',
+          '#height' => $height,
+          '#width' => $width,
+          '#slot_attributes_array' => array(
+            'data-ad-client'  => $adsense_id,
+            'data-ad-slot'  => $data_ad_slot,
           ),
         );
       }
@@ -595,14 +612,13 @@ function amp_block_view($delta = '') {
       $height = variable_get('amp_google_doubleclick_block_height', '');
       $data_ad_slot = variable_get('amp_google_doubleclick_block_data_ad_slot', '');
       if (!empty($width) && !empty($height) && !empty($data_ad_slot)) {
-        $block['content'] = array(
-          'message' => array(
-            '#type' => 'markup',
-            '#markup' => t('Height: @height, width: @width, ad slot: @adslot', array(
-              '@height'  => $height,
-              '@width'  => $width,
-              '@adslot'  => $data_ad_slot,
-            )),
+        $block['content']['amp_doubleclick'] = array(
+          '#theme' => 'amp_ad',
+          '#adtype' => 'doubleclick',
+          '#height' => $height,
+          '#width' => $width,
+          '#slot_attributes_array' => array(
+            'data-slot'  => $doubleclick_id . '/' . $data_ad_slot,
           ),
         );
       }
