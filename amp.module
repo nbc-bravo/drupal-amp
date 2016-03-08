@@ -619,3 +619,49 @@ function amp_block_view($delta = '') {
   }
   return $block;
 }
+
+/**
+* Implements hook_field_formatter_info().
+*/
+function amp_field_formatter_info() {
+  return array(
+    'amp_text' => array(
+      'label' => t('AMP text'),
+      'description' => t('Display AMP text.'),
+      'field types' => array('text', 'text_long', 'text_with_summary'),
+    ),
+    'amp_text_trimmed' => array(
+      'label' => t('AMP trimmed text'),
+      'description' => t('Display AMP trimmed text.'),
+      'field types' => array('text', 'text_long', 'text_with_summary'),
+    ),
+    'amp_text_summary_or_trimmed' => array(
+      'label' => t('AMP summary or trimmed'),
+      'description' => t('Display AMP summary or trimmed text.'),
+      'field types' => array('text_with_summary'),
+    ),
+    'amp_video' => array(
+      'label' => t('AMP video'),
+      'description' => t('Display an AMP video file.'),
+      'field types' => array('file'),
+    ),
+    'amp_image' => array(
+      'label' => t('AMP image'),
+      'description' => t('Display an AMP image file.'),
+      'field types' => array('image'),
+    ),
+    'amp_iframe' => array(
+      'label' => t('AMP iframe'),
+      'description' => t('Display amp-iframe content.'),
+      'field types' => array('text', 'text_long', 'text_with_summary'),
+    ),
+  );
+}
+
+/**
+* Implements hook_field_formatter_view().
+*/
+function amp_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  return $element;
+}
