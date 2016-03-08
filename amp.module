@@ -491,10 +491,13 @@ function amp_block_info() {
     'info' => t('AMP Google Adsense block'),
     'cache' => DRUPAL_NO_CACHE,
   );
-  $blocks['amp_google_doubleclick_block'] = array(
-    'info' => t('AMP Google DoubleClick for Publishers block'),
-    'cache' => DRUPAL_NO_CACHE,
-  );
+  $block_ids = array(1, 2, 3, 4);
+  foreach ($block_ids as $block_id) {
+    $blocks['amp_google_doubleclick_block_' . $block_id] = array(
+      'info' => t('AMP Google DoubleClick for Publishers block ' . $block_id),
+      'cache' => DRUPAL_NO_CACHE,
+    );
+  }
   return $blocks;
 }
 
@@ -503,6 +506,13 @@ function amp_block_info() {
  */
 function amp_block_configure($delta = '') {
   $form = array();
+  // In Drupal 7 we have to hard code each block.
+  $doubleclick_blocks = array(
+    'amp_google_doubleclick_block_1',
+    'amp_google_doubleclick_block_2',
+    'amp_google_doubleclick_block_3',
+    'amp_google_doubleclick_block_4',
+  );
   if ($delta == 'amp_google_adsense_block') {
     $form['width'] = array(
       '#type' => 'textfield',
@@ -526,29 +536,28 @@ function amp_block_configure($delta = '') {
       '#size' => 20,
     );
   }
-  elseif ($delta == 'amp_google_doubleclick_block') {
+  elseif (in_array($delta, $doubleclick_blocks)) {
     $form['width'] = array(
       '#type' => 'textfield',
       '#title' => t('Width'),
-      '#default_value' => variable_get('amp_google_doubleclick_block_width'),
+      '#default_value' => variable_get($delta . '_width'),
       '#maxlength' => 25,
       '#size' => 20,
     );
     $form['height'] = array(
       '#type' => 'textfield',
       '#title' => t('Height'),
-      '#default_value' => variable_get('amp_google_doubleclick_block_height'),
+      '#default_value' => variable_get($delta . '_height'),
       '#maxlength' => 25,
       '#size' => 20,
     );
     $form['data_ad_slot'] = array(
       '#type' => 'textfield',
       '#title' => t('Data ad slot'),
-      '#default_value' => variable_get('amp_google_doubleclick_block_data_ad_slot'),
+      '#default_value' => variable_get($delta . '_data_ad_slot'),
       '#maxlength' => 25,
       '#size' => 20,
     );
-
   }
   return $form;
 }
@@ -557,15 +566,21 @@ function amp_block_configure($delta = '') {
  * Implements hook_block_save().
  */
 function amp_block_save($delta = '', $edit = array()) {
+  $doubleclick_blocks = array(
+    'amp_google_doubleclick_block_1',
+    'amp_google_doubleclick_block_2',
+    'amp_google_doubleclick_block_3',
+    'amp_google_doubleclick_block_4',
+  );
   if ($delta == 'amp_google_adsense_block') {
     variable_set('amp_google_adsense_block_width', $edit['width']);
     variable_set('amp_google_adsense_block_height', $edit['height']);
     variable_set('amp_google_adsense_block_data_ad_slot', $edit['data_ad_slot']);
   }
-  elseif ($delta == 'amp_google_doubleclick_block') {
-    variable_set('amp_google_doubleclick_block_width', $edit['width']);
-    variable_set('amp_google_doubleclick_block_height', $edit['height']);
-    variable_set('amp_google_doubleclick_block_data_ad_slot', $edit['data_ad_slot']);
+  elseif (in_array($delta, $doubleclick_blocks)) {
+    variable_set($delta . '_width', $edit['width']);
+    variable_set($delta . '_height', $edit['height']);
+    variable_set($delta . '_data_ad_slot', $edit['data_ad_slot']);
   }
 }
 
@@ -575,6 +590,12 @@ function amp_block_save($delta = '', $edit = array()) {
  */
 function amp_block_view($delta = '') {
   $block = array();
+  $doubleclick_blocks = array(
+    'amp_google_doubleclick_block_1',
+    'amp_google_doubleclick_block_2',
+    'amp_google_doubleclick_block_3',
+    'amp_google_doubleclick_block_4',
+  );
   if ($delta == 'amp_google_adsense_block') {
     // Start by getting global Adsense configuration.
     $adsense_id = variable_get('amp_google_adsense_id', '');
@@ -605,12 +626,12 @@ function amp_block_view($delta = '') {
       );
     }
   }
-  if ($delta == 'amp_google_doubleclick_block') {
+  elseif (in_array($delta, $doubleclick_blocks)) {
     $doubleclick_id = variable_get('amp_google_doubleclick_id', '');
     if (isset($doubleclick_id) && $doubleclick_id != "/") {
-      $width = variable_get('amp_google_doubleclick_block_width', '');
-      $height = variable_get('amp_google_doubleclick_block_height', '');
-      $data_ad_slot = variable_get('amp_google_doubleclick_block_data_ad_slot', '');
+      $width = variable_get($delta . '_width', '');
+      $height = variable_get($delta . '_height', '');
+      $data_ad_slot = variable_get($delta . '_data_ad_slot', '');
       if (!empty($width) && !empty($height) && !empty($data_ad_slot)) {
         $block['content']['amp_doubleclick'] = array(
           '#theme' => 'amp_ad',
@@ -622,15 +643,15 @@ function amp_block_view($delta = '') {
           ),
         );
       }
-    }
-    else {
-      $block['content'] = array(
-        'message' => array(
-          '#type' => 'markup',
-          '#markup' => t('This block requires a Google DoubleClick ID, width, height, and a data ad slot.'),
-          '#suffix' => '',
-        ),
-      );
+      else {
+        $block['content'] = array(
+          'message' => array(
+            '#type' => 'markup',
+            '#markup' => t('This block requires a Google DoubleClick ID, width, height, and a data ad slot.'),
+            '#suffix' => '',
+          ),
+        );
+      }
     }
   }
   return $block;
