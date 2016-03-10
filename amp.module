@@ -50,7 +50,7 @@ function amp_theme() {
         'slot_attributes' => NULL,
         'slot_attributes_array' => array()
       ),
-      'template' => 'amp-ad'
+      'template' => 'templates/amp-ad'
     ),
     'amp_analytics' => array(
       'variables' => array(
@@ -58,7 +58,13 @@ function amp_theme() {
         'analytics_attributes' => NULL,
         'analytics_attributes_array' => array()
       ),
-      'template' => 'amp-analytics'
+      'template' => 'templates/amp-analytics'
+    ),
+    'amp_iframe' => array(
+      'variables' => array(
+        'iframe' => NULL
+      ),
+      'template' => 'templates/amp-iframe'
     ),
     'amp_pixel' => array(
       'variables' => array(
@@ -154,7 +160,17 @@ function amp_theme() {
           )
         )
       ),
-      'template' => 'amp-pixel'
+      'template' => 'templates/amp-pixel'
+    ),
+    'amp_video' => array(
+      'variables' => array(
+        'file' => NULL,
+        'description' => NULL,
+        'schema' => NULL,
+        'video_attributes' => NULL,
+        'video_attributes_array' => array()
+      ),
+      'template' => 'templates/amp-video'
     )
   );
 
@@ -173,6 +189,29 @@ function amp_preprocess_amp_ad(&$variables) {
  */
 function amp_preprocess_amp_analytics(&$variables) {
   $variables['analytics_attributes'] = drupal_attributes($variables['analytics_attributes_array']);
+}
+
+/**
+ * Implements hook_preprocess_amp_video().
+ */
+function amp_preprocess_amp_video(&$variables) {
+  $file = $variables['file'];
+  $variables['src'] = file_create_url($file->uri);
+
+  // amp-video can only be displayed if the src for the video is https.
+  $variables['scheme'] = file_uri_scheme($variables['src']);
+
+  // Use the description as the title text if available.
+  if (empty($variables['description'])) {
+    $title_text = $file->filename;
+  }
+  else {
+    $title_text = $variables['description'];
+  }
+  $variables['video_attributes_array']['title'] = $title_text;
+
+  // Turn attributes array into a string.
+  $variables['video_attributes'] = drupal_attributes($variables['video_attributes_array']);
 }
 
 /**
@@ -441,10 +480,10 @@ function amp_page_alter(array &$page) {
     if (!empty($google_analytics_id)) {
       $amp_analytics = array(
         '#type' => 'amp_analytics',
+        '#account' => $google_analytics_id,
         '#analytics_attributes_array' => array(
           'type' => 'googleanalytics'
-        ),
-        '#account' => $google_analytics_id
+        )
       );
       $page['page_bottom']['amp_analytics'] = $amp_analytics;
     }
@@ -592,7 +631,6 @@ function amp_block_save($delta = '', $edit = array()) {
   }
 }
 
-
 /**
  * Implements hook_block_view().
  */
@@ -675,25 +713,38 @@ function amp_field_formatter_info() {
       'description' => t('Display AMP text.'),
       'field types' => array('text', 'text_long', 'text_with_summary'),
     ),
+    // The amp_text_trimmed formatter displays the trimmed version of the
+    // full element of the field. It is intended to be used with text
+    // and text_long fields. It also works with text_with_summary
+    // fields though the text_summary_or_trimmed formatter makes more
+    // sense for that field type.
     'amp_text_trimmed' => array(
       'label' => t('AMP trimmed text'),
       'description' => t('Display AMP trimmed text.'),
       'field types' => array('text', 'text_long', 'text_with_summary'),
+      'settings' => array('trim_length' => 600),
     ),
+    // The 'summary or trimmed' field formatter for text_with_summary
+    // fields displays returns the summary element of the field or, if
+    // the summary is empty, the trimmed version of the full element
+    // of the field.
     'amp_text_summary_or_trimmed' => array(
       'label' => t('AMP summary or trimmed'),
       'description' => t('Display AMP summary or trimmed text.'),
       'field types' => array('text_with_summary'),
+      'settings' => array('trim_length' => 600),
     ),
     'amp_video' => array(
       'label' => t('AMP video'),
       'description' => t('Display an AMP video file.'),
       'field types' => array('file'),
+      'settings' => array('amp_video_height' => '175', 'amp_video_width' => '350'),
     ),
     'amp_image' => array(
       'label' => t('AMP image'),
       'description' => t('Display an AMP image file.'),
       'field types' => array('image'),
+      'settings' => array('image_style' => '', 'image_link' => '', 'amp_layout' => 'responsive', 'amp_fixed_height' => '300'),
     ),
     'amp_iframe' => array(
       'label' => t('AMP iframe'),
@@ -704,9 +755,276 @@ function amp_field_formatter_info() {
 }
 
 /**
-* Implements hook_field_formatter_view().
-*/
+ * Implements hook_field_formatter_settings_form().
+ */
+function amp_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $element = array();
+
+  if (strpos($display['type'], '_trimmed') !== FALSE) {
+    $element['trim_length'] = array(
+      '#title' => t('Trimmed limit'),
+      '#type' => 'textfield',
+      '#field_suffix' => t('characters'),
+      '#size' => 10,
+      '#default_value' => $settings['trim_length'],
+      '#element_validate' => array('element_validate_integer_positive'),
+      '#description' => t('If the summary is not set, the trimmed %label field will be shorter than this character limit.', array('%label' => $instance['label'])),
+      '#required' => TRUE,
+    );
+  }
+
+  if ($display['type'] == 'amp_image') {
+    $image_styles = image_style_options(FALSE, PASS_THROUGH);
+    $element['image_style'] = array(
+      '#title' => t('Image style'),
+      '#type' => 'select',
+      '#default_value' => $settings['image_style'],
+      '#empty_option' => t('None (original image)'),
+      '#options' => $image_styles,
+    );
+
+    $link_types = array(
+      'content' => t('Content'),
+      'file' => t('File'),
+    );
+    $element['image_link'] = array(
+      '#title' => t('Link image to'),
+      '#type' => 'select',
+      '#default_value' => $settings['image_link'],
+      '#empty_option' => t('Nothing'),
+      '#options' => $link_types,
+    );
+
+    $layout_url = 'https://www.ampproject.org/docs/guides/responsive/control_layout.html#size-and-position-elements';
+    $layout_options = _amp_get_layouts();
+
+    $element['amp_layout'] = array(
+      '#title' => t('AMP Layout'),
+      '#type' => 'select',
+      '#default_value' => $settings['amp_layout'],
+      '#empty_option' => t('None (no layout)'),
+      '#options' => $layout_options,
+      '#description' => t('<a href="@url" target="_blank">Layout Information</a>', array('@url' => $layout_url)),
+      '#required' => TRUE,
+    );
+
+    $element['amp_fixed_height'] = array(
+      '#title' => t('Layout Height (used for fixed-height only)'),
+      '#type' => 'textfield',
+      '#states' => array(
+        'visible' => array(
+          ':input[name="fields[' .$field['field_name'] . '][settings_edit_form][settings][amp_layout]"]' =>
+            array('value' => 'fixed-height'))
+      ),
+      '#size' => 10,
+      '#default_value' => $settings['amp_fixed_height'],
+    );
+  }
+
+  if ($display['type'] == 'amp_video') {
+    $element['amp_video_height'] = array(
+      '#title' => t('Height'),
+      '#type' => 'textfield',
+      '#size' => 10,
+      '#default_value' => $settings['amp_video_height'],
+      '#element_validate' => array('element_validate_integer_positive'),
+      '#description' => t('The height of the video is used to determine the aspect ratio in a responsive layout.'),
+      '#required' => TRUE,
+    );
+
+    $element['amp_video_width'] = array(
+      '#title' => t('Width'),
+      '#type' => 'textfield',
+      '#size' => 10,
+      '#default_value' => $settings['amp_video_width'],
+      '#element_validate' => array('element_validate_integer_positive'),
+      '#description' => t('The width of the video is used to determine the aspect ratio in a responsive layout.'),
+      '#required' => TRUE,
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function amp_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  $summary = array();
+
+  if (strpos($display['type'], '_trimmed') !== FALSE) {
+    $summary[] = t('Trimmed limit: @trim_length characters', array('@trim_length' => $settings['trim_length']));
+  }
+
+  if (strpos($display['type'], 'amp_video') !== FALSE) {
+    $summary[] = t('Dimensions for aspect ratio: @width' . 'px x @height' . 'px', array('@width' => $settings['amp_video_width'], '@height' => $settings['amp_video_height']));
+  }
+
+  if (strpos($display['type'], 'amp_image') !== FALSE) {
+    $image_styles = image_style_options(FALSE, PASS_THROUGH);
+    // Unset possible 'No defined styles' option.
+    unset($image_styles['']);
+    // Styles could be lost because of enabled/disabled modules that defines
+    // their styles in code.
+    if (isset($image_styles[$settings['image_style']])) {
+      $summary[] = t('Image style: @style', array('@style' => $image_styles[$settings['image_style']]));
+    }
+    else {
+      $summary[] = t('Original image');
+    }
+
+    $link_types = array(
+      'content' => t('Linked to content'),
+      'file' => t('Linked to file'),
+    );
+    // Display this setting only if image is linked.
+    if (isset($link_types[$settings['image_link']])) {
+      $summary[] = $link_types[$settings['image_link']];
+    }
+
+    $layout_options = _amp_get_layouts();
+    $layout_setting = $settings['amp_layout'];
+
+    if (isset($layout_options[$layout_setting])) {
+      $summary[] =  t('Layout: @setting', array('@setting' => $layout_options[$layout_setting]));
+
+      if ($layout_options[$layout_setting] === 'fixed-height') {
+        $summary[] = t('Fixed height: @height', array('@height' => $settings['amp_fixed_height']));
+      }
+    }
+  }
+
+  return implode('<br />', $summary);
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
 function amp_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $element = array();
+
+  switch ($display['type']) {
+    case 'amp_iframe':
+      foreach ($items as $delta => $item) {
+        $output = _text_sanitize($instance, $langcode, $item, 'value');
+        $element[$delta] = array(
+          '#markup' => $output,
+          '#iframe' => array(
+            '#markup' => $output
+          )
+        );
+      }
+
+      $iframe_script = array(
+        '#tag' => 'script',
+        '#type' => 'html_tag',
+        '#attributes' => array(
+          'src' => 'https://cdn.ampproject.org/v0/amp-iframe-0.1.js',
+          'async' => "async",
+          'custom-element' => 'amp-iframe'
+        ),
+      );
+      drupal_add_html_head($iframe_script, 'amp-iframe');
+
+      break;
+
+    case 'amp_text':
+      foreach ($items as $delta => $item) {
+        $output = _text_sanitize($instance, $langcode, $item, 'value');
+        $element[$delta] = array('#markup' => $output);
+      }
+      break;
+
+    case 'amp_text_trimmed':
+      foreach ($items as $delta => $item) {
+        $output = _text_sanitize($instance, $langcode, $item, 'value');
+        if ($display['type'] == 'amp_text_trimmed') {
+          $output = text_summary($output, $instance['settings']['text_processing'] ? $item['format'] : NULL, $display['settings']['trim_length']);
+        }
+        $element[$delta] = array('#markup' => $output);
+      }
+      break;
+
+    case 'amp_summary_or_trimmed':
+      foreach ($items as $delta => $item) {
+        if (!empty($item['summary'])) {
+          $output = _text_sanitize($instance, $langcode, $item, 'summary');
+        }
+        else {
+          $output = _text_sanitize($instance, $langcode, $item, 'value');
+          $output = text_summary($output, $instance['settings']['text_processing'] ? $item['format'] : NULL, $display['settings']['trim_length']);
+        }
+        $element[$delta] = array('#markup' => $output);
+      }
+      break;
+
+    case 'amp_image':
+      // Check if the formatter involves a link.
+      if ($display['settings']['image_link'] == 'content') {
+        $uri = entity_uri($entity_type, $entity);
+      }
+      elseif ($display['settings']['image_link'] == 'file') {
+        $link_file = TRUE;
+      }
+
+      foreach ($items as $delta => $item) {
+        if (isset($link_file)) {
+          $uri = array(
+            'path' => file_create_url($item['uri']),
+            'options' => array(),
+          );
+        }
+
+        $element[$delta] = array(
+          '#theme' => 'image_formatter',
+          '#item' => $item,
+          '#image_style' => $display['settings']['image_style'],
+          '#path' => isset($uri) ? $uri : '',
+        );
+
+        $element[$delta]['#item']['attributes']['layout'] = $display['settings']['amp_layout'];
+
+        if ($display['settings']['amp_layout'] == 'fixed-height') {
+          $element[$delta]['#item']['attributes']['height'] = $display['settings']['amp_fixed_height'];
+          $element[$delta]['#item']['attributes']['width'] = 'auto';
+        }
+      }
+      break;
+
+    case 'amp_video':
+      foreach ($items as $delta => $item) {
+        $element[$delta] = array(
+          '#theme' => 'amp_video',
+          '#file' => (object) $item,
+          '#video_attributes_array' => array(
+            'height' => $display['settings']['amp_video_height'],
+            'width' => $display['settings']['amp_video_width']
+          )
+        );
+
+      }
+      break;
+  }
+
   return $element;
+}
+
+/**
+ * Helper function to return a list of AMP layouts.
+ */
+function _amp_get_layouts() {
+  return array(
+    'nodisplay' => 'nodisplay',
+    'fixed' => 'fixed',
+    'responsive' => 'responsive',
+    'fixed-height' => 'fixed-height',
+    'fill' => 'fill',
+    'container' => 'container',
+  );
 }
