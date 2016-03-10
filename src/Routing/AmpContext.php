@@ -63,7 +63,7 @@ class AmpContext {
     }
 
     // Get a list of content types that are AMP enabled.
-    $enabled_types = \Drupal::config('amp.settings')->get('node_types');
+    $enabled_types = amp_get_enabled_types();
     // Load the current node.
     $node = $this->routeMatch->getParameter('node');
     // If we only got back the node ID, load the node.

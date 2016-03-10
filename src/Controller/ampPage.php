@@ -87,7 +87,7 @@ class ampPage extends ControllerBase {
     $node_view_controller = new NodeViewController($this->entity_manager, $this->renderer);
 
     // Get a list of content types that are AMP enabled.
-    $enabled_types = \Drupal::config('amp.settings')->get('node_types');
+    $enabled_types = amp_get_enabled_types();
     $type = $node->getType();
 
     // Only use the AMP view mode for content that is AMP enabled.
