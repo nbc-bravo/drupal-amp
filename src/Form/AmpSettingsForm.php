@@ -193,16 +193,43 @@ class AmpSettingsForm extends ConfigFormBase {
       ),
     );
 
-    $form['test_page'] = array(
-      '#type' => 'item',
-      '#markup' => t('<a href="/admin/amp/library/test">Test that AMP is configured properly</a>'),
+
+    $form['amp_library_group'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('AMP Library Configuration <a href="https://github.com/Lullabot/amp-library">(GitHub Home and Documentation)</a>'),
     );
 
-    $form['amp_library_warnings_display'] = array(
+    $form['amp_library_group']['test_page'] = array(
+        '#type' => 'item',
+        '#markup' => t('<a href="/admin/amp/library/test">Test that AMP is configured properly</a>'),
+    );
+
+    $form['amp_library_group']['amp_library_warnings_display'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('<em>Debugging</em>: Show AMP Library warnings in all AMP text formatters for all users'),
       '#default_value' => $amp_config->get('amp_library_warnings_display'),
-      '#description' => $this->t('If you only want to see AMP formatter specific warning for one node add query "warnfix" at end of a node url. e.g. <strong>node/12345/amp?warnfix</strong>'),
+      '#description' => $this->t('If you only want to see AMP formatter specific warning for one node add query ' .
+          '"warnfix" at end of a node url. e.g. <strong>node/12345/amp?warnfix</strong>'),
+    );
+
+    $form['amp_library_group']['amp_library_process_full_html'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('<em>Experimental:</em> Run the whole HTML page through the AMP library'),
+      '#default_value' => $amp_config->get('amp_library_process_full_html'),
+      '#description' => $this->t('The AMP PHP library will fix many AMP HTML standard non-compliance issues by ' .
+          'removing illegal or disallowed attributes, tags and property value pairs. Useful for processing the output of modules that ' .
+          'generate AMP unfriendly HTML. Please test when enabling on your site as some modules may depend on ' .
+          'the HTML removed by the library and thus break in possibly subtle ways.')
+    );
+
+    $form['amp_library_group']['amp_library_process_full_html_warnings'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Debugging: Add a notice in the drupal log for each processed Amp page showing the AMP warnings (and fixes) generated'),
+      '#default_value' => $amp_config->get('amp_library_process_full_html_warnings'),
+      '#description' => $this->t('<em>Note:</em> A drupal log entry will be generated for each uncached AMP request'),
+      '#states' => array('visible' => array(
+          ':input[name="amp_library_process_full_html"]' => array('checked' => TRUE))
+      ),
     );
 
     return parent::buildForm($form, $form_state);
@@ -307,6 +334,9 @@ class AmpSettingsForm extends ConfigFormBase {
       $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
       $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
       $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
+
+      $amp_config->set('amp_library_process_full_html', $form_state->getValue('amp_library_process_full_html'))->save();
+      $amp_config->set('amp_library_process_full_html_warnings', $form_state->getValue('amp_library_process_full_html_warnings'))->save();
 
       // This piece of code is redundant because of the drupal_flush_all_caches() below
       // But its an attempt to be more fine grained and will be useful once drupal_flush_all_caches() call is removed
