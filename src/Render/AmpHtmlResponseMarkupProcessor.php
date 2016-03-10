@@ -7,6 +7,9 @@
 
 namespace Drupal\amp\Render;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\amp\Service\AMPService;
 use Lullabot\AMP\Validate\Scope;
@@ -47,14 +50,33 @@ class AmpHtmlResponseMarkupProcessor {
   protected $ampConverter;
 
   /**
+   * @var LoggerChannelInterface
+   */
+  protected $loggerChannel;
+
+  /**
+   * @var ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * @var \Drupal\Core\Config\ImmutableConfig
+   */
+  protected $ampConfig;
+
+  /**
    * Constructs an AmpHtmlResponseMarkupProcessor object.
    *
    * @param AMPService $amp_library_service
    *   An amp library service.
+   *
    */
-  public function __construct(AMPService $amp_library_service) {
+  public function __construct(AMPService $amp_library_service, LoggerChannelInterface $loggerChannel, ConfigFactoryInterface $configFactoryInterface) {
     $this->ampService = $amp_library_service;
     $this->ampConverter = $this->ampService->createAMPConverter();
+    $this->loggerChannel = $loggerChannel;
+    $this->configFactory = $configFactoryInterface;
+    $this->ampConfig = $this->configFactory->get('amp.settings');
   }
 
   /**
@@ -79,15 +101,21 @@ class AmpHtmlResponseMarkupProcessor {
     // Get a reference to the content.
     $this->content = $response->getContent();
 
-    // Disable this feature for now. We also dont want to run the converter.
-    //$this->ampConverter->loadHtml($this->content, ['scope' => Scope::HTML_SCOPE]);
-    //$this->ampContent = $this->ampConverter->convertToAmpHtml();
+    // First check the config if full html warnings are on
+    if (!$this->ampConfig->get('amp_library_process_full_html')) {
+      return $response;
+    }
 
-    // @todo this is for debugging only. We need to have a better way to check for validation issues though.
-    // $this->ampContent .= "<--! FULL DOCUMENT VALIDATION\n " . $this->ampConverter->warningsHumanText() . "-->";
+    $this->ampConverter->loadHtml($this->content, ['scope' => Scope::HTML_SCOPE]);
+    $this->ampContent = $this->ampConverter->convertToAmpHtml();
+
+    if ($this->ampConfig->get('amp_library_process_full_html_warnings')) {
+      // Add any warnings that were generated
+      $this->loggerChannel->notice('<pre>' . $this->ampConverter->warningsHumanHtml() . '</pre>');
+    }
 
     // Return the processed content.
-    // $response->setContent($this->ampContent);
+    $response->setContent($this->ampContent);
 
     return $response;
   }

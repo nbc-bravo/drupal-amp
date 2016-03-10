@@ -17,9 +17,12 @@ services:
   html_response.amp_markup_processor:
     class: Drupal\amp\Render\AmpHtmlResponseMarkupProcessor
     tags:
-    arguments: ['@amp.utilities']
+    arguments: ['@amp.utilities', '@logger.channel.amp', '@config.factory']
   html_response.amp_subscriber:
     class: Drupal\amp\EventSubscriber\AmpHtmlResponseSubscriber
     tags:
       - { name: event_subscriber, priority: 30 }
     arguments: ['@html_response.amp_markup_processor', '@router.amp_context']
+  logger.channel.amp:
+    parent: logger.channel_base
+    arguments: ['amp']
