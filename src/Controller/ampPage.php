@@ -7,6 +7,7 @@
 
 namespace Drupal\amp\Controller;
 
+use Drupal\amp\EntityTypeInfo;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Entity\EntityManagerInterface;
@@ -22,6 +23,13 @@ use Drupal\Core\Cache\Cache;
  */
 class ampPage extends ControllerBase {
 
+  /**
+   * Information about AMP-enabled content types.
+   *
+   * @var \Drupal\amp\EntityTypeInfo
+   */
+  protected $entityTypeInfo;
+
   /** @var EntityManagerInterface  */
   protected $entity_manager;
 
@@ -36,12 +44,21 @@ class ampPage extends ControllerBase {
   protected $configFactory;
 
   /**
-   * {@inheritdoc}
+   * @param \Drupal\Core\Entity\EntityManagerInterface $entity_manager
+   *   The entity manager service.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface; $configFactoryInterface
+   *   The config factory.
+   * @param \Drupal\amp\EntityTypeInfo $entity_type_info
+   *   Information about AMP-enabled content types.
    */
-  public function __construct(EntityManagerInterface $entity_manager, RendererInterface $renderer, ConfigFactoryInterface $configFactoryInterface) {
+  public function __construct(EntityManagerInterface $entity_manager, RendererInterface $renderer, ConfigFactoryInterface
+  $configFactoryInterface, EntityTypeInfo $entity_type_info) {
     $this->entity_manager = $entity_manager;
     $this->renderer = $renderer;
     $this->configFactory = $configFactoryInterface;
+    $this->entityTypeInfo = $entity_type_info;
   }
 
   /**
@@ -51,7 +68,8 @@ class ampPage extends ControllerBase {
     return new static(
       $container->get('entity.manager'),
       $container->get('renderer'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('amp.entity_type')
     );
   }
 
@@ -87,7 +105,7 @@ class ampPage extends ControllerBase {
     $node_view_controller = new NodeViewController($this->entity_manager, $this->renderer);
 
     // Get a list of content types that are AMP enabled.
-    $enabled_types = amp_get_enabled_types();
+    $enabled_types = $this->entityTypeInfo->getAmpEnabledTypes();
     $type = $node->getType();
 
     // Only use the AMP view mode for content that is AMP enabled.

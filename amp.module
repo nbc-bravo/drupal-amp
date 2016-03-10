@@ -5,6 +5,7 @@
  * Contains amp.module.
  */
 
+use Drupal\amp\EntityTypeInfo;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -428,7 +429,7 @@ function amp_delete_amp_alias(EntityInterface $entity) {
  * Helper function to retrieve a formatted list of AMP-enabled content types.
  */
 function amp_get_formatted_status_list() {
-  $enabled_types = null !== amp_get_enabled_types() ? amp_get_enabled_types() : array();
+  $enabled_types = null !== EntityTypeInfo::getAmpEnabledTypes() ? EntityTypeInfo::getAmpEnabledTypes() : array();
   $node_types = node_type_get_names();
   $node_status_list = array();
   foreach ($node_types as $bundle => $label) {
@@ -449,26 +450,6 @@ function amp_get_formatted_status_list() {
     }
   }
   return $node_status_list;
-}
-
-/**
- * Helper function to retrieve a list of AMP-enabled content types.
- */
-function amp_get_enabled_types() {
-  if ($cache = \Drupal::cache()->get('amp_enabled_types')) {
-    $enabled_types = $cache->data;
-  }
-  else {
-    $node_types = array_keys(node_type_get_names());
-    foreach ($node_types as $node_type) {
-      $amp_display = entity_get_display('node', $node_type, 'amp');
-      if ($amp_display->status()) {
-        $enabled_types[] = $node_type;
-      }
-    }
-    \Drupal::cache()->set('amp_enabled_types', $enabled_types);
-  }
-  return array_combine($enabled_types, $enabled_types);
 }
 
 /**
