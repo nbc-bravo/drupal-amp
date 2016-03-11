@@ -10,6 +10,21 @@ require_once dirname(__FILE__).'/amp.admin.inc';
 use Lullabot\AMP\AMP;
 
 /**
+ * Implements hook_init().
+ */
+function amp_init() {
+  $library_autoload = dirname(__FILE__).'/vendor/autoload.php';
+  if (file_exists($library_autoload)) {
+    require_once $library_autoload;
+  }
+  else {
+    drupal_set_message('AMP Module install incomplete. Could not find AMP Library <strong>autoload.php </strong>. ' .
+      'Please install <a href="https://getcomposer.org/">composer</a> and type <pre>composer install</pre> on the ' .
+      'command line while in the amp module folder to install the <a href="https://github.com/Lullabot/amp-library">AMP PHP Library</a>', 'warning');
+  }
+}
+
+/**
  * Implements hook_help().
  */
 function amp_help($path, $arg) {
