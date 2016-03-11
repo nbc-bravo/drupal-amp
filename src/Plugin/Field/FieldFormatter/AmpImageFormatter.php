@@ -41,7 +41,6 @@ class AmpImageFormatter extends ImageFormatter {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
 
-    //dpm($element);
     $layout_url = 'https://www.ampproject.org/docs/guides/responsive/control_layout.html#size-and-position-elements';
     // Add configuration options for layout.
     $element['amp_layout'] = [

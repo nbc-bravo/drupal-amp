@@ -30,3 +30,11 @@ function amp_requirements($phase) {
   }
   return $requirements;
 }
+
+/**
+ * Remove node_types from amp.settings.
+ */
+function amp_update_8001(&$sandbox) {
+  $config = \Drupal::service('config.factory')->getEditable('amp.settings');
+  $config->clear('node_types')->save();
+}

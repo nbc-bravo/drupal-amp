@@ -7,6 +7,7 @@
 
 namespace Drupal\amp\Routing;
 
+use Drupal\amp\EntityTypeInfo;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Symfony\Component\Routing\Route;
 
@@ -14,6 +15,13 @@ use Symfony\Component\Routing\Route;
  * Provides a helper class to determine whether the route is an amp one.
  */
 class AmpContext {
+
+  /**
+   * Information about AMP-enabled content types.
+   *
+   * @var \Drupal\amp\EntityTypeInfo
+   */
+  protected $entityTypeInfo;
 
   /**
    * The route match.
@@ -25,10 +33,13 @@ class AmpContext {
   /**
    * Construct a new amp context helper instance.
    *
+   * @param \Drupal\amp\EntityTypeInfo $entity_type_info
+   *   Information about AMP-enabled content types.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    */
-  public function __construct(RouteMatchInterface $route_match) {
+  public function __construct(EntityTypeInfo $entity_type_info, RouteMatchInterface $route_match) {
+    $this->entityTypeInfo = $entity_type_info;
     $this->routeMatch = $route_match;
   }
 
@@ -63,7 +74,7 @@ class AmpContext {
     }
 
     // Get a list of content types that are AMP enabled.
-    $enabled_types = \Drupal::config('amp.settings')->get('node_types');
+    $enabled_types = $this->entityTypeInfo->getAmpEnabledTypes();
     // Load the current node.
     $node = $this->routeMatch->getParameter('node');
     // If we only got back the node ID, load the node.

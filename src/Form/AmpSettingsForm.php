@@ -108,12 +108,10 @@ class AmpSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $amp_config = $this->config('amp.settings');
     $node_types = node_type_get_names();
-    $form['node_types'] = array(
-      '#type' => 'checkboxes',
-      '#multiple' => TRUE,
-      '#title' => $this->t('Enable and disable content types (and their configuration) that have AMP versions by default:'),
-      '#default_value' => !empty($amp_config->get('node_types')) ? $amp_config->get('node_types') : [],
-      '#options' => $node_types,
+    $form['amp_content_amp_status'] = array(
+      '#title' => $this->t('AMP Status by Content Type'),
+      '#theme' => 'item_list',
+      '#items' => amp_get_formatted_status_list(),
     );
 
     $amptheme_config = $this->config('amp.theme');
@@ -265,92 +263,32 @@ class AmpSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
-    if ($form_state->hasValue('node_types') && $form_state->hasValue('amptheme')) {
-      $node_types = $form_state->getValue('node_types');
-      $amp_config = $this->config('amp.settings');
+    // AMP theme settings.
+    $amptheme = $form_state->getValue('amptheme');
+    $amptheme_config = $this->config('amp.theme');
+    $amptheme_config->setData(['amptheme' => $amptheme]);
+    $amptheme_config->save();
 
-      // Get a list of changes. The first time this form is accessed, this will
-      // be empty because we will not know all of the node types.
-      if (!empty($amp_config->get('node_types'))) {
-        $changes = array_diff_assoc($node_types, $amp_config->get('node_types'));
-      }
-      else {
-        $changes = array_filter($node_types);
-      }
-      foreach ($changes as $bundle => $value) {
-        if (!empty($value)) {
-          // Get a list of view modes for the bundle.
-          $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $bundle);
-          if (!isset($view_modes['amp'])) {
-            // Create the AMP view mode.
-            if (\Drupal\Core\Entity\Entity\EntityViewDisplay::create(array(
-                'targetEntityType' => 'node',
-                'bundle' => $bundle,
-                'mode' => 'amp',
-              ))->setStatus(TRUE)->save()) {
-              drupal_set_message(t('The content type <strong>@bundle</strong> is now AMP enabled.', array('@bundle' => $bundle)), 'status');
+    // Other module settings.
+    $amp_config = $this->config('amp.settings');
 
-              // Update logic only after view mode is created, but before
-              // before aliases are created.
-              $amp_config->setData(['node_types' => $node_types])->save();
+    $amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
+    $amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
+    $amp_config->set('google_doubleclick_id', $form_state->getValue('google_doubleclick_id'))->save();
 
-              // If the view move is created, create AMP path aliases for all
-              // existing content with path aliases.
-              $nids = \Drupal::entityQuery('node')->condition('type', $bundle)->execute();
-              $entities = \Drupal\node\Entity\Node::loadMultiple($nids);
-              foreach ($entities as $entity) {
-                amp_create_amp_alias($entity);
-                drupal_set_message(t('An AMP alias has been created for all @bundle content with an existing path alias.', array('@bundle' => $bundle)), 'status');
-              }
-            }
-          }
-        }
-        elseif (\Drupal::configFactory()->getEditable('core.entity_view_display.node.' . $bundle . '.amp')->delete()) {
-          drupal_set_message(t('The content type <strong>@bundle</strong> is no longer AMP enabled.', array('@bundle' => $bundle)), 'status');
+    $amp_config->set('amp_pixel', $form_state->getValue('amp_pixel'))->save();
+    $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
+    $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
+    $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
 
-          // Update configuration to match the view mode. 
-          $amp_config->setData(['node_types' => $node_types])->save();
+    $amp_config->set('amp_library_process_full_html', $form_state->getValue('amp_library_process_full_html'))->save();
+    $amp_config->set('amp_library_process_full_html_warnings', $form_state->getValue('amp_library_process_full_html_warnings'))->save();
 
-          // Delete all AMP aliases for this content type.
-          $nids = \Drupal::entityQuery('node')->condition('type', $bundle)->execute();
-          $entities = \Drupal\node\Entity\Node::loadMultiple($nids);
-          foreach ($entities as $entity) {
-            amp_delete_amp_alias($entity);
-            drupal_set_message(t('All @bundle AMP aliases have been deleted', array('@bundle' => $bundle)), 'status');
-          }
-        }
-      }
-
-      $amptheme = $form_state->getValue('amptheme');
-      $amptheme_config = $this->config('amp.theme');
-      $amptheme_config->setData(['amptheme' => $amptheme]);
-      $amptheme_config->save();
-
-      $amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
-      $amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
-      $amp_config->set('google_doubleclick_id', $form_state->getValue('google_doubleclick_id'))->save();
-
-      $amp_config->set('amp_pixel', $form_state->getValue('amp_pixel'))->save();
-      $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
-      $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
-      $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
-
-      $amp_config->set('amp_library_process_full_html', $form_state->getValue('amp_library_process_full_html'))->save();
-      $amp_config->set('amp_library_process_full_html_warnings', $form_state->getValue('amp_library_process_full_html_warnings'))->save();
-
-      // This piece of code is redundant because of the drupal_flush_all_caches() below
-      // But its an attempt to be more fine grained and will be useful once drupal_flush_all_caches() call is removed
-      if ($form_state->getValue('amp_library_warnings_display') !== $amp_config->get('amp_library_warnings_display')) {
-        $amp_config->set('amp_library_warnings_display', $form_state->getValue('amp_library_warnings_display'))->save();
-        $this->tagInvalidate->invalidateTags(['amp-warnings']);
-      }
-
-      // For now, we use the bazooka approach to make sure everything from
-      // cached nodes to link tags are rebuilt.
-      // TODO: determine if we can be more selective.
-      drupal_flush_all_caches();
-
-      parent::submitForm($form, $form_state);
+    if ($form_state->getValue('amp_library_warnings_display') !== $amp_config->get('amp_library_warnings_display')) {
+      $amp_config->set('amp_library_warnings_display', $form_state->getValue('amp_library_warnings_display'))->save();
+      $this->tagInvalidate->invalidateTags(['amp-warnings']);
     }
+
+    parent::submitForm($form, $form_state);
   }
 }

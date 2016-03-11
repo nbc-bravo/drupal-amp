@@ -5,6 +5,7 @@
  * Contains amp.module.
  */
 
+use Drupal\amp\EntityTypeInfo;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -275,7 +276,7 @@ function template_preprocess_amp_video(&$variables) {
 function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
 
   // Check if the content is AMP enabled.
-  $amp_types = \Drupal::config('amp.settings')->get('node_types');
+  $amp_types = node_type_get_names();
   $type = $form_state->getStorage()['form_display']->getTargetBundle();
   if ($amp_types[$type] !== $type) {
     return;
@@ -337,7 +338,7 @@ function amp_node_form_submit_with_warn(&$form, FormStateInterface $form_state) 
 * Implements hook_form_BASE_FORM_ID_alter().
 */
 function amp_form_node_type_edit_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $enabled = \Drupal::config('amp.settings')->get('node_types');
+  $enabled = node_type_get_names();
   $node_type = $form['type']['#default_value'];
 
   $form['workflow']['amp'] = array(
@@ -402,7 +403,7 @@ function amp_create_amp_alias(EntityInterface $entity) {
   if ($alias = \Drupal::service('path.alias_storage')->lookupPathAlias($path, $langcode)) {
 
     // Get a list of all AMP-enabled node types.
-    $enabled_types = \Drupal::config('amp.settings')->get('node_types');
+    $enabled_types = node_type_get_names();
     $type = $entity->getType();
 
     // Check if the content is AMP enabled.
@@ -422,4 +423,76 @@ function amp_delete_amp_alias(EntityInterface $entity) {
   }
   $amp_path = '/' . $entity->toUrl('canonical')->getInternalPath() . "/amp";
   \Drupal::service('path.alias_storage')->delete(array('source' => $amp_path));
+}
+
+/**
+ * Helper function to retrieve a formatted list of AMP-enabled content types.
+ */
+function amp_get_formatted_status_list() {
+  $enabled_types = null !== EntityTypeInfo::getAmpEnabledTypes() ? EntityTypeInfo::getAmpEnabledTypes() : array();
+  $node_types = node_type_get_names();
+  $node_status_list = array();
+  foreach ($node_types as $bundle => $label) {
+    $configure = t('/admin/structure/types/manage/:bundle/display/amp?destination=/admin/config/content/amp', array(':bundle' => $bundle));
+    $enable_disable = t('/admin/structure/types/manage/:bundle/display?destination=/admin/config/content/amp', array(':bundle' => $bundle));
+    if (in_array($bundle, $enabled_types)) {
+      $node_status_list[] = t(':label is <em>enabled</em>: <a href=":configure">Configure AMP view mode</a> or <a href=":enable_disable">Disable AMP display</a>', array(
+          ':label' => $label,
+          ':configure' => $configure,
+          ':enable_disable' => $enable_disable,
+        ));
+    }
+    else {
+      $node_status_list[] =  t(':label is <em>disabled</em>: <a href=":enable_disable">Enable AMP in Custom Display Settings</a>', array(
+          ':label' => $label,
+          ':enable_disable' => $enable_disable,
+        ));
+    }
+  }
+  return $node_status_list;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function amp_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  if ($form_id == 'entity_view_display_edit_form') {
+    $form['actions']['submit']['#submit'][] = 'amp_view_modes_submit';
+  }
+}
+
+/**
+ * Submit handler for enabling or disabling AMP view modes.
+ */
+function amp_view_modes_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $new_values = array();
+  $old_values = array();
+  if ($form_state->getValues()['display_modes_custom']) {
+    $new_values = array_filter($form_state->getValues()['display_modes_custom']);
+  }
+  if (isset($form_state->getCompleteForm()['modes']['display_modes_custom']['#default_value'])) {
+    $old_values = $form_state->getCompleteForm()['modes']['display_modes_custom']['#default_value'];
+  }
+  $removed = array_diff($old_values, $new_values);
+  $added = array_diff($new_values, $old_values);
+  if (is_array($removed) && in_array('amp', $removed) && $type = $form['#bundle']) {
+    // Load all nodes of the type being edited.
+    $storage = \Drupal::entityManager()->getStorage('node');
+    $nids = $storage->getQuery()->condition('type', $type)->execute();
+    $amp_nodes = $storage->loadMultiple($nids);
+    // Remove all AMP aliases for the content type.
+    foreach ($amp_nodes as $amp_node) {
+      amp_delete_amp_alias($amp_node);
+    }
+    // If the AMP view was removed, clear cache of AMP-enabled content.
+    \Drupal::cache()->delete('amp_enabled_types');
+  }
+  if (is_array($added) && in_array('amp', $added)) {
+    // Create all AMP aliases for the content type.
+    foreach ($amp_nodes as $amp_node) {
+      amp_create_amp_alias($amp_node);
+    }
+    // If the AMP view was added, clear cache of AMP-enabled content.
+    \Drupal::cache()->delete('amp_enabled_types');
+  }
 }
