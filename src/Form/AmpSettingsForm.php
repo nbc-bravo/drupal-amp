@@ -7,6 +7,7 @@
 
 namespace Drupal\amp\Form;
 
+use Drupal\amp\EntityTypeInfo;
 use Drupal\Core\Cache\CacheTagsInvalidatorInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ThemeHandlerInterface;
@@ -34,8 +35,19 @@ class AmpSettingsForm extends ConfigFormBase {
    */
   private $themeOptions;
 
-  /** @var CacheTagsInvalidatorInterface */
+  /**
+   * The cache tags invalidator.
+   *
+   * @var \Drupal\Core\Cache\CacheTagsInvalidatorInterface
+   */
   protected $tagInvalidate;
+
+  /**
+   * Information about AMP-enabled content types.
+   *
+   * @var \Drupal\amp\EntityTypeInfo
+   */
+  protected $entityTypeInfo;
 
   /**
    * {@inheritdoc}
@@ -82,13 +94,18 @@ class AmpSettingsForm extends ConfigFormBase {
    *   The factory for configuration objects.
    * @param \Drupal\Core\Extension\ThemeHandlerInterface $theme_handler
    *   The theme handler.
+   * @param \Drupal\Core\Cache\CacheTagsInvalidatorInterface $tag_invalidate
+   *   The cache tags invalidator.
+   * @param \Drupal\amp\EntityTypeInfo $entity_type_info
+   *   Information about AMP-enabled content types.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ThemeHandlerInterface $theme_handler, CacheTagsInvalidatorInterface $tag_invalidate) {
+  public function __construct(ConfigFactoryInterface $config_factory, ThemeHandlerInterface $theme_handler, CacheTagsInvalidatorInterface $tag_invalidate, EntityTypeInfo $entity_type_info) {
     parent::__construct($config_factory);
 
     $this->themeHandler = $theme_handler;
     $this->themeOptions = $this->getThemeOptions();
     $this->tagInvalidate = $tag_invalidate;
+    $this->entityTypeInfo = $entity_type_info;
   }
 
   /**
@@ -98,7 +115,8 @@ class AmpSettingsForm extends ConfigFormBase {
     return new static(
       $container->get('config.factory'),
       $container->get('theme_handler'),
-      $container->get('cache_tags.invalidator')
+      $container->get('cache_tags.invalidator'),
+      $container->get('amp.entity_type')
     );
   }
 
@@ -111,7 +129,7 @@ class AmpSettingsForm extends ConfigFormBase {
     $form['amp_content_amp_status'] = array(
       '#title' => $this->t('AMP Status by Content Type'),
       '#theme' => 'item_list',
-      '#items' => amp_get_formatted_status_list(),
+      '#items' => $this->entityTypeInfo->getFormattedAmpEnabledTypes(),
     );
 
     $amptheme_config = $this->config('amp.theme');
