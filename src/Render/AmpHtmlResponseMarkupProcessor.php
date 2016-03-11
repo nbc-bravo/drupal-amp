@@ -108,10 +108,12 @@ class AmpHtmlResponseMarkupProcessor {
 
     $this->ampConverter->loadHtml($this->content, ['scope' => Scope::HTML_SCOPE]);
     $this->ampContent = $this->ampConverter->convertToAmpHtml();
+    $request_uri = \Drupal::request()->getRequestUri();
 
+    $heading = "<h3>AMP PHP Library messages for $request_uri</h3>" . PHP_EOL;
     if ($this->ampConfig->get('amp_library_process_full_html_warnings')) {
       // Add any warnings that were generated
-      $this->loggerChannel->notice('<pre>' . $this->ampConverter->warningsHumanHtml() . '</pre>');
+      $this->loggerChannel->notice("$heading <pre>" . $this->ampConverter->warningsHumanHtml() . '</pre>');
     }
 
     // Return the processed content.
