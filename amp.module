@@ -404,9 +404,9 @@ function amp_create_amp_alias(EntityInterface $entity) {
   if ($alias = \Drupal::service('path.alias_storage')->lookupPathAlias($path, $langcode)) {
 
     // Get a list of all AMP-enabled node types.
-    $enabled_types = node_type_get_names();
+    $amp_entity_type_service = \Drupal::service('amp.entity_type');
+    $enabled_types = $amp_entity_type_service->getAmpEnabledTypes();
     $type = $entity->getType();
-
     // Check if the content is AMP enabled.
     if ($enabled_types[$type] === $type) {
       // Save an AMP version of the alias.
