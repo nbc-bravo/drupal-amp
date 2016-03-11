@@ -276,7 +276,7 @@ function template_preprocess_amp_video(&$variables) {
 function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
 
   // Check if the content is AMP enabled.
-  $amp_types = node_type_get_names();
+  $amp_types = EntityTypeInfo::getAmpEnabledTypes();
   $type = $form_state->getStorage()['form_display']->getTargetBundle();
   if ($amp_types[$type] !== $type) {
     return;
