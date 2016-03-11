@@ -419,11 +419,12 @@ function amp_view_modes_submit(&$form, \Drupal\Core\Form\FormStateInterface $for
   }
   $removed = array_diff($old_values, $new_values);
   $added = array_diff($new_values, $old_values);
-  if (is_array($removed) && in_array('amp', $removed) && $type = $form['#bundle']) {
-    // Load all nodes of the type being edited.
-    $storage = \Drupal::entityManager()->getStorage('node');
-    $nids = $storage->getQuery()->condition('type', $type)->execute();
-    $amp_nodes = $storage->loadMultiple($nids);
+  $type = $form['#bundle'];
+  // Load all nodes of the type being edited.
+  $storage = \Drupal::entityManager()->getStorage('node');
+  $nids = Drupal::entityQuery('node')->condition('type', $type)->execute();
+  $amp_nodes = $storage->loadMultiple($nids);
+  if (is_array($removed) && in_array('amp', $removed) && isset($type)) {
     // Remove all AMP aliases for the content type.
     foreach ($amp_nodes as $amp_node) {
       amp_delete_amp_alias($amp_node);
@@ -431,7 +432,7 @@ function amp_view_modes_submit(&$form, \Drupal\Core\Form\FormStateInterface $for
     // If the AMP view was removed, clear cache of AMP-enabled content.
     \Drupal::cache()->delete('amp_enabled_types');
   }
-  if (is_array($added) && in_array('amp', $added)) {
+  if (is_array($added) && in_array('amp', $added) && isset($type)) {
     // Create all AMP aliases for the content type.
     foreach ($amp_nodes as $amp_node) {
       amp_create_amp_alias($amp_node);
