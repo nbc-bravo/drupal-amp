@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Contains amp.install.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function amp_requirements($phase) {
+  $requirements = array();
+  if ($phase == 'install' || $phase == 'runtime') {
+    //if (empty(drupal_get_library('amp'))) {
+      //$requirements['amp_library'] = array(
+        //'title' => t('AMP'),
+        //'description' => t('The AMP module requires the PHP <a href="@library">AMP library</a>.', array('@library' => 'https://github.com/Lullabot/amp-library')),
+        //'severity' => REQUIREMENT_ERROR,
+      //);
+    //}
+    $themes = list_themes();
+    if (empty($themes['amptheme']) || empty($themes['amptheme']->status)) {
+      $requirements['amptheme'] = array(
+        'title' => t('AMP Base Theme'),
+        'description' => t('The AMP module requires the <a href="@theme">AMP Base Theme</a> to be installed.', array('@theme' => 'https://www.drupal.org/project/amptheme')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+  return $requirements;
+}
