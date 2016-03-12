@@ -365,22 +365,24 @@ function amp_entity_delete(EntityInterface $entity) {
  * to their own class and determine how that might affect the D7 module.
  */
 function amp_create_amp_alias(EntityInterface $entity) {
-  if ($entity instanceof EntityViewDisplay || !$entity->hasLinkTemplate('canonical')) {
+  if ($entity instanceof EntityViewDisplay) {
     return;
   }
-  $path = '/' . $entity->toUrl('canonical')->getInternalPath();
-  $langcode = $entity->language()->getId();
-  // First check to see if there is an alias for the node.
-  if ($alias = \Drupal::service('path.alias_storage')->lookupPathAlias($path, $langcode)) {
+  if ($entity->hasLinkTemplate('canonical')) {
+    $path = '/' . $entity->toUrl('canonical')->getInternalPath();
+    $langcode = $entity->language()->getId();
+    // First check to see if there is an alias for the node.
+    if ($alias = \Drupal::service('path.alias_storage')->lookupPathAlias($path, $langcode)) {
 
-    // Get a list of all AMP-enabled node types.
-    $amp_entity_type_service = \Drupal::service('amp.entity_type');
-    $enabled_types = $amp_entity_type_service->getAmpEnabledTypes();
-    $type = $entity->getType();
-    // Check if the content is AMP enabled.
-    if ($enabled_types[$type] === $type) {
-      // Save an AMP version of the alias.
-      \Drupal::service('path.alias_storage')->save($path . "/amp", $alias . "/amp", $langcode);
+      // Get a list of all AMP-enabled node types.
+      $amp_entity_type_service = \Drupal::service('amp.entity_type');
+      $enabled_types = $amp_entity_type_service->getAmpEnabledTypes();
+      $type = $entity->getType();
+      // Check if the content is AMP enabled.
+      if ($enabled_types[$type] === $type) {
+        // Save an AMP version of the alias.
+        \Drupal::service('path.alias_storage')->save($path . "/amp", $alias . "/amp", $langcode);
+      }
     }
   }
 }
@@ -389,11 +391,13 @@ function amp_create_amp_alias(EntityInterface $entity) {
  * Helper function to delete an alias.
  */
 function amp_delete_amp_alias(EntityInterface $entity) {
-  if ($entity instanceof EntityViewDisplay || !$entity->hasLinkTemplate('canonical')) {
+  if ($entity instanceof EntityViewDisplay) {
     return;
   }
-  $amp_path = '/' . $entity->toUrl('canonical')->getInternalPath() . "/amp";
-  \Drupal::service('path.alias_storage')->delete(array('source' => $amp_path));
+  if ($entity->hasLinkTemplate('canonical')) {
+    $amp_path = '/' . $entity->toUrl('canonical')->getInternalPath() . "/amp";
+    \Drupal::service('path.alias_storage')->delete(array('source' => $amp_path));
+  }
 }
 
 /**
