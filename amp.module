@@ -428,6 +428,9 @@ function amp_entity_delete($entity, $type) {
  */
 function amp_create_amp_alias($entity) {
   $enabled_types = amp_get_enabled_types();
+  if (empty($enabled_types)) {
+    return;
+  }
   // Only create aliases for AMP-enabled entities with an alias.
   if (in_array($entity->type, $enabled_types) && !empty($entity->path['alias'])) {
     $path = array(
@@ -522,6 +525,9 @@ function amp_page_alter(array &$page) {
  */
 function amp_entity_view_alter(&$build, $type) {
   $enabled_types = amp_get_enabled_types();
+  if (empty($enabled_types)) {
+    return;
+  }
   // Show amphtml links on AMP-enabled nodes so search engines can find AMP.
   if ($type == 'node' && in_array($build['#bundle'], $enabled_types)) {
     if ($build['#view_mode'] == 'full') {
