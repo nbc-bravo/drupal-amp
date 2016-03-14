@@ -211,13 +211,13 @@ class AmpSettingsForm extends ConfigFormBase {
 
 
     $form['amp_library_group'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('AMP Library Configuration <a href="https://github.com/Lullabot/amp-library">(GitHub Home and Documentation)</a>'),
+      '#type' => 'fieldset',
+      '#title' => t('AMP Library Configuration <a href="https://github.com/Lullabot/amp-library">(GitHub Home and Documentation)</a>'),
     );
 
     $form['amp_library_group']['test_page'] = array(
-        '#type' => 'item',
-        '#markup' => t('<a href="/admin/amp/library/test">Test that AMP is configured properly</a>'),
+      '#type' => 'item',
+      '#markup' => t('<a href="/admin/amp/library/test">Test that AMP is configured properly</a>'),
     );
 
     $form['amp_library_group']['amp_library_warnings_display'] = array(
