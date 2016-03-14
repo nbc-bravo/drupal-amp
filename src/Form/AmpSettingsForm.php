@@ -217,7 +217,7 @@ class AmpSettingsForm extends ConfigFormBase {
 
     $form['amp_library_group']['test_page'] = array(
       '#type' => 'item',
-      '#markup' => t('<a href="/admin/amp/library/test">Test that AMP is configured properly</a>'),
+      '#markup' => t('<a href=":url">Test that AMP is configured properly</a>', array(':url' => \Drupal::url('amp.test_library_hello')))
     );
 
     $form['amp_library_group']['amp_library_warnings_display'] = array(
