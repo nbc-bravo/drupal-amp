@@ -277,8 +277,8 @@ function amp_is_amp_request() {
   // Get current URL.
   $current_url = url(current_path(), array('absolute' => TRUE));
 
-  // Check if URL ends with '/amp'
-  if (stripos(strrev($current_url), strrev('/amp')) === 0) {
+  // Check if URL contains the amp parameter
+  if (isset($_GET['amp'])) {
     // Get system path.
     $system_path = drupal_lookup_path('source', $path);
 
@@ -348,11 +348,20 @@ function amp_form_node_form_alter(&$form, &$form_state, $form_id) {
  */
 function amp_node_form_submit(&$form, $form_state) {
   if (!empty($form_state['node']->path['alias'])) {
-    drupal_goto($form_state['node']->path['alias'] . '/amp');
+    $current_path = $form_state['node']->path['alias'];
   }
   elseif (!empty($form_state['node']->path['source'])) {
-    drupal_goto($form_state['node']->path['source'] . '/amp');
+    $current_path = $form_state['node']->path['source'];
   }
+
+  if (strpos($current_path, '?') === FALSE) {
+    $current_path = $current_path . '?amp';
+  }
+  else {
+    $current_path = $current_path . '&amp';
+  }
+
+  drupal_goto($current_path);
 }
 
 /**
@@ -378,101 +387,13 @@ function amp_view_modes_submit(&$form, $form_state) {
   }
   $removed = array_diff($old_values, $new_values);
   $added = array_diff($new_values, $old_values);
-  if ($type = $form['#bundle']) {
-    $amp_nodes = node_load_multiple(array(), array('type' => $type));
-  }
   if (is_array($removed) && in_array('amp', $removed)) {
-    // Remove all AMP aliases for the content type.
-    foreach ($amp_nodes as $amp_node) {
-      amp_delete_amp_alias($amp_node);
-    }
     // If the AMP view was removed, clear cache of AMP-enabled content.
     cache_clear_all('amp_enabled_types', 'cache');
   }
   if (is_array($added) && in_array('amp', $added)) {
-    // Create all AMP aliases for the content type.
-    foreach ($amp_nodes as $amp_node) {
-      amp_create_amp_alias($amp_node);
-    }
     // If the AMP view was added, clear cache of AMP-enabled content.
     cache_clear_all('amp_enabled_types', 'cache');
-  }
-}
-
-/**
- * Implements hook_entity_insert().
- */
-function amp_entity_insert($entity, $type) {
-  amp_create_amp_alias($entity);
-}
-
-/**
- * Implements hook_entity_update().
- */
-function amp_entity_update($entity, $type) {
-  // Delete old AMP aliases.
-  amp_delete_amp_alias($entity);
-  // Create a new AMP alias.
-  amp_create_amp_alias($entity);
-}
-
-/**
- * Implements hook_entity_delete().
- */
-function amp_entity_delete($entity, $type) {
-  amp_delete_amp_alias($entity);
-}
-
-/**
- * Helper function to create an AMP alias.
- */
-function amp_create_amp_alias($entity) {
-  $enabled_types = amp_get_enabled_types();
-  if (empty($enabled_types)) {
-    return;
-  }
-  // Only create aliases for AMP-enabled entities with an alias.
-  if (in_array($entity->type, $enabled_types) && !empty($entity->path['alias'])) {
-    $path = array(
-      'source' => $entity->path['source'] . '/amp',
-      'alias' => $entity->path['alias'] . '/amp',
-      'language' => $entity->path['language'],
-    );
-  }
-  // Allow nodes as well.
-  if (in_array($entity->type, $enabled_types) && isset($entity->nid)) {
-    if ($node_alias = drupal_get_path_alias('node/' . $entity->nid)) {
-      // Only create AMP aliases for nodes with aliases;
-      if ($node_alias != 'node/' . $entity->nid) {
-        $path = array(
-          'source' => 'node/' . $entity->nid . '/amp',
-          'alias' => $node_alias . '/amp',
-          'language' => $entity->language,
-        );
-      }
-    }
-  }
-  // Save an AMP version of the alias.
-  if (isset($path)) {
-    path_save($path);
-  }
-}
-
-/**
- * Helper function to delete an AMP alias.
- */
-function amp_delete_amp_alias($entity) {
-  if (isset($entity->path['source'])) {
-    $path = $entity->path['source'];
-  }
-  elseif (isset($entity->nid)) {
-    $path = 'node/' . $entity->nid;
-  }
-  if (isset($path)) {
-    $amp_alias = drupal_get_path_alias($path . '/amp');
-    if (isset($amp_alias) && $amp_alias != $path . '/amp') {
-      path_delete(array('alias' => $amp_alias));
-    }
   }
 }
 
@@ -531,7 +452,7 @@ function amp_entity_view_alter(&$build, $type) {
   // Show amphtml links on AMP-enabled nodes so search engines can find AMP.
   if ($type == 'node' && in_array($build['#bundle'], $enabled_types)) {
     if ($build['#view_mode'] == 'full') {
-      $path = '/' . drupal_get_path_alias('node/' . $build['#node']->nid) . "/amp";
+      $path = '/' . drupal_get_path_alias('node/' . $build['#node']->nid) . "?amp";
       drupal_add_html_head_link(array('rel' => 'amphtml', 'href' => $path), TRUE);
     }
   }
