@@ -46,19 +46,22 @@ class AMPTestLibrary extends ControllerBase {
    * @return string
    */
   public function hello() {
-    $html =
-      '<p><a href="javascript:run();">Run</a></p>' . PHP_EOL .
-      '<p><a style="margin: 2px;" href="http://www.cnn.com" target="_parent">CNN</a></p>' . PHL_EOL .
-      '<p><a href="http://www.bbcnews.com" target="_blank">BBC</a></p>' . PHP_EOL .
-      '<p><INPUT type="submit" value="submit"></p>' . PHP_EOL .
-      '<p>This is a <!-- test comment --> <!-- [if IE9] --> sample <div onmouseover="hello();">sample</div> paragraph</p>';
+    $html_header = PHP_EOL . PHP_EOL . 'OUTPUT HTML'. PHP_EOL;
+    $html_header .= '-------------' . PHP_EOL;
+    $html = '<p><a href="javascript:run();">Run</a></p>' . PHP_EOL .
+        '<p><a style="margin: 2px;" href="http://www.cnn.com" target="_parent">CNN</a></p>' . PHP_EOL .
+        '<p><a href="http://www.bbcnews.com" target="_blank">BBC</a></p>' . PHP_EOL .
+        '<p><INPUT type="submit" value="submit"></p>' . PHP_EOL .
+        '<p>This is a <!-- test comment -->sample <div onmouseover="hello();">sample</div> paragraph</p>';
 
     $this->amp->loadHtml($html);
-    $this->amp->convertToAmpHtml();
-    $diff = $this->amp->getInputOutputHtmlDiff();
+    $amp_html = htmlspecialchars($this->amp->convertToAmpHtml());
+    $original_html = PHP_EOL . PHP_EOL . 'ORIGINAL TEST HTML INPUT'. PHP_EOL;
+    $original_html .=                    '-------------------------' . PHP_EOL;
+    $original_html .= htmlspecialchars($html);
     return [
         '#type' => 'markup',
-        '#markup' => "<pre>$diff" .  $this->amp->warningsHumanHtml() . "</pre>"
+        '#markup' => "<h3>The Library is working fine</h3><pre>$html_header $amp_html $original_html" .  $this->amp->warningsHumanHtml() . "</pre>"
     ];
   }
 
