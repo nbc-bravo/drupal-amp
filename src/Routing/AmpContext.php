@@ -67,9 +67,8 @@ class AmpContext {
       return TRUE;
     }
 
-    // We only want to consider URLs that end with 'amp'.
-    $current_path = \Drupal::service('path.current')->getPath();
-    if (substr($current_path, -3) != 'amp') {
+    // We only want to consider path with amp in the query string.
+    if (!(isset($_GET['amp']))) {
       return FALSE;
     }
 

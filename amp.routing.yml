@@ -7,12 +7,13 @@ amp.settings:
     _permission: 'administer site configuration'
 
 amp.node_amp_page:
-  path: '/node/{node}/amp'
+  path: '/node/{node}'
   defaults:
-    _controller: '\Drupal\amp\Controller\ampPage::amp'
-    _title: 'AMP Page'
+    _controller: '\Drupal\amp\Controller\ampNodeViewController::view'
+    _title_callback: '\Drupal\node\Controller\NodeViewController::title'
   requirements:
-    _permission: 'access content'
+    _entity_access: 'node.view'
+    node: \d+
   options:
     _amp_route: FALSE
 
