@@ -88,18 +88,41 @@ function amp_admin_form($form, &$form_state) {
       ':input[name="amp_pixel"]' => array('checked' => TRUE))
     ),
   );
-  $form['amp_test_page'] = array(
+
+  $form['amp_library'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('AMP Library Configuration <a href="https://github.com/Lullabot/amp-library">(GitHub Home and Documentation)</a>'),
+  );
+
+  $form['amp_library']['amp_test_page'] = array(
     '#type' => 'item',
     '#markup' => t('<a href="@url">Test that AMP is configured properly</a>', array('@url' => '/admin/amp/library/test')),
   );
-  $form['amp_library_warnings_display'] = array(
+
+  $form['amp_library']['amp_library_warnings_display'] = array(
     '#type' => 'checkbox',
-    '#title' => t('<em>debugging</em>: show amp library warnings in all amp text formatters for all users'),
-    '#default_value' => variable_get('amp_library_warnings_display'),
-    '#description' => t('if you only want to see amp formatter specific warning for one node add query "warnfix" at end of a node url. e.g. <strong>node/12345/amp?warnfix</strong>'),
+    '#title' => t('<em>Debugging</em>: Show AMP PHP library warnings in all amp text formatters for all users'),
+    '#default_value' => variable_get('amp_library_warnings_display', false),
+    '#description' => t('<ul><li>if you only want to see amp formatter specific warning for one node add '
+            . 'query "warnfix" at end of a node url. e.g. <strong>node/12345?amp&warnfix</strong></li>'
+            . '<li>If the Debugging checkbox value is changed upon save, the Drupal cache will be cleared</li>'),
   );
 
+  $form['#submit'] = array('amp_admin_form_submit');
   return system_settings_form($form);
+}
+/**
+ * Submit handler for the amp_admin_form
+ * Clears the Drupal cache if the AMP Library warnings display checkbox value is changed
+ * 
+ * @param type $form
+ * @param type $form_state
+ */
+function amp_admin_form_submit($form, &$form_state) {
+  if (variable_get('amp_library_warnings_display', false) !== $form_state['values']['amp_library_warnings_display']) {
+    cache_clear_all();
+    drupal_set_message(t('AMP Library debugging checkbox changed. Cleared cache.'));    
+  }
 }
 
 /**

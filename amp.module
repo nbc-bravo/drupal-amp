@@ -858,6 +858,9 @@ function amp_field_formatter_view($entity_type, $entity, $field, $instance, $lan
         $output = _text_sanitize($instance, $langcode, $item, 'value');
         $amp_content = _amp_convert_markup_to_amp($output);
         $element[$delta] = array('#markup' => $amp_content['amp_markup']);
+        if (isset($_GET['warnfix']) || variable_get('amp_library_warnings_display', false)) {
+          $element[$delta]['#markup'] .= '<pre>' . $amp_content['amp_warnings'] . '</pre>';
+        }
         _amp_add_component_libraries($amp_content['amp_components']);
       }
       break;
@@ -870,6 +873,9 @@ function amp_field_formatter_view($entity_type, $entity, $field, $instance, $lan
         }
         $amp_content = _amp_convert_markup_to_amp($output);
         $element[$delta] = array('#markup' => $amp_content['amp_markup']);
+        if (isset($_GET['warnfix']) || variable_get('amp_library_warnings_display', false)) {
+          $element[$delta]['#markup'] .= '<pre>' . $amp_content['amp_warnings'] . '</pre>';
+        }
         _amp_add_component_libraries($amp_content['amp_components']);
       }
       break;
@@ -885,6 +891,9 @@ function amp_field_formatter_view($entity_type, $entity, $field, $instance, $lan
         }
         $amp_content = _amp_convert_markup_to_amp($output);
         $element[$delta] = array('#markup' => $amp_content['amp_markup']);
+        if (isset($_GET['warnfix']) || variable_get('amp_library_warnings_display', false)) {
+          $element[$delta]['#markup'] .= '<pre>' . $amp_content['amp_warnings'] . '</pre>';
+        }
         _amp_add_component_libraries($amp_content['amp_components']);
       }
       break;
