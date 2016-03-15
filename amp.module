@@ -27,6 +27,15 @@ function amp_help($path, $arg) {
  */
 function amp_menu() {
   $items = array();
+
+  $items['admin/config/amp/library/test'] = array(
+    'title' => 'Test the AMP Library',
+    'description' => 'Test the AMP Library',
+    'page callback' => 'amp_library_test',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['admin/config/content/amp'] = array(
     'title' => 'AMP Configuration',
     'description' => 'Configure the AMP module',
@@ -37,6 +46,31 @@ function amp_menu() {
     'file' => 'amp.admin.inc',
   );
   return $items;
+}
+
+/**
+ * Test the AMP Library
+ * @return type
+ */
+function amp_library_test() {
+    $html_header = PHP_EOL . PHP_EOL . 'OUTPUT HTML'. PHP_EOL;
+    $html_header .= '-------------' . PHP_EOL;
+    $html = '<p><a href="javascript:run();">Run</a></p>' . PHP_EOL .
+    '<p><a style="margin: 2px;" href="http://www.cnn.com" target="_parent">CNN</a></p>' . PHP_EOL .
+    '<p><a href="http://www.bbcnews.com" target="_blank">BBC</a></p>' . PHP_EOL .
+    '<p><INPUT type="submit" value="submit"></p>' . PHP_EOL .
+    '<p>This is a <!-- test comment -->sample <div onmouseover="hello();">sample</div> paragraph</p>';
+
+    $amp = _amp_create_amp_converter();
+    $amp->loadHtml($html);
+    $amp_html = htmlspecialchars($amp->convertToAmpHtml());
+    $original_html = PHP_EOL . PHP_EOL . 'ORIGINAL TEST HTML INPUT'. PHP_EOL;
+    $original_html .=                    '-------------------------' . PHP_EOL;
+    $original_html .= htmlspecialchars($html);
+    return array(
+        '#type' => 'markup',
+        '#markup' => "<h3>The Library is working fine</h3><pre>$html_header $amp_html $original_html" .  $amp->warningsHumanHtml() . "</pre>"
+    );
 }
 
 /**

@@ -96,7 +96,7 @@ function amp_admin_form($form, &$form_state) {
 
   $form['amp_library']['amp_test_page'] = array(
     '#type' => 'item',
-    '#markup' => t('<a href="@url">Test that AMP is configured properly</a>', array('@url' => '/admin/amp/library/test')),
+    '#markup' => t('<a href="@url">Test that AMP is configured properly</a>', array('@url' => '/admin/config/amp/library/test')),
   );
 
   $form['amp_library']['amp_library_warnings_display'] = array(
