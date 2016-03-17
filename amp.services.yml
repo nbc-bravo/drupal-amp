@@ -24,7 +24,7 @@ services:
   html_response.amp_subscriber:
     class: Drupal\amp\EventSubscriber\AmpHtmlResponseSubscriber
     tags:
-      - { name: event_subscriber, priority: 30 }
+      - { name: event_subscriber }
     arguments: ['@html_response.amp_markup_processor', '@router.amp_context']
   logger.channel.amp:
     parent: logger.channel_base

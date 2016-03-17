@@ -101,12 +101,18 @@ class AmpHtmlResponseMarkupProcessor {
     // Get a reference to the content.
     $this->content = $response->getContent();
 
-    // First check the config if full html warnings are on
+    // First check the config if full html warnings are on, if not then exit with unaltered response
     if (!$this->ampConfig->get('amp_library_process_full_html')) {
       return $response;
     }
 
-    $this->ampConverter->loadHtml($this->content, ['scope' => Scope::HTML_SCOPE]);
+    $options = ['scope' => Scope::HTML_SCOPE];
+    if ($this->ampConfig->get('amp_library_process_statistics')) {
+      $options += ['add_stats_html_comment' => true];
+    }
+
+    $this->ampConverter->loadHtml($this->content, $options);
+
     $this->ampContent = $this->ampConverter->convertToAmpHtml();
     $request_uri = \Drupal::request()->getRequestUri();
 
