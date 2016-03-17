@@ -66,7 +66,8 @@ class AmpHtmlResponseSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
-    $events[KernelEvents::RESPONSE][] = ['onRespond'];
+    // We want to run this as late as possible, after the HTML has been modified by all the Response listeners
+    $events[KernelEvents::RESPONSE][] = ['onRespond', -1024];
     return $events;
   }
 
