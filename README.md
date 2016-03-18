@@ -56,8 +56,8 @@ The body field presents a special problem, since it is likely to contain lots of
 * Download the theme, module, and composer manager: `drush dl amp, amptheme, composer_manager`
 * Enable Composer Manager and the AMP Theme: `drush en composer_manager, amptheme, ampsubtheme_example`
 * Composer Manager writes a file to `sites/default/files/composer`
-* Go to the directory: 'cd sites/default/files/composer`
-* Complete installation: `composer install`
+* Go to the AMP module directory (e.g., `cd sites/default/files/composer`)
+* Complete installation: `drush composer-manager install`
 * Check `/admin/config/system/composer-manager` to ensure it's all green
 * Enable AMP: `drush en amp`
 
