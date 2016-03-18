@@ -50,15 +50,36 @@ The module will be responsible for the basic functionality of providing an AMP v
 The body field presents a special problem, since it is likely to contain lots of invalid markup, especially embedded images, videos, tweets, and iframes. There is no easy way to convert a blob of text with invalid markup into AMP-compatible markup. At the same time, this is a common problem that other projects will run into. Our solution is to create a separate, stand-alone, [AMP PHP Library](https://github.com/Lullabot/amp-library) to transform that markup, as best it can, from non-compliant HTML to AMP HTML. The AMP formatter for the body will use that library to render the body in the AMP view mode.
 
 
-# Configuration
-* Go to the AMP configuration screen at `/admin/config/content/amp`
+## Initial setup
+
+* Follow instructions at https://www.drupal.org/node/2405811 to get Composer Manager working. (Unfortunately, with the latest stable version of Drupal 8, `composer drupal-update` will fail without [this core patch](https://www.drupal.org/node/2664274). One easy way to apply that patch would be to run: `curl https://www.drupal.org/files/issues/2664274-19-fix-composer.patch | patch -p1`.)
+* Download the AMP theme into the `/themes` directory.
+* Download this (AMP) module into the `/modules` directory.
+* On the command line, move to the root of the Drupal project and run `composer drupal-update` to pick up remaining dependencies.
+
+
+## AMP Configuration
+
+* Install the AMP Base theme and the ExAMPle subtheme included in amptheme, but don't make it the default theme. It will only be used on AMP pages.
+  * With Drush, you can install both with the command `drush en ampsubtheme_example`, because amptheme is set as the base theme for ampsubtheme_example.
+* Enable the AMP module. This should be done after the AMP themes have been installed.
+  * Go to `/admin/config/content/amp` and select configuration options.
+  * Identify which content types you want to create AMP pages and which theme you will use on those pages. By default, the ExAMPle Subtheme should be selected. You can create a custom theme that is based on the AMP Base theme, in order to provide custom markup and styles. If that custom subtheme is installed, you can select it here.
+  * If you use Google AdSense or Google Analytics you can also provide the IDs that will be used to create ads and analytics on the AMP pages.
+  * Select and save the options.
+* Go to `/admin/structure/block/list/{AMP-THEME-NAME}` and set up the blocks for the AMP page.
+  * The AMP page is a simple page, with a header, content area, and footer. You should remove most blocks from this theme. We suggest just displaying the branding, title and content on the page. Start simple and add more elements later if desired.
+  * If you want ads on your AMP pages, add AMP Ad blocks as desired. The ads will use the IDs provided in your AMP configuration.
+* Go to `/admin/structure/types/manage/{CONTENT-TYPE}/display/amp` and set up the fields for the AMP version of each content type.
+  * The AMP view mode is where you can control which fields will display on the AMP page for each content type. You might only want a title, image, and body.
+  * There are special AMP formatters for text, image, and iframe fields, so be sure to use them in the AMP view mode.
 
 ### Content Types
 * Find the list of your content types at the top
 * Click the link to "Enable AMP in Custom Display Settings"
 * Open "Custom Display Settings" fieldset, check AMP, click Save button (this brings you back to the AMP config form)
 * Click "Configure AMP view mode"
-* Set your Body field to use the `AMP text` format (and any other fields you want to configure)
+* Set your Body field to use the "AMP text" format (and any other fields you want to configure)
 * Click Save button (this brings you back to the AMP config form)
 
 ### Analytics (optional)
