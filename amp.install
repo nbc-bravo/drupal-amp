@@ -10,7 +10,7 @@
  */
 function amp_requirements($phase) {
   $requirements = array();
-  if ($phase == 'install' || $phase == 'runtime') {
+  if ($phase == 'runtime') {
     if (!class_exists('\Lullabot\AMP\AMP')) {
       $requirements['amp_library'] = array(
         'title' => t('AMP'),
