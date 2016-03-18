@@ -393,9 +393,12 @@ function amp_node_form_submit(&$form, $form_state) {
   if (!empty($form_state['node']->path['alias'])) {
     $current_path = $form_state['node']->path['alias'];
   }
-  elseif (!empty($form_state['node']->path['source'])) {
-    $current_path = $form_state['node']->path['source'];
+  else {
+    $current_path = 'node/' . $form_state['node']->nid;
   }
+
+  // We need to remove destination if its there
+  unset($_GET['destination']);
 
   // We must pass amp => null as there is no value to the amp parameter
   drupal_goto($current_path, array('query' => array('amp' => null)));
@@ -408,9 +411,12 @@ function amp_node_form_submit_warnfix(&$form, $form_state) {
   if (!empty($form_state['node']->path['alias'])) {
     $current_path = $form_state['node']->path['alias'];
   }
-  elseif (!empty($form_state['node']->path['source'])) {
-    $current_path = $form_state['node']->path['source'];
+  else {
+    $current_path = 'node/' . $form_state['node']->nid;
   }
+
+  // We need to remove destination if its there
+  unset($_GET['destination']);
 
   // We must pass amp => null as there is no value to the amp parameter
   drupal_goto($current_path, array('query' => array('amp' => null, 'warnfix' => null)));
