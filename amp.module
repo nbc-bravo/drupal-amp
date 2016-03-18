@@ -375,6 +375,14 @@ function amp_form_node_form_alter(&$form, &$form_state, $form_id) {
       '#weight' => 12,
       '#access' => TRUE,
     );
+    // Add the buttong between "Preview" (weight of 10) and "Delete" (15).
+    $form['actions']['save_view_amp_warnfix'] = array(
+        '#type' => 'submit',
+        '#value' => t('Save and view AMP page and see any AMP formatter warnings'),
+        '#submit' => array('node_form_submit', 'amp_node_form_submit_warnfix'),
+        '#weight' => 13,
+        '#access' => TRUE,
+    );
   }
 }
 
@@ -391,6 +399,21 @@ function amp_node_form_submit(&$form, $form_state) {
 
   // We must pass amp => null as there is no value to the amp parameter
   drupal_goto($current_path, array('query' => array('amp' => null)));
+}
+
+/**
+ * Submit handler for viewing the AMP page with warnings/fixes messages
+ */
+function amp_node_form_submit_warnfix(&$form, $form_state) {
+  if (!empty($form_state['node']->path['alias'])) {
+    $current_path = $form_state['node']->path['alias'];
+  }
+  elseif (!empty($form_state['node']->path['source'])) {
+    $current_path = $form_state['node']->path['source'];
+  }
+
+  // We must pass amp => null as there is no value to the amp parameter
+  drupal_goto($current_path, array('query' => array('amp' => null, 'warnfix' => null)));
 }
 
 /**
