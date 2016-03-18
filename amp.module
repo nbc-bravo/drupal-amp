@@ -1007,21 +1007,15 @@ function _amp_create_amp_converter() {
  *
  * @param string $markup
  *   The markup to be converted.
- * @param array $options
- *   Options array passed to AMP::loadHTML() method
  * @return array $amp_content
  *   An array containing the following:
  *   - amp_markup: The AMP HTML.
  *   - amp_warnings: The AMP warning messages.
  *   - amp_components: An array of AMP JS components.
  */
-function _amp_convert_markup_to_amp($markup, $options = array()) {
-  global $base_url;
-  if (empty($options['base_uri'])) {
-      $options['base_uri'] = $base_url;
-  }
+function _amp_convert_markup_to_amp($markup) {
   $amp = _amp_create_amp_converter();
-  $amp->loadHtml($markup, $options);
+  $amp->loadHtml($markup);
   $amp_content = array(
     'amp_markup' => $amp->convertToAmpHtml(),
     'amp_warnings' => $amp->warningsHumanHtml(),
@@ -1236,8 +1230,7 @@ function amp_deliver_html_page($page_callback_result) {
       print $full_html_unprocessed;
     } else {
       // Setup of AMP conversion
-      global $base_url;
-      $options = array('scope' => Scope::HTML_SCOPE, 'base_uri' => $base_url);
+      $options = array('scope' => Scope::HTML_SCOPE);
       if (variable_get('amp_library_process_statistics', false)) {
         $options += array('add_stats_html_comment' => true);
       }
