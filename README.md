@@ -57,8 +57,12 @@ The body field presents a special problem, since it is likely to contain lots of
 * Enable Composer Manager and the AMP Theme: `drush en composer_manager, amptheme, ampsubtheme_example`
 * Composer Manager writes a file to `sites/default/files/composer`
 * Enable AMP: `drush en amp`
-* As long as Composer Manager is enabled, the required dependencies will be added to `sites/all/vendor`
+* As long as Composer Manager is enabled, the required dependencies will be added to `sites/all/vendor` as soon as you enable the AMP module
+* If you don't see any dependencies download, try `drush composer-json-rebuild` followed by `drush composer-manager install` when in docroot
 * Check `/admin/config/system/composer-manager` to ensure it's all green
+* Tip: If you ever want to update your composer dependencies to a more recent version (while respecting versioning constraints) try `drush composer-manager update`
+* Tip: See composer manager drupal documentation to understand how this all works
+
 
 ## Configuration
 * Go to the AMP configuration screen at `/admin/config/content/amp`
