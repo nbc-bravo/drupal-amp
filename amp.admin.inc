@@ -89,23 +89,53 @@ function amp_admin_form($form, &$form_state) {
     ),
   );
 
-  $form['amp_library'] = array(
+  $form['amp_library_group'] = array(
     '#type' => 'fieldset',
     '#title' => t('AMP Library Configuration <a href="https://github.com/Lullabot/amp-library">(GitHub Home and Documentation)</a>'),
   );
 
-  $form['amp_library']['amp_test_page'] = array(
+  $form['amp_library_group']['amp_test_page'] = array(
     '#type' => 'item',
     '#markup' => t('<a href="@url">Test that AMP is configured properly</a>', array('@url' => '/admin/config/amp/library/test')),
   );
 
-  $form['amp_library']['amp_library_warnings_display'] = array(
+  $form['amp_library_group']['amp_library_warnings_display'] = array(
     '#type' => 'checkbox',
-    '#title' => t('<em>Debugging</em>: Show AMP PHP library warnings in all amp text formatters for all users'),
+    '#title' => t('<em>Debugging</em>: Show AMP Library warnings in <em>all</em> AMP text formatters for <em>all</em> users'),
     '#default_value' => variable_get('amp_library_warnings_display', false),
-    '#description' => t('<ul><li>if you only want to see amp formatter specific warning for one node add '
+    '#description' => t('<ul><li>If you only want to see amp formatter specific warning for one node add '
             . 'query "warnfix" at end of a node url. e.g. <strong>node/12345?amp&warnfix</strong></li>'
             . '<li>If the Debugging checkbox value is changed upon save, the Drupal cache will be cleared</li>'),
+  );
+
+  $form['amp_library_group']['amp_library_process_full_html'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('<strong><em>Power User:</em> Run the whole HTML page through the AMP library</strong>'),
+      '#default_value' => variable_get('amp_library_process_full_html', false),
+      '#description' => t('The AMP PHP library will fix many AMP HTML standard non-compliance issues by ' .
+          'removing illegal or disallowed attributes, tags and property value pairs. This is useful for processing the output of modules that ' .
+          'generate AMP unfriendly HTML. Please test when enabling on your site as some modules may depend on ' .
+          'the HTML removed by the library and thus break in possibly subtle ways.')
+  );
+
+  $form['amp_library_group']['amp_library_process_statistics'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('<em>Statistics:</em> Add an <a href="https://www.drupal.org/files/issues/time_taken.png">HTML comment</a> at the end of Drupal page output indicating various performance statistics like time taken, number of tags processed etc.'),
+      '#default_value' => variable_get('amp_library_process_statistics', false),
+      '#states' => array('visible' => array(
+          ':input[name="amp_library_process_full_html"]' => array('checked' => TRUE))
+      ),
+  );
+
+  $form['amp_library_group']['amp_library_process_full_html_warnings'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('<em>Debugging:</em> Add a notice in the Drupal log for each processed AMP page showing the AMP warnings (and fixes) generated'),
+      '#default_value' => variable_get('amp_library_process_full_html_warnings', false),
+      '#description' => t('A Drupal log entry will be generated for <em>each</em> non-anonymous AMP request. ' .
+          'However <em>anonymous</em> page requests will be cached by Drupal and will not repeatedly call the AMP library.'),
+      '#states' => array('visible' => array(
+          ':input[name="amp_library_process_full_html"]' => array('checked' => TRUE))
+      ),
   );
 
   $form['#submit'] = array('amp_admin_form_submit');
