@@ -389,14 +389,8 @@ function amp_node_form_submit(&$form, $form_state) {
     $current_path = $form_state['node']->path['source'];
   }
 
-  if (strpos($current_path, '?') === FALSE) {
-    $current_path = $current_path . '?amp';
-  }
-  else {
-    $current_path = $current_path . '&amp';
-  }
-
-  drupal_goto($current_path);
+  // We must pass amp => null as there is no value to the amp parameter
+  drupal_goto($current_path, array('query' => array('amp' => null)));
 }
 
 /**
