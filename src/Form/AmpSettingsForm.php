@@ -222,7 +222,7 @@ class AmpSettingsForm extends ConfigFormBase {
 
     $form['amp_library_group']['amp_library_warnings_display'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('<em>Debugging</em>: Show AMP Library warnings in all AMP text formatters for all users'),
+      '#title' => $this->t('<em>Debugging</em>: Show AMP Library warnings in <em>all</em> AMP text formatters for <em>all</em> users'),
       '#default_value' => $amp_config->get('amp_library_warnings_display'),
       '#description' => $this->t('If you only want to see AMP formatter specific warning for one node add query ' .
           '"warnfix" at end of a node url. e.g. <strong>node/12345?amp&warnfix</strong>'),
@@ -230,7 +230,7 @@ class AmpSettingsForm extends ConfigFormBase {
 
     $form['amp_library_group']['amp_library_process_full_html'] = array(
       '#type' => 'checkbox',
-      '#title' => $this->t('<em>Power User:</em> Run the whole HTML page through the AMP library'),
+      '#title' => $this->t('<strong><em>Power User:</em> Run the whole HTML page through the AMP library</strong>'),
       '#default_value' => $amp_config->get('amp_library_process_full_html'),
       '#description' => $this->t('The AMP PHP library will fix many AMP HTML standard non-compliance issues by ' .
           'removing illegal or disallowed attributes, tags and property value pairs. This is useful for processing the output of modules that ' .

@@ -117,6 +117,9 @@ class AmpHtmlResponseMarkupProcessor {
     $request_uri = \Drupal::request()->getRequestUri();
 
     $heading = "<h3>AMP PHP Library messages for $request_uri</h3>" . PHP_EOL;
+    $heading .= 'To disable these notices goto <a href="/admin/config/content/amp">AMP configuration</a> and uncheck '
+        . '<em>Debugging: Add a notice in the Drupal log ...</em> in the AMP PHP Library Configuration fieldset' . PHP_EOL;
+
     if ($this->ampConfig->get('amp_library_process_full_html_warnings')) {
       // Add any warnings that were generated
       $this->loggerChannel->notice("$heading <pre>" . $this->ampConverter->warningsHumanHtml() . '</pre>');
