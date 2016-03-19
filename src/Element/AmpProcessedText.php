@@ -77,7 +77,7 @@ class AmpProcessedText extends ProcessedText {
 
     $amp->loadHtml($element['#markup']);
     $element['#markup'] = $amp->convertToAmpHtml();
-    $warning_message = "<pre>" . $amp->warningsHumanHtml() . "</pre></div>";
+    $warning_message = "<pre>" . $amp->warningsHumanHtml() . "</pre>";
 
     if (self::warningsOn()) {
       $element['#markup'] .= $warning_message;
