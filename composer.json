@@ -10,13 +10,7 @@
     "issues": "http://drupal.org/project/issues/amp",
     "source": "http://cgit.drupalcode.org/amp"
   },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/Lullabot/amp-library"
-    }
-  ],
   "require": {
-    "lullabot/amp": "dev-master"
+    "lullabot/amp": "1.0.*"
   }
 }
