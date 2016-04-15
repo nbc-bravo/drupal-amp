@@ -4,6 +4,7 @@
 
 * [AMP Theme](https://www.drupal.org/project/amptheme)
 * [AMP PHP Library](https://github.com/Lullabot/amp-library)
+* PHP version 5.5.+
 
 
 ## Introduction
