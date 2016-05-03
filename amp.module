@@ -305,39 +305,31 @@ function amp_entity_info_alter(&$entity_info) {
  * Determines whether a request should return AMP HTML.
  */
 function amp_is_amp_request() {
+  $result = &drupal_static(__FUNCTION__);
 
-  // Get current path.
-  $path = current_path();
+  if (!isset($result)) {
+    $result = FALSE;
 
-  // Get current URL.
-  $current_url = url(current_path(), array('absolute' => TRUE));
-
-  // Check if URL contains the amp parameter
-  if (isset($_GET['amp'])) {
-    // Get system path.
-    $system_path = drupal_lookup_path('source', $path);
-
-    // Load menu item based on system path.
-    $menu_item = menu_get_item($system_path ? $system_path : current_path());
-
-    if ($menu_item && isset($menu_item['page_arguments'][0])) {
-      // Load the node.
-      $node = $menu_item['page_arguments'][0];
-
-      // Get node type.
-      $node_type = node_type_get_type($node);
-
-      // Get view mode settings for node type.
-      if ($node_type) {
-        $view_mode_settings = field_view_mode_settings('node', $node_type->type);
-      }
-      if (isset($view_mode_settings['amp']) && $view_mode_settings['amp']['custom_settings']) {
-        return TRUE;
+    // The current request must have '?amp' in the query string.
+    if (isset($_GET['amp'])) {
+      // Ensure that there is a node loaded from the current request, and that
+      // it is a node type which has the AMP view mode enabled.
+      $node = menu_get_object();
+      if ($node && in_array($node->type, amp_get_enabled_types())) {
+        // Do an additional check to ensure the current path is actually the
+        // node's public URI. Without this check, this function would return
+        // TRUE on the node's edit form.
+        $uri = entity_uri('node', $node);
+        if ($uri['path'] == current_path()) {
+          // Only if all of the above conditions are true is this a valid AMP
+          // request.
+          $result = TRUE;
+        }
       }
     }
   }
 
-  return FALSE;
+  return $result;
 }
 
 /**
