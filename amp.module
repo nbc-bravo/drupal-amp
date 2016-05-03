@@ -492,19 +492,14 @@ function amp_page_alter(array &$page) {
 }
 
 /**
- * Implements hook_entity_view_alter().
+ * Implements hook_node_view().
  */
-function amp_entity_view_alter(&$build, $type) {
-  $enabled_types = amp_get_enabled_types();
-  if (empty($enabled_types)) {
-    return;
-  }
+function amp_node_view($node, $view_mode, $langcode) {
   // Show amphtml links on AMP-enabled nodes so search engines can find AMP.
-  if ($type == 'node' && in_array($build['#bundle'], $enabled_types)) {
-    if ($build['#view_mode'] == 'full') {
-      $path = '/' . drupal_get_path_alias('node/' . $build['#node']->nid) . "?amp";
-      drupal_add_html_head_link(array('rel' => 'amphtml', 'href' => $path), TRUE);
-    }
+  if ($view_mode == 'full' && node_is_page($node) && in_array($node->type, amp_get_enabled_types())) {
+    $uri = entity_uri('node', $node);
+    $uri['options']['query']['amp'] = NULL;
+    drupal_add_html_head_link(array('rel' => 'amphtml', 'href' => url($uri['path'], $uri['options'])), TRUE);
   }
 }
 
