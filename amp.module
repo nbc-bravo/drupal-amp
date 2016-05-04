@@ -509,15 +509,20 @@ function amp_node_view($node, $view_mode, $langcode) {
 function amp_block_info() {
   $blocks = array();
   $block_ids = array(1, 2, 3, 4);
+  $amp_dfp_installed = module_exists('amp_dfp');
   foreach ($block_ids as $block_id) {
     $blocks['amp_google_adsense_' . $block_id] = array(
       'info' => t('AMP Google Adsense ' . $block_id),
       'cache' => DRUPAL_NO_CACHE,
     );
-    $blocks['amp_google_doubleclick_' . $block_id] = array(
-      'info' => t('AMP Google DoubleClick for Publishers ' . $block_id),
-      'cache' => DRUPAL_NO_CACHE,
-    );
+
+    if (!$amp_dfp_installed) {
+      $blocks['amp_google_doubleclick_' . $block_id] = array(
+        'info' => t('AMP Google DoubleClick for Publishers ' . $block_id),
+        'cache' => DRUPAL_NO_CACHE,
+      );
+    }
+
   }
   return $blocks;
 }

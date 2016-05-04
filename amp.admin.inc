@@ -43,14 +43,18 @@ function amp_admin_form($form, &$form_state) {
     '#size' => 20,
     '#description' => t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to pub-9999999999999'),
   );
-  $form['amp_google_doubleclick_id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Google DoubleClick for Publishers Network ID'),
-    '#default_value' => variable_get('amp_google_doubleclick_id', '/'),
-    '#maxlength' => 25,
-    '#size' => 20,
-    '#description' => t('The Network ID to use on all tags. This value should begin with a /.'),
-  );
+
+  if (!module_exists('amp_dfp')) {
+    $form['amp_google_doubleclick_id'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Google DoubleClick for Publishers Network ID'),
+      '#default_value' => variable_get('amp_google_doubleclick_id', '/'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#description' => t('The Network ID to use on all tags. This value should begin with a /.'),
+    );
+  }
+  
   $form['pixel_group'] = array(
     '#type' => 'fieldset',
     '#title' => t('amp-pixel'),

@@ -1,0 +1,5 @@
+name = AMP Doubleclick
+description = Helps render Doubleclick blocks as AMP elements
+core = 7.x
+dependencies[] = amp
+dependencies[] = dfp
