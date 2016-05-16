@@ -215,6 +215,15 @@ function amp_theme() {
 }
 
 /**
+ * Implementation of hook_ctools_plugin_directory().
+ */
+function amp_ctools_plugin_directory($owner, $plugin_type) {
+  if ($owner == 'ctools' && $plugin_type == 'access') {
+    return 'plugins/' . $plugin_type;
+  }
+}
+
+/**
  * Implements hook_preprocess_amp_ad().
  */
 function amp_preprocess_amp_ad(&$variables) {
