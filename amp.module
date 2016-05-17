@@ -287,7 +287,7 @@ function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_
   $amp_entity_type_service = \Drupal::service('amp.entity_type');
   $amp_types = $amp_entity_type_service->getAmpEnabledTypes();
   $type = $form_state->getStorage()['form_display']->getTargetBundle();
-  if ($amp_types[$type] !== $type) {
+  if (array_key_exists($type, $amp_types) && $amp_types[$type] !== $type) {
     return;
   }
 
