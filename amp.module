@@ -368,7 +368,7 @@ function amp_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state
 function amp_view_modes_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
   $new_values = array();
   $old_values = array();
-  if ($form_state->getValues()['display_modes_custom']) {
+  if (isset($form_state->getValues()['display_modes_custom'])) {
     $new_values = array_filter($form_state->getValues()['display_modes_custom']);
   }
   if (isset($form_state->getCompleteForm()['modes']['display_modes_custom']['#default_value'])) {
