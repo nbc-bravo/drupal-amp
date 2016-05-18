@@ -7,6 +7,8 @@
 
 namespace Drupal\amp;
 
+use Drupal\Core\Url;
+
 /**
  * Service class for retrieving and manipulating entity type information.
  */
@@ -52,19 +54,20 @@ class EntityTypeInfo {
     $enabled_types = !empty($this->getAmpEnabledTypes()) ? $this->getAmpEnabledTypes() : array();
     $node_types = node_type_get_names();
     $node_status_list = array();
+    $destination = Url::fromRoute("amp.settings")->toString();
     foreach ($node_types as $bundle => $label) {
-      $configure = t('/admin/structure/types/manage/:bundle/display/amp?destination=/admin/config/content/amp', array(':bundle' => $bundle));
-      $enable_disable = t('/admin/structure/types/manage/:bundle/display?destination=/admin/config/content/amp', array(':bundle' => $bundle));
+      $configure = Url::fromRoute("entity.entity_view_display.node.view_mode", ['node_type' => $bundle, 'view_mode_name' => 'amp'], ['query' => ['destination' => $destination]])->toString();
+      $enable_disable = Url::fromRoute("entity.entity_view_display.node.default", ['node_type' => $bundle], ['query' => ['destination' => $destination]])->toString();
       if (in_array($bundle, $enabled_types)) {
-        $node_status_list[] = t(':label is <em>enabled</em>: <a href=":configure">Configure AMP view mode</a> or <a href=":enable_disable">Disable AMP display</a>', array(
-            ':label' => $label,
+        $node_status_list[] = t('@label is <em>enabled</em>: <a href=":configure">Configure AMP view mode</a> or <a href=":enable_disable">Disable AMP display</a>', array(
+            '@label' => $label,
             ':configure' => $configure,
             ':enable_disable' => $enable_disable,
           ));
       }
       else {
-        $node_status_list[] = t(':label is <em>disabled</em>: <a href=":enable_disable">Enable AMP in Custom Display Settings</a>', array(
-            ':label' => $label,
+        $node_status_list[] = t('@label is <em>disabled</em>: <a href=":enable_disable">Enable AMP in Custom Display Settings</a>', array(
+            '@label' => $label,
             ':enable_disable' => $enable_disable,
           ));
       }
