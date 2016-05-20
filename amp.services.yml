@@ -9,7 +9,7 @@ services:
       - { name: theme_negotiator, priority: -50 }
   amp.entity_type:
     class: Drupal\amp\EntityTypeInfo
-    arguments: []
+    arguments: ['@entity_type.manager', '@cache.default']
   amp.utilities:
     class: Drupal\amp\Service\AMPService
     arguments: []

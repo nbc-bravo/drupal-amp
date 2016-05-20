@@ -8,11 +8,60 @@
 namespace Drupal\amp;
 
 use Drupal\Core\Url;
+use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Service class for retrieving and manipulating entity type information.
  */
 class EntityTypeInfo {
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * The cache backend to use for the complete theme registry data.
+   *
+   * @var \Drupal\Core\Cache\CacheBackendInterface
+   */
+  protected $cache;
+
+  /**
+   * Constructs a new EntityTypeRepository.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   * @param \Drupal\Core\Cache\CacheBackendInterface $cache
+   *   The cache backend interface to use for the complete theme registry data.
+   */
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, CacheBackendInterface $cache) {
+    $this->entityTypeManager = $entity_type_manager;
+    $this->cache = $cache;
+  }
+
+  /**
+   * Checks if AMP is enabled for this bundle.
+   *
+   * @param string $node_type
+   *   The node type to check whether AMP is enabled or not.
+   *
+   * @return bool
+   *   TRUE if AMP is enabled for this bundle. FALSE otherwise.
+   */
+  public function isAmpEnabledType($node_type) {
+    $amp_display = $this->entityTypeManager
+      ->getStorage('entity_view_display')
+      ->load('node.' . $node_type . '.amp');
+
+    if ($amp_display && $amp_display->status()) {
+      return TRUE;
+    }
+    return FALSE;
+  }
 
   /**
    * Returns a list of AMP-enabled content types.
@@ -22,22 +71,28 @@ class EntityTypeInfo {
    */
   public function getAmpEnabledTypes() {
     $enabled_types = [];
-    if ($cache = \Drupal::cache()->get('amp_enabled_types')) {
+    if ($cache = $this->cache->get('amp_enabled_types')) {
       $enabled_types = $cache->data;
     }
     else {
-      $node_types = array_keys(node_type_get_names());
-      foreach ($node_types as $node_type) {
-        $amp_display = \Drupal::entityManager()
-          ->getStorage('entity_view_display')
-          ->load('node.' . $node_type . '.amp');
-        if ($amp_display && $amp_display->status()) {
-          $enabled_types[] = $node_type;
+      // Get the list of node entities with AMP view mode enabled and store
+      // their bundles.
+      $ids = $this->entityTypeManager
+        ->getStorage('entity_view_display')
+        ->getQuery()
+        ->condition('id', 'node.', 'STARTS_WITH')
+        ->condition('mode', 'amp')
+        ->condition('status', TRUE)
+        ->execute();
+      if ($ids) {
+        foreach ($ids as $id) {
+          $parts = explode('.', $id);
+          $enabled_types[$parts[1]] = $parts[1];
         }
       }
-      \Drupal::cache()->set('amp_enabled_types', $enabled_types);
+      $this->cache->set('amp_enabled_types', $enabled_types);
     }
-    return array_combine($enabled_types, $enabled_types);
+    return $enabled_types;
   }
 
   /**
