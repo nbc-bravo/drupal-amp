@@ -84,7 +84,7 @@ class AmpContext {
     if (is_object($node)) {
       $type = $node->getType();
       // Only show AMP routes for content that is AMP enabled.
-      if ($enabled_types[$type] === $type) {
+      if (isset($enabled_types[$type]) && $enabled_types[$type] === $type) {
         return TRUE;
       }
     }
