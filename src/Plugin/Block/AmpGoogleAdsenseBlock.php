@@ -61,21 +61,21 @@ class AmpGoogleAdsenseBlock extends BlockBase {
     $form['width'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Width'),
-      '#default_value' => $config['width'],
+      '#default_value' => isset($config['width']) ? $config['width'] : '',
       '#maxlength' => 25,
       '#size' => 20,
     );
     $form['height'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Height'),
-      '#default_value' => $config['height'],
+      '#default_value' => isset($config['height']) ? $config['height'] : '',
       '#maxlength' => 25,
       '#size' => 20,
     );
     $form['data_ad_slot'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Data ad slot'),
-      '#default_value' => $config['data_ad_slot'],
+      '#default_value' => isset($config['data_ad_slot']) ? $config['data_ad_slot'] : '',
       '#maxlength' => 25,
       '#size' => 20,
     );
