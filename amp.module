@@ -5,15 +5,11 @@
  * Contains amp.module.
  */
 
-use Drupal\amp\EntityTypeInfo;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
-use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Url;
 use Drupal\Core\Template\Attribute;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -34,38 +30,57 @@ function amp_help($route_name, RouteMatchInterface $route_match) {
 }
 
 /**
+ * Implements hook_entity_view_mode_alter().
+ */
+function amp_entity_view_mode_alter(&$view_mode, EntityInterface $entity, $context) {
+  $amp_context = \Drupal::service('router.amp_context');
+
+  // If on AMP route, and in full view mode, switch to AMP view mode.
+  if ($amp_context->isAmpRoute() && $view_mode == 'full') {
+    $view_mode = 'amp';
+  }
+}
+
+/**
  * Implements hook_entity_view_alter().
  */
 function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
+  // Check if entity is a node in either full or AMP view mode.
+  if ($entity->getEntityType()->id() === 'node' && (($build['#view_mode'] === 'full') || ($build['#view_mode'] === 'amp'))) {
+    // Get a list of available view modes for the current entity.
+    $view_modes = \Drupal::service('entity_display.repository')->getViewModeOptionsByBundle('node', $entity->bundle());
+    // Double-check that the AMP view mode is enabled for this content type.
+    if (isset($view_modes['amp'])) {
+      // Catches any variations based on 'amp' query parameter in URL.
+      // @todo Replace with 'url.query_args:amp' at some point after
+      // https://www.drupal.org/node/2729439 lands in Drupal core.
+      $build['#cache']['contexts'][] = 'url.amp';
 
-  // Git a list of available view modes for the current entity.
-  $view_modes = \Drupal::entityManager()->getViewModeOptionsByBundle('node', $entity->bundle());
-
-  if ($entity->getEntityType()->id() == 'node' && isset($view_modes['amp'])) {
-    if (!empty($build['#attached']['html_head_link'])) {
-      foreach ($build['#attached']['html_head_link'] as $key => $config) {
-        if ($build['#view_mode'] == 'amp') {
-          if ($config[0]['rel'] != 'canonical' && $config[0]['rel'] != 'shortlink') {
-            unset($build['#attached']['html_head_link'][$key]);
+      if (!empty($build['#attached']['html_head_link'])) {
+        foreach ($build['#attached']['html_head_link'] as $key => $config) {
+          if ($build['#view_mode'] === 'amp') {
+            if ($config[0]['rel'] != 'canonical' && $config[0]['rel'] != 'shortlink') {
+              unset($build['#attached']['html_head_link'][$key]);
+            }
           }
-        }
-        else if ($build['#view_mode'] == 'full') {
-          if ($config[0]['rel'] == 'canonical') {
-            $original_href = $config[0]['href'];
-            if (strpos($original_href, '?') === FALSE) {
-              $amp_href = $original_href . "?amp";
-            }
-            else {
-              $amp_href = $original_href . "&amp";
-            }
+          elseif ($build['#view_mode'] === 'full') {
+            if ($config[0]['rel'] == 'canonical') {
+              $original_href = $config[0]['href'];
+              if (strpos($original_href, '?') === FALSE) {
+                $amp_href = $original_href . "?amp";
+              }
+              else {
+                $amp_href = $original_href . "&amp";
+              }
 
-            $build['#attached']['html_head_link'][] = array(
-              array(
-                'rel' => 'amphtml',
-                'href' => $amp_href,
-              ),
-              TRUE,
-            );
+              $build['#attached']['html_head_link'][] = [
+                [
+                  'rel' => 'amphtml',
+                  'href' => $amp_href,
+                ],
+                TRUE,
+              ];
+            }
           }
         }
       }

@@ -10,6 +10,7 @@ namespace Drupal\amp\Element;
 use Drupal\filter\Element\ProcessedText;
 use Lullabot\AMP\AMP;
 use Drupal\amp\Service\AMPService;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Provides an amp-processed text render element.
@@ -33,10 +34,11 @@ class AmpProcessedText extends ProcessedText {
         array($class, 'preRenderAmpText'),
       ),
       '#cache' => [
-        'tags' => ['amp-warnings'],
-        // This should be bubbling up but its not
-        // Instead we have to place the #cache setting in src/Controller/ampPage
-        // 'context' => ['url.query_args:warnfix'],
+        // @todo Replace with ['url.query_args:amp, 'url.query_args:warnfix'] at
+        // some point after https://www.drupal.org/node/2729439 lands in Drupal
+        // core.
+        'contexts' => ['url.amp', 'url.warnfix'],
+        'tags' => ['config:amp.settings']
       ]
     );
   }

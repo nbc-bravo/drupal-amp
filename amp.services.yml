@@ -1,4 +1,14 @@
 services:
+  cache_context.url.amp:
+    class: Drupal\amp\Cache\AmpUrlAmpCacheContext
+    arguments: ['@request_stack']
+    tags:
+      - { name: cache.context }
+  cache_context.url.warnfix:
+    class: Drupal\amp\Cache\AmpUrlWarnfixCacheContext
+    arguments: ['@request_stack']
+    tags:
+      - { name: cache.context }
   router.amp_context:
     class: Drupal\amp\Routing\AmpContext
     arguments: ['@amp.entity_type', '@current_route_match']

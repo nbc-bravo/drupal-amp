@@ -43,6 +43,13 @@ class AmpIframe extends ProcessedText {
         array($class, 'preRenderAmpIframe'),
       ),
       '#theme' => 'amp_iframe',
+      '#cache' => [
+        // @todo Replace with ['url.query_args:amp, 'url.query_args:warnfix'] at
+        // some point after https://www.drupal.org/node/2729439 lands in Drupal
+        // core.
+        'contexts' => ['url.amp', 'url.warnfix'],
+        'tags' => ['config:amp.settings']
+      ]
     );
   }
 
