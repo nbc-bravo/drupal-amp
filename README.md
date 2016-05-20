@@ -53,7 +53,7 @@ The body field presents a special problem, since it is likely to contain lots of
 
 ## Initial setup
 
-* Follow instructions at https://www.drupal.org/node/2405811 to get Composer Manager working. (Unfortunately, with the latest stable version of Drupal 8, `composer drupal-update` will fail without [this core patch](https://www.drupal.org/node/2664274). One easy way to apply that patch would be to run: `curl https://www.drupal.org/files/issues/2664274-19-fix-composer.patch | patch -p1`.)
+* Follow instructions at https://www.drupal.org/node/2405811 to get Composer Manager working.
 * Download the AMP theme into the `/themes` directory.
 * Download this (AMP) module into the `/modules` directory.
 * On the command line, move to the root of the Drupal project and run `composer drupal-update` to pick up remaining dependencies.
