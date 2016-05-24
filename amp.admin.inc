@@ -212,7 +212,7 @@ function _amp_get_theme_options() {
  */
 function amp_get_enabled_types() {
   $enabled_types = &drupal_static(__FUNCTION__, array());
-  if (!isset($enabled_types)) {
+  if (empty($enabled_types)) {
     if ($cache = cache_get('amp_enabled_types')) {
       $enabled_types = $cache->data;
     }
