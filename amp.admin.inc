@@ -207,10 +207,11 @@ function _amp_get_theme_options() {
 }
 
 /**
- * Helper function to retrieve a list of AMP-enabled content types.
+ * Helper function to retrieve an array of AMP-enabled content types.
+ *
  */
 function amp_get_enabled_types() {
-  $enabled_types = &drupal_static(__FUNCTION__);
+  $enabled_types = &drupal_static(__FUNCTION__, array());
   if (!isset($enabled_types)) {
     if ($cache = cache_get('amp_enabled_types')) {
       $enabled_types = $cache->data;
@@ -233,7 +234,7 @@ function amp_get_enabled_types() {
  * Helper function to retrieve a formatted list of AMP-enabled content types.
  */
 function amp_get_formatted_status_list() {
-  $enabled_types = null !== amp_get_enabled_types() ? amp_get_enabled_types() : array();
+  $enabled_types = amp_get_enabled_types();
   $node_types = node_type_get_names();
   $node_status_list = array();
   foreach ($node_types as $bundle => $label) {
