@@ -79,7 +79,8 @@ class AmpSettingsForm extends ConfigFormBase {
       if (!empty($theme->info['hidden'])) {
         continue;
       }
-      else if (!empty($theme->status)) {
+      // Only display enabled themes that are subthemes of the AMP Theme.
+      else if (!empty($theme->status) && (array_key_exists('amptheme', $theme->base_themes) || $theme->info['name'] == 'AMP Base')) {
         $theme_options[$theme->getName()] = $theme->info['name'];
       }
     }
@@ -133,13 +134,17 @@ class AmpSettingsForm extends ConfigFormBase {
     );
 
     $amptheme_config = $this->config('amp.theme');
-    $form['amptheme'] = array(
+    $form['amptheme'] = [
       '#type' => 'select',
       '#options' => $this->themeOptions,
+      '#required' => TRUE,
       '#title' => $this->t('AMP theme'),
       '#description' => $this->t('Choose a theme to use for AMP pages.'),
       '#default_value' => $amptheme_config->get('amptheme'),
-    );
+    ];
+    if (empty($this->themeOptions)) {
+      $form['amptheme']['#description'] = $this->t('To use the AMP module, the AMP Base theme must be installed. You must choose between AMP Base or an installed subtheme of AMP Base, such as the ExAMPle Subtheme, for use as the AMP Theme in order to provide custom styles on AMP pages.');
+    }
 
     $form['google_analytics_id'] = [
       '#type' => 'textfield',

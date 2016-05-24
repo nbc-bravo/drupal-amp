@@ -21,7 +21,7 @@ function amp_requirements($phase) {
     }
 
     $theme_handler = \Drupal::service('theme_handler');
-    if (!$theme_handler->themeExists('amptheme')) {
+    if ($phase == 'runtime' && !$theme_handler->themeExists('amptheme')) {
       $requirements['amptheme'] = [
         'title' => t('AMP Base Theme'),
         'value' => t('Not installed'),
