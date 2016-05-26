@@ -357,10 +357,10 @@ function amp_node_form_submit_with_warn(&$form, FormStateInterface $form_state) 
   $url = !empty($path[0]['alias']) ? $path[0]['alias'] : $path[0]['source'];
   if (isset($url)) {
     if (strpos($url, '?') === FALSE) {
-      $amp_path = $url . "?amp&warnfix";
+      $amp_path = $url . "?amp&warnfix=1";
     }
     else {
-      $amp_path = $url . "&amp&warnfix";
+      $amp_path = $url . "&amp&warnfix=1";
     }
     $response = new RedirectResponse($amp_path);
     $response->send();
