@@ -48,7 +48,14 @@ class AmpNegotiator implements ThemeNegotiatorInterface {
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $route_match) {
-    return $this->ampContext->isAmpRoute($route_match->getRouteObject());
+    $is_amp_route = $this->ampContext->isAmpRoute($route_match->getRouteObject());
+    if ($is_amp_route) {
+      // Disable big pipe on AMP pages.
+      // @todo Rely on https://www.drupal.org/node/2729441 instead, when it is
+      //   resolved.
+      $route_match->getRouteObject()->setOption('_no_big_pipe', TRUE);
+    }
+    return $is_amp_route;
   }
 
   /**
