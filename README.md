@@ -75,6 +75,12 @@ The body field presents a special problem, since it is likely to contain lots of
   * The AMP view mode is where you can control which fields will display on the AMP page for each content type. You might only want a title, image, and body.
   * There are special AMP formatters for text, image, and iframe fields, so be sure to use them in the AMP view mode.
 
+### Theme
+* The AMP Theme project provides an AMP Base theme that takes care of converting some of the larger parts of the page into AMP
+* The AMP Theme provides a subtheme aptly named the ExAMPle theme that demonstrates how to customize the appearance of AMP pages with custom styles
+* It is also possible to create your own custom subtheme with your own styles
+* Make sure to configure the blocks for the AMP theme you have selected
+
 ### Content Types
 * Find the list of your content types at the top
 * Click the link to "Enable AMP in Custom Display Settings"
