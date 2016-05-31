@@ -68,6 +68,12 @@ The body field presents a special problem, since it is likely to contain lots of
 ## Configuration
 * Go to the AMP configuration screen at `/admin/config/content/amp`
 
+### Theme
+* The AMP Theme project provides an AMP Base theme that takes care of converting some of the larger parts of the page into AMP
+* The AMP Theme provides a subtheme aptly named the ExAMPle theme that demonstrates how to customize the appearance of AMP pages with custom styles
+* It is also possible to create your own custom subtheme with your own styles
+* Make sure to configure the blocks for the AMP theme you have selected
+
 ### Content Types
 * Find the list of your content types at the top
 * Click the link to "Enable AMP in Custom Display Settings"
