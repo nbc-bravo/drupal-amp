@@ -1,0 +1,6 @@
+name = AMP Adsense
+description = Helps render Adsense blocks as AMP elements
+core = 7.x
+dependencies[] = amp
+dependencies[] = adsense
+dependencies[] = adsense_managed

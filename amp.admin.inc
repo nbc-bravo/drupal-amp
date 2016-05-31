@@ -35,14 +35,17 @@ function amp_admin_form($form, &$form_state) {
     '#maxlength' => 20,
     '#description' => t('This ID is unique to each site you want to track separately, and is in the form of UA-xxxxxxx-yy. To get a Web Property ID, <a href="@analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href="@webpropertyid">Find more information in the documentation</a>.', array('@analytics' => 'http://www.google.com/analytics/', '@webpropertyid' => url('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', array('fragment' => 'webProperty')))),
   );
-  $form['amp_google_adsense_id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Google AdSense Publisher ID'),
-    '#default_value' => variable_get('amp_google_adsense_id'),
-    '#maxlength' => 25,
-    '#size' => 20,
-    '#description' => t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to pub-9999999999999'),
-  );
+
+  if (!module_exists('amp_adsense')) {
+    $form['amp_google_adsense_id'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Google AdSense Publisher ID'),
+      '#default_value' => variable_get('amp_google_adsense_id'),
+      '#maxlength' => 25,
+      '#size' => 20,
+      '#description' => t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to pub-9999999999999'),
+    );
+  }
 
   if (!module_exists('amp_dfp')) {
     $form['amp_google_doubleclick_id'] = array(
@@ -54,7 +57,7 @@ function amp_admin_form($form, &$form_state) {
       '#description' => t('The Network ID to use on all tags. This value should begin with a /.'),
     );
   }
-  
+
   $form['pixel_group'] = array(
     '#type' => 'fieldset',
     '#title' => t('amp-pixel'),
