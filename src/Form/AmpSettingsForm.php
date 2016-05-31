@@ -127,11 +127,21 @@ class AmpSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $amp_config = $this->config('amp.settings');
     $node_types = node_type_get_names();
-    $form['amp_content_amp_status'] = array(
-      '#title' => $this->t('AMP Status by Content Type'),
-      '#theme' => 'item_list',
-      '#items' => $this->entityTypeInfo->getFormattedAmpEnabledTypes(),
-    );
+
+    if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
+      $form['amp_content_amp_status'] = [
+        '#title' => $this->t('AMP Status by Content Type'),
+        '#theme' => 'item_list',
+        '#items' => $this->entityTypeInfo->getFormattedAmpEnabledTypes(),
+      ];
+    }
+    else {
+      $form['amp_content_amp_status'] = [
+        '#type' => 'item',
+        '#title' => $this->t('AMP Status by Content Type'),
+        '#markup' => $this->t('(In order to enable and disable AMP content types in the UI, the Field UI module must be enabled.)'),
+      ];
+    }
 
     $amptheme_config = $this->config('amp.theme');
     $form['amptheme'] = [
