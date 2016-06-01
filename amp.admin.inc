@@ -14,11 +14,22 @@
  */
 function amp_admin_form($form, &$form_state) {
   $form = array();
-  $form['amp_content_amp_status'] = array(
-    '#title' => 'AMP Status by Content Type',
-    '#theme' => 'item_list',
-    '#items' => amp_get_formatted_status_list(),
-  );
+
+  if (module_exists('field_ui')) {
+    $form['amp_content_amp_status'] = array(
+      '#title' => t('AMP Status by Content Type'),
+      '#theme' => 'item_list',
+      '#items' => amp_get_formatted_status_list(),
+    );
+  }
+  else {
+    $form['amp_content_amp_status'] = array(
+      '#type' => 'item',
+      '#title' => t('AMP Status by Content Type'),
+      '#markup' => t('(In order to enable and disable AMP content types in the UI, the Field UI module must be enabled.)'),
+    );
+  }
+
   // AMP theme settings.
   $form['amp_theme'] = array(
     '#type' => 'select',
