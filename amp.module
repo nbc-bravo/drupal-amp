@@ -1069,6 +1069,7 @@ function _amp_add_component_libraries(array $components) {
  */
 function _amp_get_amp_js() {
   return array(
+    'amp-ad' => 'https://cdn.ampproject.org/v0/amp-ad-0.1.js',
     'amp-analytics' => 'https://cdn.ampproject.org/v0/amp-analytics-0.1.js',
     'amp-anim' => 'https://cdn.ampproject.org/v0/amp-anim-0.1.js',
     'amp-audio' => 'https://cdn.ampproject.org/v0/amp-audio-0.1.js',
