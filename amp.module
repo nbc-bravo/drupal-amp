@@ -4,7 +4,7 @@
  * @file
  * Contains amp.module.
  */
-
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\file\Entity\File;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
@@ -55,6 +55,7 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
       // @todo Replace with 'url.query_args:amp' at some point after
       // https://www.drupal.org/node/2729439 lands in Drupal core.
       $build['#cache']['contexts'][] = 'url.amp';
+      $absolute_canonical = $entity->toUrl('canonical', ['absolute' => TRUE])->toString();
 
       if (!empty($build['#attached']['html_head_link'])) {
         foreach ($build['#attached']['html_head_link'] as $key => $config) {
@@ -62,15 +63,30 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
             if ($config[0]['rel'] != 'canonical' && $config[0]['rel'] != 'shortlink') {
               unset($build['#attached']['html_head_link'][$key]);
             }
+            elseif ($config[0]['rel'] == 'canonical') {
+              // Replace the canonical link with an absolute version, this is
+              // required for AMP pages and recommended for others.
+              // @todo Remove this when https://www.drupal.org/node/2738373 is
+              //   fixed.
+              $build['#attached']['html_head_link'][$key][0]['href'] = $absolute_canonical;
+              $build['#cache']['contexts'][] = 'url.site';
+            }
           }
           elseif ($build['#view_mode'] === 'full') {
             if ($config[0]['rel'] == 'canonical') {
-              $original_href = $config[0]['href'];
-              if (strpos($original_href, '?') === FALSE) {
-                $amp_href = $original_href . "?amp";
+
+              // Check if the canonical link is absolute and external. Do not
+              // expose AMP for those.
+              $current_canonical = $build['#attached']['html_head_link'][$key][0]['href'];
+              if (UrlHelper::isExternal($current_canonical) && !UrlHelper::externalIsLocal($current_canonical, \Drupal::service('router.request_context')->getCompleteBaseUrl())) {
+                continue;
+              }
+
+              if (strpos($absolute_canonical, '?') === FALSE) {
+                $amp_href = $absolute_canonical . "?amp";
               }
               else {
-                $amp_href = $original_href . "&amp";
+                $amp_href = $absolute_canonical . "&amp";
               }
 
               $build['#attached']['html_head_link'][] = [
@@ -80,6 +96,7 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
                 ],
                 TRUE,
               ];
+              $build['#cache']['contexts'][] = 'url.site';
             }
           }
         }
