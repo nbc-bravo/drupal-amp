@@ -80,7 +80,7 @@ class AmpSettingsForm extends ConfigFormBase {
         continue;
       }
       // Only display enabled themes that are subthemes of the AMP Theme.
-      else if (!empty($theme->status) && (array_key_exists('amptheme', $theme->base_themes) || $theme->info['name'] == 'AMP Base')) {
+      else if (!empty($theme->status) && !empty($theme->base_themes) && (array_key_exists('amptheme', $theme->base_themes) || $theme->info['name'] == 'AMP Base')) {
         $theme_options[$theme->getName()] = $theme->info['name'];
       }
     }
