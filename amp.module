@@ -508,6 +508,7 @@ function amp_node_view($node, $view_mode, $langcode) {
   if ($view_mode == 'full' && node_is_page($node) && in_array($node->type, amp_get_enabled_types())) {
     $uri = entity_uri('node', $node);
     $uri['options']['query']['amp'] = NULL;
+    $uri['options']['absolute'] = TRUE;
     drupal_add_html_head_link(array('rel' => 'amphtml', 'href' => url($uri['path'], $uri['options'])), TRUE);
   }
 }
@@ -1190,5 +1191,26 @@ function amp_deliver_html_page($page_callback_result) {
 function amp_page_delivery_callback_alter(&$deliver_callback) {
   if (amp_is_amp_request()) {
     $deliver_callback = 'amp_deliver_html_page';
+  }
+}
+
+/**
+ * Implements hook_html_head_alter().
+ */
+function amp_html_head_alter(&$head_elements) {
+  // Make canonical links absolute for AMP content.
+  if (amp_is_amp_request()) {
+    foreach ($head_elements as $key => &$tag) {
+      if (strpos($key, 'drupal_add_html_head_link:canonical:') === 0) {
+        if (isset($tag['#attributes']['href'])) {
+          $amphtml_url = $tag['#attributes']['href'];
+          // Double check that the URL is relative.
+          if ($amphtml_url == drupal_get_normal_path($amphtml_url)) {
+            $absolute_url = url($amphtml_url, array('absolute' => TRUE));
+            $tag['#attributes']['href'] = $absolute_url;
+          }
+        }
+      }
+    }
   }
 }
