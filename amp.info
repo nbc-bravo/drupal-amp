@@ -3,3 +3,4 @@ description = Google AMP integration
 core = 7.x
 configure = admin/config/content/amp
 php = 5.5
+files[] = amp.test

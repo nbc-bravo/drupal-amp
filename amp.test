@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Tests for amp.module.
+ */
+
+class AmpTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'AMP display modes',
+      'description' => 'Tests for the AMP module.',
+      'group' => 'AMP',
+    );
+  }
+
+  protected function setUp() {
+    // Enable AMP module.
+    parent::setUp('amp');
+    // Install the AMP theme.
+    theme_enable(array('amptheme'));
+  }
+
+  /**
+   * Test the AMP view mode.
+   */
+  public function testAmpViewMode() {
+    global $base_url;
+
+    // Login as an admin user.
+    $admin_user = $this->drupalCreateUser(array('administer content types'));
+    $this->drupalLogin($admin_user);
+
+    // Create a node to test AMP metadata.
+    $node = $this->drupalCreateNode(array('type' => 'article'));
+
+    // Enable AMP display on article content.
+    $this->drupalGet("admin/structure/types/manage/article/display");
+    $this->assertResponse(200);
+    $edit = ["view_modes_custom[amp]" => '1'];
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Check the metadata of the full display mode.
+    $this->drupalGet('node/' . $node->nid);
+    $this->assertResponse(200);
+    $this->assertRaw('link rel="amphtml" href="' . $base_url . '/node/1?amp"');
+
+    // Check the metadata of the AMP display mode.
+    $this->drupalGet('node/' . $node->nid, array('query' => array('amp' => TRUE)));
+    $this->assertResponse(200);
+    $this->assertRaw('link rel="canonical" href="' . $base_url . '/node/1"');
+  }
+}
