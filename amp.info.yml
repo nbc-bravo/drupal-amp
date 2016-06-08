@@ -6,4 +6,5 @@ package: Other
 dependencies:
   - image
   - node
+  - token
 configure: amp.settings

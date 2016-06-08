@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\amp\EntityTypeInfo.
- */
-
 namespace Drupal\amp;
 
 use Drupal\Core\Url;

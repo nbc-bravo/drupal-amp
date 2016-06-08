@@ -17,6 +17,9 @@ services:
     arguments: ['@config.factory', '@router.amp_context']
     tags:
       - { name: theme_negotiator, priority: -50 }
+  amp.metadata:
+    class: Drupal\amp\AmpMetadataInfo
+    arguments: ['@entity_type.manager', '@cache.default', '@amp.entity_type']
   amp.entity_type:
     class: Drupal\amp\EntityTypeInfo
     arguments: ['@entity_type.manager', '@cache.default']

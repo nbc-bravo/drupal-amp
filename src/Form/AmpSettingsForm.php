@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Form\AmpSettingsForm.
- */
-
 namespace Drupal\amp\Form;
 
 use Drupal\amp\EntityTypeInfo;
@@ -126,7 +121,6 @@ class AmpSettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $amp_config = $this->config('amp.settings');
-    $node_types = node_type_get_names();
 
     if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
       $form['amp_content_amp_status'] = [
@@ -223,7 +217,6 @@ class AmpSettingsForm extends ConfigFormBase {
         ':input[name="amp_pixel"]' => array('checked' => TRUE))
       ),
     );
-
 
     $form['amp_library_group'] = array(
       '#type' => 'fieldset',

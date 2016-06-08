@@ -1,16 +1,20 @@
 <?php
 
-/**
- * @file
- * Contains amp.module.
- */
+use Drupal\amp\Entity\AmpMetadata;
+use Drupal\Component\Render\PlainTextOutput;
 use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Entity\EntityInterface;
-use Drupal\file\Entity\File;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Image\ImageInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\StreamWrapper\PublicStream;
 use Drupal\Core\Template\Attribute;
+use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
+use Drupal\image\Entity\ImageStyle;
+use Drupal\image\ImageStyleInterface;
+use Drupal\node\NodeInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
@@ -46,10 +50,11 @@ function amp_entity_view_mode_alter(&$view_mode, EntityInterface $entity, $conte
  */
 function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityViewDisplayInterface $display) {
   // Check if entity is a node in either full or AMP view mode.
+  /** @var NodeInterface $entity */
   if ($entity->getEntityType()->id() === 'node' && (($build['#view_mode'] === 'full') || ($build['#view_mode'] === 'amp'))) {
     // Get a list of available view modes for the current entity.
     $view_modes = \Drupal::service('entity_display.repository')->getViewModeOptionsByBundle('node', $entity->bundle());
-    // Double-check that the AMP view mode is enabled for this content type.
+    // Double-check that the AMP view mode is enabled for this node type.
     if (isset($view_modes['amp'])) {
       // Catches any variations based on 'amp' query parameter in URL.
       // @todo Replace with 'url.query_args:amp' at some point after
@@ -58,6 +63,7 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
       $absolute_canonical = $entity->toUrl('canonical', ['absolute' => TRUE])->toString();
 
       if (!empty($build['#attached']['html_head_link'])) {
+        $canonical_href = '';
         foreach ($build['#attached']['html_head_link'] as $key => $config) {
           if ($build['#view_mode'] === 'amp') {
             if ($config[0]['rel'] != 'canonical' && $config[0]['rel'] != 'shortlink') {
@@ -73,21 +79,15 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
             }
           }
           elseif ($build['#view_mode'] === 'full') {
-            if ($config[0]['rel'] == 'canonical') {
-
+            if ($config[0]['rel'] == 'canonical' && !empty($config[0]['href'])) {
               // Check if the canonical link is absolute and external. Do not
               // expose AMP for those.
-              $current_canonical = $build['#attached']['html_head_link'][$key][0]['href'];
+              $current_canonical = $config[0]['href'];
               if (UrlHelper::isExternal($current_canonical) && !UrlHelper::externalIsLocal($current_canonical, \Drupal::service('router.request_context')->getCompleteBaseUrl())) {
                 continue;
               }
 
-              if (strpos($absolute_canonical, '?') === FALSE) {
-                $amp_href = $absolute_canonical . "?amp";
-              }
-              else {
-                $amp_href = $absolute_canonical . "&amp";
-              }
+              $amp_href = _amp_get_amp_url($absolute_canonical);
 
               $build['#attached']['html_head_link'][] = [
                 [
@@ -98,6 +98,16 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
               ];
               $build['#cache']['contexts'][] = 'url.site';
             }
+          }
+        }
+
+        if ($build['#view_mode'] === 'amp' && !empty($absolute_canonical)) {
+          // Build render array containing AMP metadata formatted as JSON.
+          $amp_metadata = _amp_build_metadata($entity, $absolute_canonical);
+          if (!empty($amp_metadata)) {
+            $build['#attached']['html_head'][] = $amp_metadata;
+            $build['#cache']['tags'][] = 'amp_metadata';
+            $build['#cache']['tags'][] = 'amp_available_metadata';
           }
         }
       }
@@ -353,13 +363,8 @@ function amp_node_form_submit(&$form, FormStateInterface $form_state) {
   // Redirect to the alias if it exists, otherwise use the node URL.
   $url = !empty($path[0]['alias']) ? $path[0]['alias'] : $path[0]['source'];
   if (isset($url)) {
-    if (strpos($url, '?') === FALSE) {
-      $amp_path = $url . "?amp";
-    }
-    else {
-      $amp_path = $url . "&amp";
-    }
-    $response = new RedirectResponse($amp_path);
+    $amp_url = _amp_get_amp_url($url);
+    $response = new RedirectResponse($amp_url);
     $response->send();
   }
 }
@@ -373,13 +378,8 @@ function amp_node_form_submit_with_warn(&$form, FormStateInterface $form_state) 
   // Redirect to the alias if it exists, otherwise use the node URL.
   $url = !empty($path[0]['alias']) ? $path[0]['alias'] : $path[0]['source'];
   if (isset($url)) {
-    if (strpos($url, '?') === FALSE) {
-      $amp_path = $url . "?amp&warnfix=1";
-    }
-    else {
-      $amp_path = $url . "&amp&warnfix=1";
-    }
-    $response = new RedirectResponse($amp_path);
+    $amp_warnfix_url = _amp_get_amp_url($url, $warnfix = TRUE);
+    $response = new RedirectResponse($amp_warnfix_url);
     $response->send();
   }
 }
@@ -410,9 +410,385 @@ function amp_view_modes_submit(&$form, \Drupal\Core\Form\FormStateInterface $for
   if (is_array($removed) && in_array('amp', $removed) && $type = $form['#bundle']) {
     // If the AMP view was removed, clear cache of AMP-enabled content.
     \Drupal::cache()->delete('amp_enabled_types');
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['amp_types']);
   }
   if (is_array($added) && in_array('amp', $added)) {
     // If the AMP view was added, clear cache of AMP-enabled content.
     \Drupal::cache()->delete('amp_enabled_types');
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['amp_types']);
   }
+}
+
+/**
+ * Implements hook_preprocess_block() for block templates.
+ */
+function amp_preprocess_block(&$variables) {
+  switch ($variables['base_plugin_id']) {
+    case 'local_actions_block':
+      if (isset($variables['content']['entity.amp_metadata.add_form']) && $variables['content']['entity.amp_metadata.add_form']) {
+        $variables['content']['entity.amp_metadata.add_form']['#cache']['tags'][] = 'amp_types';
+        $message = '';
+        $has_no_amp_types = empty(\Drupal::service('amp.entity_type')->getAmpEnabledTypes());
+        $has_global_metadata = \Drupal::service('amp.metadata')->ampMetadataHasGlobal();
+        $all_types_have_metadata = empty(\Drupal::service('amp.metadata')->getAmpNodeTypesWithoutMetadataSettings());
+        if ($has_no_amp_types) {
+          $message = t('No content types have AMP enabled. Please do so before adding AMP Metadata.');
+        }
+        else {
+          $message = t('All available global and content type overrides have been added. Please edit existing settings below.');
+        }
+        if ($has_no_amp_types || ($has_global_metadata && $all_types_have_metadata)) {
+          $variables['content']['entity.amp_metadata.add_form'] = [
+            '#markup' => '<p><strong>' . $message . '</strong></p>',
+            'addmetadata' => [
+              '#theme_wrappers' => [
+                'container' => [
+                  '#attributes' => [
+                    'class' => 'hidden'
+                  ]
+                ]
+              ],
+              'addlink' => $variables['content']['entity.amp_metadata.add_form']
+            ]
+          ];
+        }
+      }
+  }
+}
+
+/**
+ * Helper function to build render array containing JSON-formatted AMP metadata.
+ *
+ * @param NodeInterface $node
+ *   The node object.
+ * @param string $canonical_url
+ *   The canonical url for this node.
+ *
+ * @return array
+ *   The render array containing JSON-formatted AMP metadata.
+ */
+function _amp_build_metadata($node, $canonical_url) {
+  $node_type = $node->getType();
+
+  $amp_metadata_script_tag = [];
+  $amp_merged_metadata = _amp_get_merged_metadata($node_type);
+  if (!empty($amp_merged_metadata)) {
+    $amp_prepared_json_metadata = _amp_prepare_metadata_json($amp_merged_metadata, $canonical_url, $node);
+    if (!empty($amp_prepared_json_metadata)) {
+      // Improve appearance of JSON output by using json_encode() directly with
+      // JSON_PRETTY_PRINT and JSON_UNESCAPED_SLASHES, which are not supported
+      // by Drupal's JSON serialization service ('serialization.json').
+      $amp_json_metadata = json_encode($amp_prepared_json_metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT);
+      $amp_metadata_script_tag = [
+        // The metadata script element.
+        [
+          '#type' => 'html_tag',
+          '#tag' => 'script',
+          '#attributes' => [
+            'type' => 'application/ld+json'
+          ],
+          '#value' => $amp_json_metadata
+        ],
+        // The render array key.
+        'amp_metadata'
+      ];
+    }
+  }
+
+  return $amp_metadata_script_tag;
+}
+
+/**
+ * Helper function to get merged global and per node type metadata.
+ *
+ * @param string $node_type
+ *   The node type.
+ *
+ * @return array
+ *   An array containing merged metadata for this node type.
+ */
+function _amp_get_merged_metadata($node_type) {
+  $amp_global_metadata = [];
+  $amp_type_metadata = [];
+  $metadata_entities = \Drupal::service('entity_type.manager')->getStorage('amp_metadata')->loadMultiple();
+
+  /** @var AmpMetadata $metadata_entity */
+  foreach ($metadata_entities as $metadata_entity) {
+    // Check if these settings are for global or type override matching the node
+    // type. Because the if selector uses OR, store this outside if statement.
+    $is_global = $is_type = FALSE;
+    $is_global = $metadata_entity->isGlobal();
+    $is_type = ($metadata_entity->getNodeType() === $node_type);
+    if ($is_global || $is_type) {
+      // Get metadata settings from config entity.
+      $entity_settings = [];
+
+      // Get organization metadata.
+      if (!empty($org_name = $metadata_entity->getOrganizationName())) {
+        $entity_settings['org_name'] = $org_name;
+      }
+      if (!empty($org_logo_fid = $metadata_entity->getOrganizationLogoFid())) {
+        $entity_settings['org_logo_fid'] = $org_logo_fid;
+      }
+      if (!empty($org_logo_style_id = $metadata_entity->getOrganizationLogoImageStyleId())) {
+        $entity_settings['org_logo_style_id'] = $org_logo_style_id;
+      }
+
+      // Get content metadata.
+      if (!empty($schema_type = $metadata_entity->getContentSchemaType())) {
+        $entity_settings['schema_type'] = $schema_type;
+      }
+      if (!empty($content_headline_token = $metadata_entity->getContentHeadlineToken())) {
+        $entity_settings['content_headline_token'] = $content_headline_token;
+      }
+      if (!empty($content_author_token = $metadata_entity->getContentAuthorToken())) {
+        $entity_settings['content_author_token'] = $content_author_token;
+      }
+      if (!empty($content_description_token = $metadata_entity->getContentDescriptionToken())) {
+        $entity_settings['content_description_token'] = $content_description_token;
+      }
+      if (!empty($content_image_token = $metadata_entity->getContentImageToken())) {
+        $entity_settings['content_image_token'] = $content_image_token;
+      }
+      if (!empty($content_image_style_id = $metadata_entity->getContentImageStyleId())) {
+        $entity_settings['content_image_style_id'] = $content_image_style_id;
+      }
+
+      // Store entity settings as global or per type so overrides can be merged.
+      if ($is_global) {
+        $amp_global_metadata = $entity_settings;
+      }
+      elseif ($is_type) {
+        $amp_type_metadata = $entity_settings;
+      }
+    }
+  }
+
+  return array_merge($amp_global_metadata, $amp_type_metadata);
+}
+
+/**
+ * Helper function to prepare AMP metadata settings for JSON encoding.
+ *
+ * @param array $amp_metadata
+ *   The array containing AMP metadata settings.
+ * @param string $canonical_url
+ *   The canonical url for this node.
+ * @param NodeInterface $node
+ *   The node object.
+ *
+ * @return array
+ *   An array containing metadata that can be encoded as JSON.
+ */
+function _amp_prepare_metadata_json($amp_metadata, $canonical_url, $node) {
+  $headline = $node->getTitle();
+  $date_published = date(DATE_ATOM, $node->getCreatedTime());
+  $date_modified = date(DATE_ATOM, $node->getChangedTime());
+
+  $amp_temp_json_metadata = [];
+
+  // Track whether AMP metadata will output completely. In the future this will
+  // be used to provide additional debugging assistance.
+  $amp_metadata_complete = TRUE;
+
+  // Provide schema context.
+  $amp_temp_json_metadata['@context'] = 'http://schema.org';
+
+  // Provide schema type.
+  if (isset($amp_metadata['schema_type']) && !empty($amp_metadata['schema_type'])) {
+    $amp_temp_json_metadata['@type'] = $amp_metadata['schema_type'];
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  // Provide the canonical URL of the main entity of the page.
+  if (!empty($canonical_url)) {
+    $amp_temp_json_metadata['mainEntityOfPage'] = [
+      '@type' => 'WebPage',
+      '@id' => $canonical_url
+    ];
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  // Provide headline of content, if available: maximum 110 characters.
+  if (isset($amp_metadata['content_headline_token']) && !empty($amp_metadata['content_headline_token'])) {
+    $headline = PlainTextOutput::renderFromHtml(\Drupal::service('token')->replace($amp_metadata['content_headline_token'], ['node' => $node]));
+    $amp_temp_json_metadata['headline'] = (strlen($headline) > 110) ? mb_strimwidth($headline, 0, 107, "...") : $headline;
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  // Provide author information.
+  if (isset($amp_metadata['content_author_token']) && !empty($amp_metadata['content_author_token'])) {
+    $amp_temp_json_metadata['author'] = [
+      '@type' => 'Person',
+      'name' => PlainTextOutput::renderFromHtml(\Drupal::service('token')->replace($amp_metadata['content_author_token'], ['node' => $node]))
+    ];
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  // Provide the published date of the node.
+  if (!empty($date_published)) {
+    $amp_temp_json_metadata['datePublished'] = $date_published;
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  // Provide the modified date of the node.
+  if (!empty($date_modified)) {
+    $amp_temp_json_metadata['dateModified'] = $date_modified;
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  // Provide content image information.
+  if (isset($amp_metadata['content_image_token']) && !empty($amp_metadata['content_image_token'])) {
+    $content_image_url = \Drupal::service('token')->replace($amp_metadata['content_image_token'], ['node' => $node]);
+
+    // Provide backup parsing of image element if token does not output a URL.
+    if (strip_tags($content_image_url) != $content_image_url) {
+      // Force path to be absolute.
+      if (strpos($content_image_url, 'img src="/') !== FALSE) {
+        global $base_root;
+        $content_image_url = str_replace('img src="/', 'img src="' . $base_root . '/', $content_image_url);
+      }
+
+      $matches = [];
+      preg_match('/src="([^"]*)"/', $content_image_url, $matches);
+      if (!empty($matches[1])) {
+        $content_image_url = $matches[1];
+      }
+    }
+    $content_image_url = PlainTextOutput::renderFromHtml($content_image_url);
+
+    $public_stream_base_url = PublicStream::baseUrl();
+    $content_image_uri = '';
+    if (substr($content_image_url, 0, strlen($public_stream_base_url)) == $public_stream_base_url) {
+      $content_image_uri = file_build_uri(substr($content_image_url, strlen($public_stream_base_url)));
+    }
+    if (!empty($content_image_uri)) {
+      /** @var ImageInterface $content_image */
+      $content_image = \Drupal::service('image.factory')->get($content_image_uri);
+      if ($content_image->isValid()) {
+        $content_image_width = $content_image->getWidth();
+        $content_image_height = $content_image->getHeight();
+
+        if (isset($amp_metadata['content_image_style_id']) && !empty($amp_metadata['content_image_style_id'])) {
+          /** @var ImageStyleInterface $content_image_style */
+          $content_image_style = ImageStyle::load($amp_metadata['content_image_style_id']);
+          $content_image_dimensions = ['width' => $content_image_width, 'height' => $content_image_height];
+          $content_image_style->transformDimensions($content_image_dimensions, $content_image_url);
+          $content_image_url = $content_image_style->buildUrl($content_image_uri);
+          $content_image_width = $content_image_dimensions['width'];
+          $content_image_height = $content_image_dimensions['height'];
+        }
+
+        $amp_temp_json_metadata['image'] = [
+          '@type' => 'ImageObject',
+          'url' => $content_image_url,
+          'width' => $content_image_width,
+          'height' => $content_image_height
+        ];
+      }
+      else {
+        $amp_metadata_complete = FALSE;
+      }
+    }
+    else {
+      $amp_metadata_complete = FALSE;
+    }
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  // Provide description of content, if available: maximum 150 characters.
+  if (isset($amp_metadata['content_description_token']) && !empty($amp_metadata['content_description_token'])) {
+    $description = PlainTextOutput::renderFromHtml(\Drupal::service('token')->replace($amp_metadata['content_description_token'], ['node' => $node]));
+    $amp_temp_json_metadata['description'] = (strlen($description) > 150) ? mb_strimwidth($description, 0, 147, "...") : $description;
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  // Provide publisher information.
+  if (isset($amp_metadata['org_name']) && !empty($amp_metadata['org_name']) && isset($amp_metadata['org_logo_fid']) && !empty($amp_metadata['org_logo_fid'])) {
+    /** @var FileInterface $org_logo_file */
+    $org_logo_file = File::load($amp_metadata['org_logo_fid']);
+    $org_logo_uri = $org_logo_file->getFileUri();
+    /** @var ImageInterface $org_logo_image */
+    $org_logo_image = \Drupal::service('image.factory')->get($org_logo_uri);
+    if ($org_logo_image->isValid()) {
+      $org_logo_width = $org_logo_image->getWidth();
+      $org_logo_height = $org_logo_image->getHeight();
+      $org_logo_url = file_create_url($org_logo_uri);
+
+      if (isset($amp_metadata['org_logo_style_id']) && !empty($amp_metadata['org_logo_style_id'])) {
+        /** @var ImageStyleInterface $org_logo_style */
+        $org_logo_style = ImageStyle::load($amp_metadata['org_logo_style_id']);
+        $org_logo_dimensions = ['width' => $org_logo_width, 'height' => $org_logo_height];
+        $org_logo_style->transformDimensions($org_logo_dimensions, $org_logo_uri);
+        $org_logo_url = $org_logo_style->buildUrl($org_logo_uri);
+        $org_logo_width = $org_logo_dimensions['width'];
+        $org_logo_height = $org_logo_dimensions['height'];
+      }
+
+      $amp_temp_json_metadata['publisher'] = [
+        '@type' => 'Organization',
+        'name' => PlainTextOutput::renderFromHtml(\Drupal::service('token')->replace($amp_metadata['org_name'], ['node' => $node])),
+        'logo' => [
+          '@type' => 'ImageObject',
+          'url' => $org_logo_url,
+          'width' => $org_logo_width,
+          'height' => $org_logo_height
+        ]
+      ];
+    }
+    else {
+      $amp_metadata_complete = FALSE;
+    }
+  }
+  else {
+    $amp_metadata_complete = FALSE;
+  }
+
+  $amp_prepared_json_metadata = $amp_temp_json_metadata;
+
+  return $amp_prepared_json_metadata;
+}
+
+/**
+ * Helper function to add amp query parameter to a URL.
+ *
+ * @param string $url
+ *   The original URL value.
+ * @param boolean $warnfix
+ *   Option to append warnfix to the end of the URL.
+ *
+ * @return string
+ *   A url containing the additional amp query parameter(s).
+ */
+function _amp_get_amp_url($url, $warnfix = FALSE) {
+  // Append amp query string parameter
+  if (strpos($url, '?') === FALSE) {
+    $amp_url = $url . "?amp";
+  }
+  else {
+    $amp_url = $url . "&amp";
+  }
+
+  // Append optional warnfix query string parameter.
+  if ($warnfix) {
+    $amp_url = $amp_url . "&warnfix";
+  }
+
+  return $amp_url;
 }
