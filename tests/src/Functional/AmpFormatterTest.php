@@ -97,18 +97,22 @@ class AmpFormatterTest extends BrowserTestBase {
     $this->submitForm($edit, t('Save'));
 
     // Check the metadata of the full display mode.
-    $node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()])->toString();
+    $node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE])->toString();
+    $amp_node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE])->toString();
+    // Adding 'query' => ['amp' => TRUE] to the line above results in ?amp=1,
+    // and the tests fail, so instead we just manually append the parameter.
+    $amp_node_url = $amp_node_url . "?amp";
     $this->drupalGet($node_url);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('AMP test body');
     $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/full"');
-    $this->assertSession()->responseContains('link rel="amphtml" href="/node/1?amp"');
+    $this->assertSession()->responseContains('link rel="amphtml" href="' . $amp_node_url . '"');
 
     // Check the metadata of the AMP display mode.
-    $this->drupalGet('node/1', ['query' => ['amp' => TRUE]]);
+    $this->drupalGet($amp_node_url);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('AMP test body');
     $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/amp"');
-    $this->assertSession()->responseContains('link rel="canonical" href="/node/1"');
+    $this->assertSession()->responseContains('link rel="canonical" href="' . $node_url . '"');
   }
 }
