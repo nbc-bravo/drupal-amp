@@ -122,7 +122,7 @@ function amp_admin_form($form, &$form_state) {
     '#title' => t('<em>Debugging</em>: Show AMP Library warnings in <em>all</em> AMP text formatters for <em>all</em> users'),
     '#default_value' => variable_get('amp_library_warnings_display', false),
     '#description' => t('<ul><li>If you only want to see amp formatter specific warning for one node add '
-            . 'query "warnfix" at end of a node url. e.g. <strong>node/12345?amp&warnfix</strong></li>'
+            . 'query "warnfix=1" at end of a node url. e.g. <strong>node/12345?amp&warnfix=1</strong></li>'
             . '<li>If the Debugging checkbox value is changed upon save, the Drupal cache will be cleared</li>'),
   );
 

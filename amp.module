@@ -420,7 +420,7 @@ function amp_node_form_submit_warnfix(&$form, $form_state) {
   unset($_GET['destination']);
 
   // We must pass amp => null as there is no value to the amp parameter
-  drupal_goto($current_path, array('query' => array('amp' => null, 'warnfix' => null)));
+  drupal_goto($current_path, array('query' => array('amp' => null, 'warnfix' => '1')));
 }
 
 /**
