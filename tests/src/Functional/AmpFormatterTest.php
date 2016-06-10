@@ -27,6 +27,7 @@ class AmpFormatterTest extends BrowserTestBase {
     'contextual',
     'field_ui',
     'quickedit',
+    'composer_manager',
   ];
 
   /**
@@ -57,7 +58,7 @@ class AmpFormatterTest extends BrowserTestBase {
     parent::setUp();
 
     // Install the AMP theme.
-    \Drupal::service('theme_handler')->install(array('amptheme'));
+    \Drupal::service('theme_handler')->install(['amptheme', 'ampsubtheme_example']);
 
     // Create Article node type.
     $this->createContentType([
@@ -101,6 +102,7 @@ class AmpFormatterTest extends BrowserTestBase {
     $amp_node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE])->toString();
     // Adding 'query' => ['amp' => TRUE] to the line above results in ?amp=1,
     // and the tests fail, so instead we just manually append the parameter.
+    // @todo: Here is the issue to update this: https://www.drupal.org/node/2745187.
     $amp_node_url = $amp_node_url . "?amp";
     $this->drupalGet($node_url);
     $this->assertSession()->statusCodeEquals(200);
@@ -114,5 +116,21 @@ class AmpFormatterTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('AMP test body');
     $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/amp"');
     $this->assertSession()->responseContains('link rel="canonical" href="' . $node_url . '"');
+
+    // Configure AMP field formatters.
+    $amp_edit = Url::fromRoute('entity.node_type.edit_form', ['node_type' => 'article'])->toString();
+    $this->drupalGet($amp_edit . '/display/amp');
+    $this->assertSession()->statusCodeEquals(200);
+    $edit = ["fields[field_image][type]" => 'amp_image'];
+    $edit = ["fields[body][type]" => 'amp_text'];
+    $this->submitForm($edit, t('Save'));
+
+    // Test the warnfix parameter.
+    $this->drupalGet($amp_node_url . "&warnfix");
+    $this->assertSession()->statusCodeEquals(200);
+    $this->assertSession()->pageTextContains('AMP test body');
+    $this->assertSession()->pageTextContains('AMP-HTML Validation Issues and Fixes');
+    $this->assertSession()->pageTextContains('-------------------------------------');
+    $this->assertSession()->pageTextContains('PASS');
   }
 }
