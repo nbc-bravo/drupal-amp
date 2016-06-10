@@ -17,9 +17,9 @@ class AmpTestCase extends DrupalWebTestCase {
 
   protected function setUp() {
     // Enable AMP module.
-    parent::setUp('amp');
+    parent::setUp('amp', 'composer_manager');
     // Install the AMP theme.
-    theme_enable(array('amptheme'));
+    theme_enable(array('amptheme', 'ampsubtheme_example'));
   }
 
   /**
@@ -41,14 +41,30 @@ class AmpTestCase extends DrupalWebTestCase {
     $edit = ["view_modes_custom[amp]" => '1'];
     $this->drupalPost(NULL, $edit, t('Save'));
 
-    // Check the metadata of the full display mode.
+    // Check the full display.
     $this->drupalGet('node/' . $node->nid);
     $this->assertResponse(200);
+    $this->assertText($node->body[LANGUAGE_NONE][0]['value']);
     $this->assertRaw('link rel="amphtml" href="' . $base_url . '/node/1?amp"');
 
-    // Check the metadata of the AMP display mode.
+    // Check the AMP display.
     $this->drupalGet('node/' . $node->nid, array('query' => array('amp' => TRUE)));
     $this->assertResponse(200);
+    $this->assertText($node->body[LANGUAGE_NONE][0]['value']);
     $this->assertRaw('link rel="canonical" href="' . $base_url . '/node/1"');
+
+    // Configure AMP field formatters.
+    $this->drupalGet('admin/structure/types/manage/article/display/amp');
+    $this->assertResponse(200);
+    $edit = ["fields[field_image][type]" => 'amp_image'];
+    $edit = ["fields[body][type]" => 'amp_text'];
+    $this->drupalPost(NULL, $edit, t('Save'));
+
+    // Check the warnfix messages.
+    $this->drupalGet('node/' . $node->nid, array('query' => array('amp' => NULL, 'warnfix' => NULL)));
+    $this->assertResponse(200);
+    $this->assertRaw('AMP-HTML Validation Issues and Fixes');
+    $this->assertRaw('-------------------------------------');
+    $this->assertRaw('PASS');
   }
 }
