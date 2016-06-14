@@ -26,6 +26,14 @@ services:
   amp.utilities:
     class: Drupal\amp\Service\AMPService
     arguments: []
+  amp.query_parameters:
+    class: Drupal\amp\Utility\AmpQueryParameters
+  amp.merge_metadata:
+    class: Drupal\amp\Utility\AmpMergeMetadata
+    arguments: ['@entity_type.manager']
+  amp.prepare_metadata_json:
+    class: Drupal\amp\Utility\AmpPrepareMetadataJson
+    arguments: ['@token']
   html_response.attachments_processor:
       class: Drupal\amp\Render\AmpHtmlResponseAttachmentsProcessor
       tags:
