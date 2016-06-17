@@ -3,6 +3,7 @@
 ## Requirements
 
 * [AMP Theme](https://www.drupal.org/project/amptheme)
+* [Token](https://www.drupal.org/project/token)
 * [AMP PHP Library](https://github.com/Lullabot/amp-library)
 * PHP version 5.5.+
 
@@ -44,6 +45,7 @@ The module will be responsible for the basic functionality of providing an AMP v
 - The theme can place AMP pixel items in the page markup where appropriate, based on the configuration options.
 - Create an AMP configuration page where users can identify which ad and analytics systems to use, and identify which theme is the AMP theme.
 - Create a way for users to identify which content types should provide AMP pages, and a way to override individual nodes to prevent them from being displayed as AMP pages (to use for odd pages that wouldn’t transform correctly).
+- Create an AMP Metadata configuration page where users can provide information necessary for an AMP page to appear in Google Top Stories carousels.
 - Make sure that paths that should not work as AMP pages generate 404s instead of broken pages.
 - Make sure that aliased paths work correctly, so if `node/1` has an alias of `my-page`, `node/1?amp` has an alias of `my-page?amp`.
 - Create a system so the user can preview the AMP page.
@@ -108,6 +110,34 @@ The body field presents a special problem, since it is likely to contain lots of
 * Fill out the domain name and query path boxes
 * Click save
 
+## AMP Metadata configuration
+* Go to the AMP Metadata configuration screen at `/admin/config/content/amp/metadata`
+
+### Gloabl AMP Metadata settings
+* The first time you use the Add AMP Metadata button, you will be adding global settings for AMP Metadata.
+* These settings will be used for all AMP content unless they are specifically overridden for a particular content type.
+
+### Content type overrides
+* Some AMP Metadata settings vary by content type, particularly the field used for content images.
+* Add a settings override for any content type that needs different fields than those selected in the global settings.
+* You only need to add settings for the individual fields you want to override. Content type fields left blank will use global settings (if they exist) for that field.
+
+### Organization information (required)
+* Provide organization name (can use a token to use the site name) and a specially-formatted organization logo (should be 600x60).
+* You can select the AMP Organization Logo image style to ensure your logo fits within those dimensions. Unless your logo already has a very wide aspect ratio, you may need to manually create a logo variation that fits within these dimensions.
+* Typically you will only need to provide global settings for organization information. You can override organization information in content type settings if necessary.
+
+### Content information (required)
+* Ensure all fields are completed with appropriate token values.
+* Some fields have character length restrictions to keep in mind. Tokens like [node:title] and [node:summary] will be automatically truncated to meet those character limits. If you want more control, you may want to create fields on your content type(s) where editors can provide short titles and summaries.
+* Take special note of the image field, as that typically varies per content type. You must provide an image field for each content type if you want that content type to appear in Top Stories listings.
+
+### View AMP Metadata JSON
+* After all AMP Metadata settings are completed, view a node for an AMP-enabled content type that has content necessary for AMP Metadata (such as an image field).
+* Make sure you are using the most recent version of AMP Theme.
+* When you view source on that node, you should see JSON in the head section of your HTML.
+* Compare the JSON with the guidelines available at https://developers.google.com/search/docs/data-types/articles.
+* You can copy the script element into the Structured Data Testing tool to verify that all information meets the requirements: https://search.google.com/structured-data/testing-tool.
 
 ## Current maintainers:
 
