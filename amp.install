@@ -20,6 +20,22 @@ function amp_requirements($phase) {
         'severity' => REQUIREMENT_ERROR,
       );
     }
+    if (!module_exists('token')) {
+      $requirements['amp_token'] = array(
+        'title' => t('Token module required for AMP'),
+        'value' => t('Not installed'),
+        'description' => t('The AMP module requires the <a href="@module">Token</a> module as a dependency. Please download and install Token to prevent errors with AMP.', array('@module' => 'https://www.drupal.org/project/token')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+    if (!module_exists('ctools')) {
+      $requirements['amp_ctools'] = array(
+        'title' => t('ctools module required for AMP'),
+        'value' => t('Not installed'),
+        'description' => t('The AMP module requires the <a href="@module">ctools</a> module as a dependency. Please download and install ctools to prevent errors with AMP.', array('@module' => 'https://www.drupal.org/project/ctools')),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
     $themes = list_themes();
     if (empty($themes['amptheme']) || empty($themes['amptheme']->status)) {
       $requirements['amptheme'] = array(

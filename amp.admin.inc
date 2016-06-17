@@ -15,6 +15,18 @@
 function amp_admin_form($form, &$form_state) {
   $form = array();
 
+  if (!module_exists('token')) {
+    // Provide message in case somebody has upgraded AMP module but has not
+    // installed Token.
+    drupal_set_message(t('The AMP module requires the <a href="@module">Token</a> module as a dependency. Please download and install Token to prevent errors with AMP.', array('@module' => 'https://www.drupal.org/project/token')), 'warning');
+  }
+
+  if (!module_exists('ctools')) {
+    // Provide message in case somebody has upgraded AMP module but has not
+    // installed ctools.
+    drupal_set_message(t('The AMP module requires the <a href="@module">ctools</a> module as a dependency. Please download and install ctools to prevent errors with AMP.', array('@module' => 'https://www.drupal.org/project/ctools')), 'warning');
+  }
+
   if (module_exists('field_ui')) {
     $form['amp_content_amp_status'] = array(
       '#title' => t('AMP Status by Content Type'),
@@ -269,4 +281,117 @@ function amp_get_formatted_status_list() {
     }
   }
   return $node_status_list;
+}
+
+/**
+ * Form constructor for the AMP metadata form.
+ */
+function amp_admin_metadata_form($form, &$form_state) {
+  if (!module_exists('token')) {
+    // Provide message in case somebody has upgraded AMP module but has not
+    // installed Token.
+    drupal_set_message(t('The AMP module requires the <a href="@module">Token</a> module as a dependency. Please download and install Token to prevent errors with AMP.', array('@module' => 'https://www.drupal.org/project/token')), 'warning');
+  }
+
+  if (!module_exists('ctools')) {
+    // Provide message in case somebody has upgraded AMP module but has not
+    // installed ctools.
+    drupal_set_message(t('The AMP module requires the <a href="@module">ctools</a> module as a dependency. Please download and install ctools to prevent errors with AMP.', array('@module' => 'https://www.drupal.org/project/ctools')), 'warning');
+  }
+
+
+  $form['amp_metadata_organization'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Organization information'),
+  );
+
+  $form['amp_metadata_organization']['description'] = array(
+    '#type' => 'item',
+    '#description' => t('Provide information about your organization for use in search metadata.'),
+  );
+
+  $form['amp_metadata_organization']['amp_metadata_token_tree'] = array(
+    '#theme' => 'token_tree',
+    '#token_types' => array('site'),
+    '#dialog' => TRUE,
+  );
+
+  $form['amp_metadata_organization']['amp_metadata_organization_name'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Organization name'),
+    '#description' => t('
+      <p>Name of the publisher of the content. Typically, this can be the same as the site name.</p>
+      <p>Suggested token: [site:name]</p>'),
+    '#required' => TRUE,
+    '#attributes' => ['placeholder' => '[site:name]'],
+    '#default_value' => variable_get('amp_metadata_organization_name', NULL)
+  );
+
+  $form['amp_metadata_organization']['amp_metadata_organization_logo'] = array(
+    '#type' => 'managed_file',
+    '#title' => t('Organization logo'),
+    '#description' => t('
+      <p>Upload a logo for your organization.</p>
+      <p>This logo must have a height of 60px and a width less than 600px. SVG logos are not allowed: please provide a JPG, JPEG, GIF or PNG.</p>
+      <p>See the AMP <a href="@logo_guidelines">logo guidelines</a>.</p>', array('@logo_guidelines' => 'https://developers.google.com/search/docs/data-types/articles#amp-logo-guidelines')),
+    '#upload_location' => 'public://',
+    '#upload_validators' => array(
+      'file_validate_extensions' => array('png jpg'),
+    ),
+    '#required' => TRUE,
+    '#default_value' => variable_get('amp_metadata_organization_logo', FALSE),
+  );
+
+  $enabled_types = amp_get_enabled_types();
+  if (!empty($enabled_types)) {
+    $node_types = node_type_get_names();
+    $enabled_type_list = array();
+    foreach ($enabled_types as $type) {
+      $enabled_type_list[] = $node_types[$type] . t(': <a href="@configure">Edit AMP metadata settings</a>', array(
+          '@configure' => '/admin/structure/types/manage/' . $type . '?destination=/admin/config/content/amp/metadata',
+        ));
+    }
+
+    $form['amp_metadata_content_types'] = array(
+      '#title' => 'Content information from AMP-enabled content types',
+      '#theme' => 'item_list',
+      '#items' => $enabled_type_list,
+    );
+  }
+  else {
+    $form['amp_metadata_content_types'] = array(
+      '#markup' => t('No content types are currently enabled for AMP. <a href="@configure">Enable them here</a>.', array(
+        '@configure' => '/admin/config/content/amp',
+      )),
+    );
+  }
+
+  $form['#submit'] = array('amp_admin_metadata_form_submit');
+  return system_settings_form($form);
+}
+
+/**
+ * Submit handler for the amp_admin_metadata_form.
+ * Sets the logo file to permanent.
+ */
+function amp_admin_metadata_form_submit($form, &$form_state) {
+  $old_fid = variable_get('amp_metadata_organization_logo', 0);
+  if ($form_state['values']['amp_metadata_organization_logo'] != $old_fid) {
+
+    $file = file_load($form_state['values']['amp_metadata_organization_logo']);
+
+    // If this is a new file...
+    if (!$file->status) {
+      $file->status = FILE_STATUS_PERMANENT;
+      file_save($file);
+      file_usage_add($file, 'amp', 'logo', 1);
+    }
+
+    // Delete the old file
+    $old_file = $old_fid ? file_load($old_fid) : FALSE;
+    if ($old_file) {
+      file_usage_delete($old_file, 'amp', 'logo', 1);
+      file_delete($old_file);
+    }
+  }
 }
