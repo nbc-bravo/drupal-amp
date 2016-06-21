@@ -11,6 +11,6 @@
     "source": "http://cgit.drupalcode.org/amp"
   },
   "require": {
-    "lullabot/amp": "1.0.*"
+    "lullabot/amp": "^1.0.0-RC1"
   }
 }
