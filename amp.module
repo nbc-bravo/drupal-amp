@@ -733,13 +733,20 @@ function amp_node_view($node, $view_mode, $langcode) {
 
     drupal_alter('amp_metadata', $metadata_json, $node, $type);
 
+    // Replace the tokens.
+    array_walk_recursive($metadata_json, function(&$value) use ($node) {
+      $value = strip_tags(token_replace($value, ['node' => $node]));
+      $value = str_replace("\n", "", $value);
+      $value = str_replace("\r", "", $value);
+    });
+
     $element = array(
       '#tag' => 'script',
       '#type' => 'html_tag',
       '#attributes' => array(
         'type' => 'application/ld+json',
       ),
-      '#value' => strip_tags(token_replace(json_encode($metadata_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), array('node' => $node))),
+      '#value' => json_encode($metadata_json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), array('node' => $node),
     );
     drupal_add_html_head($element, 'amp_metadata');
   }
