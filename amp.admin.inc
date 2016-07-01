@@ -342,6 +342,14 @@ function amp_admin_metadata_form($form, &$form_state) {
     '#default_value' => variable_get('amp_metadata_organization_logo', FALSE),
   );
 
+  $form['amp_metadata_organization']['amp_metadata_organization_logo_image_style_id'] = array(
+    '#type' => 'select',
+    '#title' => t('Organization logo image style'),
+    '#options' => image_style_options(TRUE),
+    '#description' => t('<p>The image style to use for the organization logo.</p>'),
+    '#default_value' => variable_get('amp_metadata_organization_logo_image_style_id', NULL)
+  );
+
   $enabled_types = amp_get_enabled_types();
   if (!empty($enabled_types)) {
     $node_types = node_type_get_names();

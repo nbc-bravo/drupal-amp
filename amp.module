@@ -536,6 +536,12 @@ function amp_form_node_type_form_alter(&$form, &$form_state, $form_id) {
           );
           $form_options['amp_metadata_config_' . $name]['#attributes'] = ['placeholder' => '[node:field_image]'];
           break;
+        case 'imageStyle':
+          $form_options['amp_metadata_config_' . $name]['#title'] = 'Article image style';
+          $form_options['amp_metadata_config_' . $name]['#type'] = 'select';
+          $form_options['amp_metadata_config_' . $name]['#options'] = image_style_options(TRUE);
+          $form_options['amp_metadata_config_' . $name]['#description'] = t('<p>The image style to use for the article image</p>');
+          break;
       }
     }
 
@@ -700,34 +706,43 @@ function amp_node_view($node, $view_mode, $langcode) {
           $image_uri = file_build_uri(substr($image_url, strlen($public_stream_base_url)));
         }
 
-        if (!empty($image_url) && FALSE !== image_get_info($image_uri)) {
-          $image_info = image_get_info($image_uri);
-          $metadata_json[$name] = array(
-            '@type' => 'ImageObject',
-            'url' => $image_url,
-            'width' => $image_info['width'],
-            'height' => $image_info['height'],
-          );
+        if (!empty($image_url) && !empty($image_uri)) {
+          if (!isset($metadata['amp_metadata_config_imageStyle']) || empty($image_style_id = $metadata['amp_metadata_config_imageStyle'])) {
+            $image_style_id = '';
+          }
+          if (!empty($image_info = _amp_get_image_information($image_url, $image_uri, $image_style_id))) {
+            $metadata_json[$name] = array(
+              '@type' => 'ImageObject',
+              'url' => $image_info['url'],
+              'width' => $image_info['width'],
+              'height' => $image_info['height'],
+            );
+          }
         }
       }
+    }
 
-      // Add global publisher info.
-      $metadata_json['publisher'] = array(
-        '@type' => 'Organization',
-        'name' => variable_get('amp_metadata_organization_name', ''),
-      );
+    // Add global publisher info.
+    $metadata_json['publisher'] = array(
+      '@type' => 'Organization',
+      'name' => variable_get('amp_metadata_organization_name', ''),
+    );
 
-      $logo_fid = variable_get('amp_metadata_organization_logo', NULL);
-      if ($logo_fid) {
-        $logo = file_load($logo_fid);
-        $logo_url = file_create_url($logo->uri);
-        $logo_info = image_get_info($logo_url);
-        $metadata_json['publisher']['logo'] = array(
-          '@type' => 'ImageObject',
-          'url' => $logo_url,
-          'width' => $logo_info['width'],
-          'height' => $logo_info['height'],
-        );
+    $logo_fid = variable_get('amp_metadata_organization_logo', NULL);
+    if ($logo_fid) {
+      $logo = file_load($logo_fid);
+      $logo_uri = $logo->uri;
+      $logo_url = file_create_url($logo_uri);
+      if (!empty($logo_url) && !empty($logo_uri)) {
+        $logo_style_id = variable_get('amp_metadata_organization_logo_image_style_id', '');
+        if (!empty($logo_info = _amp_get_image_information($logo_url, $logo_uri, $logo_style_id))) {
+          $metadata_json['publisher']['logo'] = array(
+            '@type' => 'ImageObject',
+            'url' => $logo_info['url'],
+            'width' => $logo_info['width'],
+            'height' => $logo_info['height'],
+          );
+        }
       }
     }
 
@@ -1455,6 +1470,45 @@ function amp_html_head_alter(&$head_elements) {
 }
 
 /**
+ * Implements hook_image_default_styles().
+ */
+function amp_image_default_styles() {
+  $styles = array();
+
+  $styles['amp_metadata_content_image_min_696px_wide'] = array(
+    'label' => 'AMP Metadata: Content image (696px wide)',
+    'effects' => array(
+      array(
+        'name' => 'image_scale',
+        'data' => array(
+          'width' => 696,
+          'height' => NULL,
+          'upscale' => 1,
+        ),
+        'weight' => 0,
+      ),
+    ),
+  );
+
+  $styles['amp_metadata_logo_600x60'] = array(
+    'label' => 'AMP Metadata: Logo (600x60)',
+    'effects' => array(
+      array(
+        'name' => 'image_scale',
+        'data' => array(
+          'width' => 600,
+          'height' => 60,
+          'upscale' => 0,
+        ),
+        'weight' => 0,
+      ),
+    ),
+  );
+
+  return $styles;
+}
+
+/**
  * Helper function to return information about metadata node type fields.
  *
  * @return array
@@ -1469,5 +1523,56 @@ function _amp_get_metadata_type_fields() {
     'description' => array('value' => '[node:summary]', 'type' => 'text'),
     'author' => array('value' => '[node:author:name]', 'type' => 'Person'),
     'image' => array('value' => '', 'type' => 'ImageObject'),
+    'imageStyle' => array('value' => '', 'type' => 'ImageStyle'),
   );
+}
+
+/**
+ * Gets image information.
+ *
+ * @param string $image_url
+ *   The absolute URL of the image. URL should include 'http'.
+ * @param string $image_uri
+ *   The URI of the image. URI should begin with 'public://'.
+ * @param string $image_style_id
+ *   The optional ID of the image style.
+ *
+ * @return array
+ *   The array containing information about the image. Return an empty array
+ *   if there is a problem getting information about the image. Otherwise the
+ *   image inforation array includes the following keys:
+ *   - url
+ *   - width
+ *   - height
+ */
+function _amp_get_image_information($image_url, $image_uri, $image_style_id) {
+  $image_width = '';
+  $image_height = '';
+
+  if (!empty($image_uri) && FALSE !== image_get_info($image_uri)) {
+    $image_info = image_get_info($image_uri);
+    $image_dimensions = array(
+      'width' => $image_info['width'],
+      'height' => $image_info['height'],
+    );
+
+    if (!empty($image_style_id)) {
+      $image_url = image_style_url($image_style_id, $image_uri);
+      image_style_transform_dimensions($image_style_id, $image_dimensions);
+    }
+
+    $image_width = $image_dimensions['width'];
+    $image_height = $image_dimensions['height'];
+  }
+
+  if (!empty($image_url) && !empty($image_width) & !empty($image_height)) {
+    return array(
+      'url' => $image_url,
+      'width'=> $image_width,
+      'height' => $image_height,
+    );
+  }
+  else {
+    return array();
+  }
 }
