@@ -399,7 +399,10 @@ function amp_admin_metadata_form_submit($form, &$form_state) {
     $old_file = $old_fid ? file_load($old_fid) : FALSE;
     if ($old_file) {
       file_usage_delete($old_file, 'amp', 'logo', 1);
-      file_delete($old_file);
+      // Only delete a file if it is the only place it is in use.
+      if (empty(file_usage_list($old_file))) {
+        file_delete($old_file);
+      }
     }
   }
 }
