@@ -361,8 +361,11 @@ class AmpMetadataForm extends EntityForm implements ContainerAwareInterface {
     /** @var \Drupal\file\FileInterface $logo_file_previous */
     if (!empty($logo_fid_previous) && ($logo_fid_previous !== $logo_fid_new) && !empty($logo_file_previous= File::load($logo_fid_previous))) {
       $this->fileUsage->delete($logo_file_previous, 'amp', 'amp_metadata', $amp_metadata->get('id'));
-      $logo_file_previous->setTemporary();
-      $logo_file_previous->delete();
+      // Only delete the file if this is the only place it was in use.
+      if (empty($this->fileUsage->listUsage($logo_file_previous))) {
+        $logo_file_previous->setTemporary();
+        $logo_file_previous->delete();
+      }
       $amp_metadata->setOrganizationLogoFid(NULL);
     }
     $amp_metadata->setOrganizationLogoImageStyleId($form_state->getValue('amp_organization_logo_image_style_id'));
