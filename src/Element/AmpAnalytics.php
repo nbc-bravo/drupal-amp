@@ -37,9 +37,7 @@ class AmpAnalytics extends RenderElement {
       ),
       '#theme' => 'amp_analytics',
       '#cache' => [
-        // @todo Replace with 'url.query_args:amp' at some point after
-        // https://www.drupal.org/node/2729439 lands in Drupal core.
-        'contexts' => ['url.amp']
+        'contexts' => ['url.query_args:amp']
       ]
     );
   }

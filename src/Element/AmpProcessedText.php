@@ -34,10 +34,7 @@ class AmpProcessedText extends ProcessedText {
         array($class, 'preRenderAmpText'),
       ),
       '#cache' => [
-        // @todo Replace with ['url.query_args:amp, 'url.query_args:warnfix'] at
-        // some point after https://www.drupal.org/node/2729439 lands in Drupal
-        // core.
-        'contexts' => ['url.amp', 'url.warnfix'],
+        'contexts' => ['url.query_args:amp', 'url.query_args:warnfix'],
         'tags' => ['config:amp.settings']
       ]
     );

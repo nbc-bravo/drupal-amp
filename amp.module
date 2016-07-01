@@ -49,10 +49,7 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
     $view_modes = \Drupal::service('entity_display.repository')->getViewModeOptionsByBundle('node', $entity->bundle());
     // Double-check that the AMP view mode is enabled for this node type.
     if (isset($view_modes['amp'])) {
-      // Catches any variations based on 'amp' query parameter in URL.
-      // @todo Replace with 'url.query_args:amp' at some point after
-      // https://www.drupal.org/node/2729439 lands in Drupal core.
-      $build['#cache']['contexts'][] = 'url.amp';
+      $build['#cache']['contexts'][] = 'url.query_args:amp';
       $absolute_canonical = $entity->toUrl('canonical', ['absolute' => TRUE])->toString();
 
       if (!empty($build['#attached']['html_head_link'])) {
