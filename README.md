@@ -60,6 +60,9 @@ The body field presents a special problem, since it is likely to contain lots of
 * Download this (AMP) module into the `/modules` directory.
 * On the command line, move to the root of the Drupal project and run `composer drupal-update` to pick up remaining dependencies.
 
+#### Troubleshooting
+
+If you're not using Composer Manager, you _may_ run into a composer error in which you're unable to install the `masterminds/html5` library dependency and you get an error like "Your requirements could not be resolved to an installable set of packages." You may have run into https://www.drupal.org/node/2752645. See the link for a workaround. This problem will be fixed in Drupal 8.1.4
 
 ## AMP Configuration
 
