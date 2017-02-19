@@ -11,7 +11,7 @@
 
 The AMP module is designed to convert Drupal pages into pages that comply with the AMP standard. At this time, only node pages are converted.
 
-When the AMP module is installed, AMP can be enabled for any node type. At that point, AMP content becomes available on URLs such as `node/1?amp=1` or `node/article-title?amp=1`. There are also special formatters for text, image, and video fields geared towards outputting the appropriate AMP Components.
+When the AMP module is installed, AMP can be enabled for any node type. At that point, AMP content becomes available on URLs such as `node/1?amp=1` or `node/article-title?amp=1`. There are also special formatters for text, image, and video fields geared towards outputting the appropriate AMP components.
 
 ## How to install AMP for Drupal
 
@@ -48,7 +48,7 @@ The AMP theme provides an AMP Base theme and an ExAMPle subtheme. You can use th
 * Open "Custom Display Settings" fieldset, check AMP, click Save button (this brings you back to the AMP config form).
 * Click "Configure AMP view mode".
 * The AMP view mode is where you can control which fields will display on the AMP page for each content type. You might only want a title, image, and body.
-* There are special formatters for text, image, and iframe fields in order to output AMP Components, so be sure to use them in the AMP view mode. Make sure to use the AMP Text formatter for the body field.
+* There are special formatters for text, image, and iframe fields in order to output AMP components, so be sure to use them in the AMP view mode. Make sure to use the AMP Text formatter for the body field.
 * Click Save button (this brings you back to the AMP config form).
 * To change these later, go to `/admin/structure/types/manage/{CONTENT-TYPE}/display/amp` and set up the fields for the AMP version of each content type.
 
@@ -76,8 +76,9 @@ The AMP theme provides an AMP Base theme and an ExAMPle subtheme. You can use th
   * The AMP page is a simple page, with a header, content area, and footer. You should remove most blocks from this theme. We suggest just displaying the branding, title and content on the page. Start simple and add more elements later if desired.
   * If you want ads on your AMP pages, add AMP Ad blocks as desired. The ads will use the IDs provided in your AMP configuration.
 
-### How to add Structured Data for AMP
+### How to configure Structured Data for AMP
 * Provide Structured Data for AMP through the AMP Metadata configuration screen at `/admin/config/content/amp/metadata`.
+* Please note that this metadata is optional for some platforms, while for others it is a requirement. For example, the metadata items below that are marked required are a requirement to make your content eligible to appear in the Google Search news carousel.  More details can be found at https://developers.google.com/search/docs/guides/mark-up-content#use-amp-html.
 
 #### Global AMP Metadata settings
 * The first time you use the Add AMP Metadata button, you will be adding global settings for AMP Metadata.
@@ -96,10 +97,10 @@ The AMP theme provides an AMP Base theme and an ExAMPle subtheme. You can use th
 #### Content information (required)
 * Ensure all fields are completed with appropriate token values.
 * Some fields have character length restrictions to keep in mind. Tokens like [node:title] and [node:summary] will be automatically truncated to meet those character limits. If you want more control, you may want to create fields on your content type(s) where editors can provide short titles and summaries.
-* Take special note of the image field, as that typically varies per content type. You must provide an image field for each content type if you want that content type to appear in Top Stories listings.
+* Take special note of the image field, as that typically varies per content type. You must provide an image field for each content type if you want that content type to appear in Top Stories on Google Search.
 
-#### View AMP Metadata JSON
-* After all AMP Metadata settings are completed, view a node for an AMP-enabled content type that has content necessary for AMP Metadata (such as an image field).
+#### Verify Structured Data from JSON file
+* After all AMP Metadata settings are completed on the AMP Metadata configuration screen at `/admin/config/content/amp/metadata`, view a node for an AMP-enabled content type that has content necessary for AMP Metadata (such as an image field).
 * Make sure you are using the most recent version of AMP Theme.
 * When you view source on that node, you should see JSON in the head section of your HTML.
 * Compare the JSON with the guidelines available at https://developers.google.com/search/docs/data-types/articles.
@@ -117,7 +118,7 @@ The module is responsible for the basic functionality of providing an AMP versio
 
 - Create an AMP view mode, so users can decide which fields should be displayed in which order on the AMP version of a page.
 - Create an AMP route, which will display the AMP view mode on an AMP path (i.e. `node/1?amp=1`).
-- Create formatters for common fields, like text, image, video, and iframe that can be used in the AMP view mode to display AMP Components for those fields.
+- Create formatters for common fields, like text, image, video, and iframe that can be used in the AMP view mode to display AMP components for those fields.
 - Create AMP ad blocks that can be placed by the theme.
 - The theme can place AMP pixel items in the page markup where appropriate, based on the configuration options.
 - Create an AMP configuration page where users can identify which ad and analytics systems to use, and identify which theme is the AMP theme.
@@ -131,7 +132,7 @@ The body field presents a special problem, since it is likely to contain lots of
 
 We have done our best to make this solution as turnkey as possible, but more could be added to this module in the future. At this point only node pages can be converted to AMP. The initial module supports AMP tags such as `amp-ad`, `amp-pixel`, `amp-img`, `amp-video`, `amp-analytics`, and `amp-iframe`. Support for additional extended components may be added in the future. For now the module supports Google Analytics, AdSense, and DoubleClick for Publisher ad networks. Additional network support could be added down the road.
 
-## Supported AMP Components
+## Supported AMP components
 
 - [amp-ad](https://www.ampproject.org/docs/reference/amp-ad.html)
 - [amp-pixel](https://www.ampproject.org/docs/reference/amp-pixel.html)
