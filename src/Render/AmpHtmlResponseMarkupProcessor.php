@@ -73,7 +73,6 @@ class AmpHtmlResponseMarkupProcessor {
    */
   public function __construct(AMPService $amp_library_service, LoggerChannelInterface $loggerChannel, ConfigFactoryInterface $configFactoryInterface) {
     $this->ampService = $amp_library_service;
-    $this->ampConverter = $this->ampService->createAMPConverter();
     $this->loggerChannel = $loggerChannel;
     $this->configFactory = $configFactoryInterface;
     $this->ampConfig = $this->configFactory->get('amp.settings');
@@ -110,6 +109,8 @@ class AmpHtmlResponseMarkupProcessor {
     if ($this->ampConfig->get('amp_library_process_statistics')) {
       $options += ['add_stats_html_comment' => true];
     }
+
+    $this->ampConverter = $this->ampService->createAMPConverter();
 
     $this->ampConverter->loadHtml($this->content, $options);
 
