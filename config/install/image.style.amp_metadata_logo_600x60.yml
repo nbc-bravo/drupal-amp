@@ -10,4 +10,7 @@ effects:
     weight: 1
     uuid: e3b08820-12f7-4cf1-9f6a-25e493a1345c
 langcode: en
-dependencies: {  }
+dependencies:
+  enforced:
+    module:
+      - amp

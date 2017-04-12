@@ -86,6 +86,22 @@ function amp_update_8002() {
 }
 
 /**
+ * Fix Amp's image style dependencies.
+ */
+function amp_update_8003() {
+  $config_factory = \Drupal::configFactory();
+  $styles = [
+    'image.style.amp_metadata_content_image_min_696px_wide',
+    'image.style.amp_metadata_logo_600x60',
+  ];
+  foreach ($styles as $style) {
+    $config = $config_factory->getEditable($style);
+    $config->set('dependencies.enforced.module', ['amp']);
+    $config->save();
+  }
+}
+
+/**
  * Helper function to create image style configuration objects for an update.
  *
  * @param string $name
