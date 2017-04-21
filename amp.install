@@ -48,3 +48,26 @@ function amp_requirements($phase) {
   }
   return $requirements;
 }
+
+/**
+ * Implements hook_uninstall().
+ */
+function amp_uninstall() {
+  // Delete variables.
+  variable_del('amp_theme');
+  variable_del('amp_google_analytics_id');
+  variable_del('amp_google_adsense_id');
+  variable_del('amp_google_doubleclick_id');
+  variable_del('amp_pixel');
+  variable_del('amp_pixel_domain_name');
+  variable_del('amp_pixel_query_string');
+  variable_del('amp_pixel_random_number');
+  variable_del('amp_library_warnings_display');
+  variable_del('amp_library_process_full_html');
+  variable_del('amp_library_process_statistics');
+  variable_del('amp_library_process_full_html_warnings');
+  variable_del('amp_library_warnings_display');
+  variable_del('amp_metadata_organization_name');
+  variable_del('amp_metadata_organization_logo');
+  variable_del('amp_metadata_organization_logo_image_style_id');
+}
