@@ -4,6 +4,7 @@
  * Template for an amp-dfp-tag.
  *
  * Available variables:
+ * - layout: The layout of the ad.
  * - height: The height of the ad.
  * - width: The width of the ad.
  * - slot: The DFP ad slot string.
@@ -14,6 +15,7 @@
  */
 ?>
 <amp-ad type="doubleclick"
+        layout="<?php print $layout; ?>"
         height="<?php print $height; ?>"
         width="<?php print $width; ?>"
         data-slot="<?php print $slot; ?>"

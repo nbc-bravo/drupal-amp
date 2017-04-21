@@ -36,6 +36,7 @@ function amp_dfp_theme($existing, $type, $theme, $path) {
  * Implements hook_preprocess_amp_dfp_tag().
  */
 function amp_dfp_preprocess_amp_dfp_tag(&$variables) {
+  $variables['layout'] = $variables['tag']->settings['amp_layout'];
   $size = _amp_dfp_get_amp_size($variables['tag']);
   if (empty($size)) {
     // Provide a default if there is a problem, so validation does not break.
@@ -83,6 +84,15 @@ function amp_dfp_form_ctools_export_ui_edit_item_form_alter(&$form, &$form_state
   if ($form_state['plugin']['schema'] == 'dfp_tags') {
     $tag = ($form_state['op'] == 'add' ? $form_state['item'] : $form_state['item']->raw);
 
+    $options = array('fill', 'fixed', 'fixed-height', 'flex-item', 'nodisplay', 'responsive');
+    $form['tag_settings']['amp_layout'] = array(
+      '#type' => 'select',
+      '#title' => t('AMP Layout'),
+      '#description' => t('Select the layout.'),
+      '#options' => drupal_map_assoc($options),
+      '#weight' => 0,
+      '#default_value' => isset($tag->settings['amp_layout']) ? $tag->settings['amp_layout'] : 'responsive',
+    );
     $form['tag_settings']['amp_size'] = array(
       '#type' => 'textfield',
       '#title' => t('AMP Size'),
@@ -114,6 +124,7 @@ function amp_dfp_ctools_export_ui_edit_item_form_validate(&$form, &$form_state) 
  */
 function amp_dfp_ctools_export_ui_edit_item_form_submit(&$form, &$form_state) {
   if (isset($form_state['values']['amp_size'])) {
+    $form_state['values']['settings']['amp_layout'] = $form_state['values']['amp_layout'];
     $form_state['values']['settings']['amp_size'] = $form_state['values']['amp_size'];
   }
 }
