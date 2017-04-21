@@ -80,9 +80,9 @@ function amp_dfp_preprocess_amp_dfp_tag(&$variables) {
 function amp_dfp_form_ctools_export_ui_edit_item_form_alter(&$form, &$form_state) {
 
   // Create a default tag object.
-  $tag = ($form_state['op'] == 'add' ? $form_state['item'] : $form_state['item']->raw);
-
   if ($form_state['plugin']['schema'] == 'dfp_tags') {
+    $tag = ($form_state['op'] == 'add' ? $form_state['item'] : $form_state['item']->raw);
+
     $form['tag_settings']['amp_size'] = array(
       '#type' => 'textfield',
       '#title' => t('AMP Size'),
