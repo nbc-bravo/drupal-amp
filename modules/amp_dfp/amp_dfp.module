@@ -46,7 +46,7 @@ function amp_dfp_preprocess_amp_dfp_tag(&$variables) {
   }
 
   $tag = _dfp_prepare_adunit($variables['tag']);
-  $tag->adunit = _dfp_clean_adunit(token_replace('[dfp_tag:network_id]/' . $tag->adunit, _dfp_prepare_tokens($tag), array('sanitize' => TRUE, 'clear' => TRUE)));
+  $tag->adunit = dfp_token_replace('[dfp_tag:network_id]/' . $tag->adunit, $tag, array('sanitize' => TRUE, 'clear' => TRUE));
 
   // We add global targeting to each dfp tag to simplify implementation.
   $global_targeting = variable_get('dfp_targeting', array());
@@ -58,12 +58,12 @@ function amp_dfp_preprocess_amp_dfp_tag(&$variables) {
   // Prepare targeting arrays for JSON formatting
   $targeting = array();
   foreach ($tag->targeting as $target) {
-    $targeting[$target['target']] = token_replace($target['value'], _dfp_prepare_tokens($tag), array('sanitize' => TRUE, 'clear' => TRUE));
+    $targeting[$target['target']] = dfp_token_replace($target['value'], $tag, array('sanitize' => TRUE, 'clear' => TRUE));
   }
 
   $global_targeting = array();
   foreach ($tag->global_targeting as $target) {
-    $global_targeting[$target['target']] = token_replace($target['value'], _dfp_prepare_tokens($tag), array('sanitize' => TRUE, 'clear' => TRUE));
+    $global_targeting[$target['target']] = dfp_token_replace($target['value'], $tag, array('sanitize' => TRUE, 'clear' => TRUE));
   }
 
   // Give preference to tag specific targeting values
