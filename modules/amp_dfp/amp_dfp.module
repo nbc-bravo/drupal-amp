@@ -101,7 +101,7 @@ function amp_dfp_form_ctools_export_ui_edit_item_form_alter(&$form, &$form_state
  * field.
  */
 function amp_dfp_ctools_export_ui_edit_item_form_validate(&$form, &$form_state) {
-  if (isset($form_state['values']['amp_size'])) {
+  if (!empty($form_state['values']['amp_size'])) {
     $pixels = _amp_dfp_get_pixel_sizes($form_state['values']['amp_size']);
     if (empty($pixels)) {
       form_set_error('amp_size', 'AMP Size is in an invalid format.');
