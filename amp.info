@@ -5,4 +5,4 @@ configure = admin/config/content/amp
 php = 5.5
 dependencies[] = token
 dependencies[] = ctools
-files[] = amp.test
+files[] = tests/amp.test

@@ -6,6 +6,7 @@
  */
 
 class AmpTestCase extends DrupalWebTestCase {
+  protected $admin_user;
 
   public static function getInfo() {
     return array(
@@ -17,7 +18,16 @@ class AmpTestCase extends DrupalWebTestCase {
 
   protected function setUp() {
     // Enable AMP module.
-    parent::setUp('amp', 'composer_manager');
+    parent::setUp('field_ui', 'amp_test');
+
+    // Create Admin user.
+    $this->admin_user = $this->drupalCreateUser(array(
+        'administer content types',
+        'administer fields',
+      )
+    );
+    $this->drupalLogin($this->admin_user);
+
     // Install the AMP theme.
     theme_enable(array('amptheme', 'ampsubtheme_example'));
   }
@@ -26,11 +36,8 @@ class AmpTestCase extends DrupalWebTestCase {
    * Test the AMP view mode.
    */
   public function testAmpViewMode() {
-    global $base_url;
-
     // Login as an admin user.
-    $admin_user = $this->drupalCreateUser(array('administer content types'));
-    $this->drupalLogin($admin_user);
+    $this->drupalLogin($this->admin_user);
 
     // Create a node to test AMP metadata.
     $node = $this->drupalCreateNode(array('type' => 'article'));
@@ -45,19 +52,24 @@ class AmpTestCase extends DrupalWebTestCase {
     $this->drupalGet('node/' . $node->nid);
     $this->assertResponse(200);
     $this->assertText($node->body[LANGUAGE_NONE][0]['value']);
-    $this->assertRaw('link rel="amphtml" href="' . $base_url . '/node/1?amp"');
+    // This will match http/https on any domain + subfolder, using clean urls or without.
+    $pattern = '|<link rel="amphtml" href="http(.*):\/\/(.*)node\/1[&\?]amp(.*)"\s\/>|';
+    $this->assertPattern($pattern, 'Check that link rel="amphtml" is present on the page.');
 
     // Check the AMP display.
     $this->drupalGet('node/' . $node->nid, array('query' => array('amp' => TRUE)));
     $this->assertResponse(200);
     $this->assertText($node->body[LANGUAGE_NONE][0]['value']);
-    $this->assertRaw('link rel="canonical" href="' . $base_url . '/node/1"');
+    $pattern = '|<link rel="canonical" href="http(.*):\/\/(.*)node\/1"\s\/>|';
+    $this->assertPattern($pattern, 'Check that link rel="canonical" is present on the page.');
 
     // Configure AMP field formatters.
     $this->drupalGet('admin/structure/types/manage/article/display/amp');
     $this->assertResponse(200);
-    $edit = ["fields[field_image][type]" => 'amp_image'];
-    $edit = ["fields[body][type]" => 'amp_text'];
+    $edit = [
+      "fields[field_image][type]" => 'amp_image',
+      "fields[body][type]" => 'amp_text',
+    ];
     $this->drupalPost(NULL, $edit, t('Save'));
 
     // Check the warnfix messages.
