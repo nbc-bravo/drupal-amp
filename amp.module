@@ -6,6 +6,7 @@
  */
 
 require_once dirname(__FILE__).'/amp.admin.inc';
+require_once dirname(__FILE__) . '/includes/amp.db.inc';
 
 use Lullabot\AMP\AMP;
 use Lullabot\AMP\Validate\Scope;
@@ -298,14 +299,17 @@ function amp_is_amp_request() {
       // it is a node type which has the AMP view mode enabled.
       $node = menu_get_object();
       if ($node && in_array($node->type, amp_get_enabled_types())) {
-        // Do an additional check to ensure the current path is actually the
-        // node's public URI. Without this check, this function would return
-        // TRUE on the node's edit form.
-        $uri = entity_uri('node', $node);
-        if ($uri['path'] == current_path()) {
-          // Only if all of the above conditions are true is this a valid AMP
-          // request.
-          $result = TRUE;
+        // Node level check.
+        if (amp_node_is_enabled($node->nid)) {
+          // Do an additional check to ensure the current path is actually the
+          // node's public URI. Without this check, this function would return
+          // TRUE on the node's edit form.
+          $uri = entity_uri('node', $node);
+          if ($uri['path'] == current_path()) {
+            // Only if all of the above conditions are true is this a valid AMP
+            // request.
+            $result = TRUE;
+          }
         }
       }
     }
@@ -345,7 +349,7 @@ function amp_form_node_form_alter(&$form, &$form_state, $form_id) {
     $form['actions']['save_view_amp'] = array(
       '#type' => 'submit',
       '#value' => t('Save and view AMP page'),
-      '#submit' => array('node_form_submit', 'amp_node_form_submit'),
+      '#submit' => array('node_form_submit', 'amp_node_enabled_form_submit', 'amp_node_form_submit'),
       '#weight' => 12,
       '#access' => TRUE,
     );
@@ -353,10 +357,42 @@ function amp_form_node_form_alter(&$form, &$form_state, $form_id) {
     $form['actions']['save_view_amp_warnfix'] = array(
         '#type' => 'submit',
         '#value' => t('Save and view AMP page and see any AMP formatter warnings'),
-        '#submit' => array('node_form_submit', 'amp_node_form_submit_warnfix'),
+        '#submit' => array('node_form_submit', 'amp_node_enabled_form_submit', 'amp_node_form_submit_warnfix'),
         '#weight' => 13,
         '#access' => TRUE,
     );
+
+    // Option to disable AMP.
+    // When adding new nodes, AMP will be turned on by default.
+    $amp_enabled = 1;
+    // If we are editing an existing node, get the value from database.
+    if (isset($form_state['node']->nid) && !amp_db_is_node_enabled($form_state['node']->nid)) {
+      $amp_enabled = 0;
+    }
+    $form['options']['amp_enabled'] = array(
+      '#title' => t('Published (AMP)'),
+      '#type' => 'checkbox',
+      '#default_value' => $amp_enabled,
+    );
+
+    // Form callback for node enabled.
+    $form['actions']['submit']['#submit'][] = 'amp_node_enabled_form_submit';
+  }
+}
+
+/**
+ * Form callback to save the enabled status.
+ */
+function amp_node_enabled_form_submit(&$form, $form_state) {
+  if (isset($form_state['node']->nid)) {
+    $node_id = $form_state['node']->nid;
+    if ($form_state['values']['amp_enabled'] == 1) {
+      amp_db_enable_amp($node_id);
+    }
+    else {
+      amp_db_disable_amp($node_id);
+    }
+    amp_clear_cache($node_id);
   }
 }
 
@@ -590,8 +626,14 @@ function amp_page_alter(array &$page) {
  * Implements hook_node_view().
  */
 function amp_node_view($node, $view_mode, $langcode) {
+  if ($node = menu_get_object()) {
+    if (!in_array($node->type, amp_get_enabled_types()) || !amp_node_is_enabled($node->nid)) {
+      return;
+    }
+  }
+
   // Show amphtml links on AMP-enabled nodes so search engines can find AMP.
-  if ($view_mode == 'full' && node_is_page($node) && in_array($node->type, amp_get_enabled_types())) {
+  if ($view_mode == 'full' && node_is_page($node)) {
     $uri = entity_uri('node', $node);
     $uri['options']['query']['amp'] = NULL;
     $uri['options']['absolute'] = TRUE;
@@ -1392,6 +1434,54 @@ function amp_page_delivery_callback_alter(&$deliver_callback) {
   if (amp_is_amp_request()) {
     $deliver_callback = 'amp_deliver_html_page';
   }
+}
+
+/**
+ * Implements hook_node_delete().
+ */
+function amp_node_delete($node) {
+  if (in_array($node->type, amp_get_enabled_types())) {
+    // We don't need the amp table for this node if it gets removed.
+    amp_db_remove($node->nid);
+    amp_clear_cache($node->nid);
+  }
+}
+
+/**
+ * Clear cache with id $id
+ *
+ * @param $id
+ *   ID of the cache to clear.
+ */
+function amp_clear_cache($id) {
+  // Clear bins as we have fresh data.
+  cache_clear_all('amp:node_enabled:' . $id, 'cache');
+}
+
+/**
+ * Get if the node is enabled.
+ *
+ * @param $node_id
+ *   Node id to check.
+ *
+ * @return bool
+ *   TRUE if enabled, FALSE otherwise.
+ */
+function amp_node_is_enabled($node_id, $cache_override = FALSE) {
+  // Setup a cache ID
+  $cid = 'amp:node_enabled:' . $node_id;
+
+  // If a cached entry exists, return it
+  if (($cache = cache_get($cid, 'cache')) && $cache_override != TRUE) {
+    $is_enabled = $cache->data;
+  }
+  else {
+    $is_enabled = amp_db_is_node_enabled($node_id);
+    // Cache the result.
+    cache_set($cid, $is_enabled, 'cache');
+  }
+
+  return $is_enabled;
 }
 
 /**

@@ -6,3 +6,4 @@ php = 5.5
 dependencies[] = token
 dependencies[] = ctools
 files[] = tests/amp.test
+files[] = tests/amp_node.test

@@ -36,6 +36,9 @@ function amp_dfp_theme($existing, $type, $theme, $path) {
  * Implements hook_preprocess_amp_dfp_tag().
  */
 function amp_dfp_preprocess_amp_dfp_tag(&$variables) {
+  if (!amp_is_amp_request()) {
+    return;
+  }
   $variables['layout'] = $variables['tag']->settings['amp_layout'];
   $size = _amp_dfp_get_amp_size($variables['tag']);
   if (empty($size)) {
