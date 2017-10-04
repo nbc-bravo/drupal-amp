@@ -1,14 +1,27 @@
 <?php
-
 /**
  * @file
  * AMP Analytics submodule.
  */
 
-function amp_analytics_form_alter(&$form, &$form_state, $form_id) {
-  if ($form_id == 'amp_admin_form') {
+/**
+ * Implements hook_menu().
+ */
+function amp_analytics_menu() {
+  $items = array();
 
-  }
+  $items['admin/config/content/amp/analytics'] = array(
+    'title' => 'AMP Analytics',
+    'description' => 'Configure AMP Analytics',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('amp_analytics_admin_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'amp_analytics.admin.inc',
+    'weight' => '3',
+  );
+
+  return $items;
 }
 
 /**

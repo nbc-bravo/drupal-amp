@@ -64,17 +64,6 @@ function amp_menu() {
     'file' => 'amp.admin.inc',
   );
 
-  $items['admin/config/content/amp/analytics'] = array(
-    'title' => 'AMP Analytics',
-    'description' => 'Configure AMP Analytics',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('amp_analytics_admin_form'),
-    'access arguments' => array('administer site configuration'),
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'modules/amp_analytics/amp_analytics.admin.inc',
-    'weight' => '3',
-  );
-
   return $items;
 }
 
