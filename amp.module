@@ -62,6 +62,18 @@ function amp_menu() {
     'type' => MENU_LOCAL_TASK,
     'file' => 'amp.admin.inc',
   );
+
+  $items['admin/config/content/amp/analytics'] = array(
+    'title' => 'AMP Analytics',
+    'description' => 'Configure AMP Analytics',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('amp_analytics_admin_form'),
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'modules/amp_analytics/amp_analytics.admin.inc',
+    'weight' => '3',
+  );
+
   return $items;
 }
 
@@ -104,14 +116,6 @@ function amp_theme() {
         'slot_attributes_array' => array()
       ),
       'template' => 'templates/amp-ad'
-    ),
-    'amp_analytics' => array(
-      'variables' => array(
-        'account' => NULL,
-        'analytics_attributes' => NULL,
-        'analytics_attributes_array' => array()
-      ),
-      'template' => 'templates/amp-analytics'
     ),
     'amp_iframe' => array(
       'variables' => array(
@@ -247,13 +251,6 @@ function amp_preprocess_amp_ad(&$variables) {
 }
 
 /**
- * Implements hook_preprocess_amp_analytics().
- */
-function amp_preprocess_amp_analytics(&$variables) {
-  $variables['analytics_attributes'] = drupal_attributes($variables['analytics_attributes_array']);
-}
-
-/**
  * Implements hook_preprocess_amp_video().
  */
 function amp_preprocess_amp_video(&$variables) {
@@ -274,46 +271,6 @@ function amp_preprocess_amp_video(&$variables) {
 
   // Turn attributes array into a string.
   $variables['video_attributes'] = drupal_attributes($variables['video_attributes_array']);
-}
-
-/**
- * Implements hook_element_info().
- */
-function amp_element_info() {
-  // AMP Analytics element
-  $types['amp_analytics'] = array(
-    '#account' => NULL,
-    '#analytics_attributes_array' => [],
-    '#pre_render' => array('amp_pre_render_amp_analytics'),
-    '#theme' => 'amp_analytics',
-  );
-
-  return $types;
-}
-
-/**
- * #pre_render callback to render amp_analytics with js library added to head.
- *
- * @param $elements
- *   A render array for amp analytics elements.
- *
- * @return
- *   The passed-in element with the js library necessary for the amp-analytics
- *   element added to head.
- */
-function amp_pre_render_amp_analytics($element) {
-  $head_js = array(
-    '#tag' => 'script',
-    '#type' => 'html_tag',
-    '#attributes' => array(
-      'src' => 'https://cdn.ampproject.org/v0/amp-analytics-0.1.js',
-      'async' => "",
-      'custom-element' => 'amp-analytics'
-    ),
-  );
-  drupal_add_html_head($head_js, 'amp-analytics');
-
-  return $element;
 }
 
 /**
@@ -602,18 +559,6 @@ function amp_view_modes_submit(&$form, $form_state) {
  */
 function amp_page_alter(array &$page) {
   if (amp_is_amp_request()) {
-    $google_analytics_id = variable_get('amp_google_analytics_id');
-    if (!empty($google_analytics_id)) {
-      $amp_analytics = array(
-        '#type' => 'amp_analytics',
-        '#account' => $google_analytics_id,
-        '#analytics_attributes_array' => array(
-          'type' => 'googleanalytics'
-        )
-      );
-      $page['page_bottom']['amp_analytics'] = $amp_analytics;
-    }
-
     if (variable_get('amp_pixel')) {
       $domain = variable_get('amp_pixel_domain_name');
       $query_string = variable_get('amp_pixel_query_string');

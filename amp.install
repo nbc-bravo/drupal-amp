@@ -55,7 +55,6 @@ function amp_requirements($phase) {
 function amp_uninstall() {
   // Delete variables.
   variable_del('amp_theme');
-  variable_del('amp_google_analytics_id');
   variable_del('amp_google_adsense_id');
   variable_del('amp_google_doubleclick_id');
   variable_del('amp_pixel');
@@ -70,4 +69,12 @@ function amp_uninstall() {
   variable_del('amp_metadata_organization_name');
   variable_del('amp_metadata_organization_logo');
   variable_del('amp_metadata_organization_logo_image_style_id');
+}
+
+/**
+ * Enable submodule amp_analytics.
+ */
+function amp_update_7001() {
+  // For backwards compatibility since the code has been moved to a submodule.
+  module_enable(array('amp_analytics'));
 }

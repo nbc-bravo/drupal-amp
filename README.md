@@ -85,8 +85,8 @@ The body field presents a special problem, since it is likely to contain lots of
 * Click Save button (this brings you back to the AMP config form)
 
 ### Analytics (optional)
-* Enter your Google Analytics Web Property ID and click save
-* This will automatically be added to the AMP version of your pages
+* Go to the AMP configuration screen at `/admin/config/content/amp/analytics`
+* Enter your Google Analytics Web Property ID and click save configuration
 
 ### Adsense (optional)
 * Enter your Google AdSense Publisher ID and click save

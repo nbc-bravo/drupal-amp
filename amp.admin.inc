@@ -50,14 +50,6 @@ function amp_admin_form($form, &$form_state) {
     '#description' => t('Choose a theme to use for AMP pages.'),
     '#default_value' => variable_get('amp_theme', 'ampsubtheme_example'),
   );
-  $form['amp_google_analytics_id'] = array(
-    '#title' => t('Google Analytics Web Property ID'),
-    '#type' => 'textfield',
-    '#default_value' => variable_get('amp_google_analytics_id'),
-    '#size' => 15,
-    '#maxlength' => 20,
-    '#description' => t('This ID is unique to each site you want to track separately, and is in the form of UA-xxxxxxx-yy. To get a Web Property ID, <a href="@analytics">register your site with Google Analytics</a>, or if you already have registered your site, go to your Google Analytics Settings page to see the ID next to every site profile. <a href="@webpropertyid">Find more information in the documentation</a>.', array('@analytics' => 'http://www.google.com/analytics/', '@webpropertyid' => url('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', array('fragment' => 'webProperty')))),
-  );
 
   if (!module_exists('amp_adsense')) {
     $form['amp_google_adsense_id'] = array(
@@ -174,14 +166,14 @@ function amp_admin_form($form, &$form_state) {
 /**
  * Submit handler for the amp_admin_form
  * Clears the Drupal cache if the AMP Library warnings display checkbox value is changed
- * 
+ *
  * @param type $form
  * @param type $form_state
  */
 function amp_admin_form_submit($form, &$form_state) {
   if (variable_get('amp_library_warnings_display', false) !== $form_state['values']['amp_library_warnings_display']) {
     cache_clear_all();
-    drupal_set_message(t('AMP Library debugging checkbox changed. Cleared cache.'));    
+    drupal_set_message(t('AMP Library debugging checkbox changed. Cleared cache.'));
   }
 }
 
@@ -191,12 +183,6 @@ function amp_admin_form_submit($form, &$form_state) {
  * @see amp_admin_form_submit()
  */
 function amp_admin_form_validate($form, &$form_state) {
-  // Validate the Google Analytics ID.
-  if (!empty($form_state['values']['amp_google_analytics_id'])) {
-    if (!preg_match('/^UA-\d+-\d+$/', $form_state['values']['amp_google_analytics_id'])) {
-      form_set_error('amp_google_analytics_id', t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.'));
-    }
-  }
   // Validate the Google Adsense ID.
   if (!empty($form_state['values']['amp_google_adsense_id'])) {
     if (!preg_match('/^pub-[0-9]+$/', $form_state['values']['amp_google_adsense_id'])) {

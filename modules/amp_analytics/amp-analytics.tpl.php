@@ -5,7 +5,7 @@
  * Template for amp-analytics.
  *
  * Available variables:
- * - account: The analytics account ID.
+ * - content: The json output.
  * - analytics_attributes: The HTML attributes for amp-analytics, primarily:
  *   - type: The type of analytics account.
  *
@@ -14,16 +14,6 @@
 ?>
 <amp-analytics <?php print $analytics_attributes; ?>>
 <script type="application/json">
-  {
-    "vars": {
-      "account": "<?php print $account; ?>"
-    },
-    "triggers": {
-      "trackAmpview": {
-        "on": "visible",
-        "request": "pageview"
-      }
-    }
-  }
+  <?php print $content; ?>
 </script>
 </amp-analytics>
