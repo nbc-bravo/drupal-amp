@@ -85,16 +85,6 @@ function amp_schema() {
 }
 
 /**
- * Add new table to track unpublished AMP nodes.
- */
-function amp_update_7001() {
-  if (!db_table_exists('amp_node')) {
-    drupal_install_schema('amp');
-  }
-
-}
-
-/**
  * Implements hook_uninstall().
  */
 function amp_uninstall() {
@@ -122,4 +112,13 @@ function amp_uninstall() {
 function amp_update_7001() {
   // For backwards compatibility since the code has been moved to a submodule.
   module_enable(array('amp_analytics'));
+}
+
+/**
+ * Add new table to track unpublished AMP nodes.
+ */
+function amp_update_7002() {
+  if (!db_table_exists('amp_node')) {
+    drupal_install_schema('amp');
+  }
 }
