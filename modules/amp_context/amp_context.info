@@ -1,0 +1,6 @@
+name = AMP Context
+description = Context integration
+core = 7.x
+dependencies[] = amp
+dependencies[] = context
+files[] = amp_context.test
