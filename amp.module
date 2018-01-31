@@ -302,6 +302,10 @@ function amp_is_amp_request() {
         }
       }
     }
+
+    // Allow other modules to create a custom logic
+    // of amp request identification.
+    drupal_alter('is_amp_request', $result);
   }
 
   return $result;
