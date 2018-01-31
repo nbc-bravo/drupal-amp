@@ -17,7 +17,7 @@
  * @param bool $result
  *   TRUE if its an AMP page, otherwise FALSE
  */
-function hook_is_amp_request(&$result) {
+function hook_is_amp_request_alter(&$result) {
 
 }
 
@@ -31,6 +31,6 @@ function hook_is_amp_request(&$result) {
  * @param $type
  *    The type
  */
-function hook_amp_metadata(&$metadata_json, $node, $type) {
+function hook_amp_metadata_alter(&$metadata_json, $node, $type) {
 
 }
