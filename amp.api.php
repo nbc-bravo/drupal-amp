@@ -34,3 +34,12 @@ function hook_is_amp_request_alter(&$result) {
 function hook_amp_metadata_alter(&$metadata_json, $node, $type) {
 
 }
+
+/**
+ * Allow other modules to alter the amp converter.
+ *
+ * @param Lullabot\AMP\AMP
+ */
+function hook_amp_converter_alter($amp) {
+
+}

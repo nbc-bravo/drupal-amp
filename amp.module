@@ -1243,7 +1243,10 @@ function _amp_get_layouts() {
  * @return AMP
  */
 function _amp_create_amp_converter() {
-  return new AMP();
+  $amp = new AMP();
+  drupal_alter('amp_converter', $amp);
+
+  return $amp;
 }
 
 
