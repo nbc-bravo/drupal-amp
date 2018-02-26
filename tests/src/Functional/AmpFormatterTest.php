@@ -27,7 +27,6 @@ class AmpFormatterTest extends BrowserTestBase {
     'contextual',
     'field_ui',
     'quickedit',
-    'composer_manager',
   ];
 
   /**
