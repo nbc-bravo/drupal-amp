@@ -57,7 +57,11 @@ class AmpFormatterTest extends BrowserTestBase {
     parent::setUp();
 
     // Install the AMP theme.
-    \Drupal::service('theme_handler')->install(['amptheme', 'ampsubtheme_example']);
+    $this->assertTrue($this->container->get('theme_installer')->install(['amptheme', 'ampsubtheme_example']));
+    $this->container->get('config.factory')
+      ->getEditable('system.theme')
+      ->set('default', 'ampsubtheme_example')
+      ->save();
 
     // Create Article node type.
     $this->createContentType([
