@@ -23,6 +23,7 @@ class AmpFormatterTest extends BrowserTestBase {
    */
   public static $modules = [
     'amp',
+    'amptheme',
     'node',
     'contextual',
     'field_ui',
@@ -57,12 +58,12 @@ class AmpFormatterTest extends BrowserTestBase {
     parent::setUp();
 
     // Install the AMP theme.
-    $this->container->get('theme_handler')->enable(array('amptheme', 'ampsubtheme_example', 'seven'));
-    $this->container->get('config.factory')
-      ->get('system.theme')
-      ->set('default', 'ampsubtheme_example')
-      ->set('admin', 'seven')
-      ->save();
+    // @see https://www.drupal.org/node/2232651
+    $this->assertTrue($this->container->get('theme_installer')->install(['amptheme']));
+    $this->assertTrue($this->container->get('config.factory')
+      ->getEditable('system.theme')
+      ->set('default', 'amptheme')
+      ->save());
 
     // Create Article node type.
     $this->createContentType([
