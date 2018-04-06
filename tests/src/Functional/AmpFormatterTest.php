@@ -57,10 +57,11 @@ class AmpFormatterTest extends BrowserTestBase {
     parent::setUp();
 
     // Install the AMP theme.
-    $this->assertTrue($this->container->get('theme_installer')->install(['amptheme', 'ampsubtheme_example']));
+    $this->container->get('theme_handler')->enable(array('amptheme', 'ampsubtheme_example', 'seven'));
     $this->container->get('config.factory')
-      ->getEditable('system.theme')
+      ->get('system.theme')
       ->set('default', 'ampsubtheme_example')
+      ->set('admin', 'seven')
       ->save();
 
     // Create Article node type.
