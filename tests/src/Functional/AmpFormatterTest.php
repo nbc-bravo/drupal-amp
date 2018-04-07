@@ -23,7 +23,6 @@ class AmpFormatterTest extends BrowserTestBase {
    */
   public static $modules = [
     'amp',
-    'amptheme',
     'node',
     'contextual',
     'field_ui',
@@ -57,13 +56,15 @@ class AmpFormatterTest extends BrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Install the AMP theme.
+    // Install the theme. It is not possible to test a contrib theme
+    // so tests are limited to things that work in the core themes.
     // @see https://www.drupal.org/node/2232651
-    $this->assertTrue($this->container->get('theme_installer')->install(['amptheme']));
-    $this->assertTrue($this->container->get('config.factory')
+    $this->container->get('theme_installer')->install(['bartik', 'seven']);
+    $this->container->get('config.factory')
       ->getEditable('system.theme')
-      ->set('default', 'amptheme')
-      ->save());
+      ->set('default', 'bartik')
+      ->set('admin', 'seven')
+      ->save();
 
     // Create Article node type.
     $this->createContentType([
