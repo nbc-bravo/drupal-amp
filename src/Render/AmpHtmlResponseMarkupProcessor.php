@@ -7,12 +7,11 @@
 
 namespace Drupal\amp\Render;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\Core\Logger\LoggerChannelInterface;
-use Drupal\Core\Render\HtmlResponse;
 use Drupal\amp\Service\AMPService;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Render\HtmlResponse;
 use Lullabot\AMP\Validate\Scope;
+use Psr\Log\LoggerInterface;
 
 /**
  * Processes markup of HTML responses.
@@ -50,9 +49,9 @@ class AmpHtmlResponseMarkupProcessor {
   protected $ampConverter;
 
   /**
-   * @var LoggerChannelInterface
+   * @var LoggerInterface
    */
-  protected $loggerChannel;
+  protected $logger;
 
   /**
    * @var ConfigFactoryInterface
@@ -71,9 +70,9 @@ class AmpHtmlResponseMarkupProcessor {
    *   An amp library service.
    *
    */
-  public function __construct(AMPService $amp_library_service, LoggerChannelInterface $loggerChannel, ConfigFactoryInterface $configFactoryInterface) {
+  public function __construct(AMPService $amp_library_service, LoggerInterface $logger, ConfigFactoryInterface $configFactoryInterface) {
     $this->ampService = $amp_library_service;
-    $this->loggerChannel = $loggerChannel;
+    $this->logger = $logger;
     $this->configFactory = $configFactoryInterface;
     $this->ampConfig = $this->configFactory->get('amp.settings');
   }
@@ -123,7 +122,7 @@ class AmpHtmlResponseMarkupProcessor {
 
     if ($this->ampConfig->get('amp_library_process_full_html_warnings')) {
       // Add any warnings that were generated
-      $this->loggerChannel->notice("$heading <pre>" . $this->ampConverter->warningsHumanHtml() . '</pre>');
+      $this->logger->notice("$heading <pre>" . $this->ampConverter->warningsHumanHtml() . '</pre>');
     }
 
     // Return the processed content.
