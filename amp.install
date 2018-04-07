@@ -42,6 +42,13 @@ function amp_requirements($phase) {
 }
 
 /**
+ * Implementation of hook_update_last_removed().
+ */
+function amp_update_last_removed() {
+  return 8002;
+}
+
+/**
  * Remove node_types from amp.settings.
  */
 function amp_update_8001(&$sandbox) {
@@ -50,37 +57,10 @@ function amp_update_8001(&$sandbox) {
 }
 
 /**
- * Create the new AMP metadata config entity on existing sites and add AMP
- * image styles on existing sites.
+ * REMOVED.
+ * @see https://www.drupal.org/project/amp/issues/2867636
  */
 function amp_update_8002() {
-  \Drupal::entityDefinitionUpdateManager()->applyUpdates();
-
-  // Add image style for content image if it does not yet exist.
-  $content_image = [
-    'name' => 'image.style.amp_metadata_content_image_min_696px_wide',
-    'label' => 'AMP Metadata: Content image (696px wide)',
-    'effect_name' => 'image_scale',
-    'effect_data' => [
-      'width' => 696,
-      'height' => null,
-      'upscale' => true
-    ]
-  ];
-  _amp_update_create_image_style($content_image['name'], $content_image['label'], $content_image['effect_name'], $content_image['effect_data']);
-
-  // Add image style for logo image if it does not yet exist.
-  $logo_image = [
-    'name' => 'image.style.amp_metadata_logo_600x60',
-    'label' => 'AMP Metadata: Logo (600x60)',
-    'effect_name' => 'image_scale',
-    'effect_data' => [
-      'width' => 600,
-      'height' => 60,
-      'upscale' => false
-    ]
-  ];
-  _amp_update_create_image_style($logo_image['name'], $logo_image['label'], $logo_image['effect_name'], $logo_image['effect_data']);
 }
 
 /**
@@ -96,33 +76,5 @@ function amp_update_8003() {
     $config = $config_factory->getEditable($style);
     $config->set('dependencies.enforced.module', ['amp']);
     $config->save();
-  }
-}
-
-/**
- * Helper function to create image style configuration objects for an update.
- *
- * @param string $name
- *   The name of the config object.
- * @param string $label
- *   The label for the image style.
- * @param string $effect_name
- *   The name of the image effect.
- * @param array $effect_data
- *   The image style effect data.
- */
-function _amp_update_create_image_style($name, $label, $effect_name, array $effect_data) {
-  if (!\Drupal::service('config.storage')->exists($name)) {
-    /** @var ImageStyleInterface $image_style */
-    $image_style = ImageStyle::create([
-      'name' => $name,
-      'label' => $label
-    ]);
-    $image_style->addImageEffect([
-      'id' => $effect_name,
-      'data' => $effect_data,
-      'weight' => 1,
-    ]);
-    $image_style->save();
   }
 }
