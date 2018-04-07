@@ -11,6 +11,10 @@
     "source": "http://cgit.drupalcode.org/amp"
   },
   "require": {
-    "lullabot/amp": "^1.0.0"
+    "lullabot/amp": "^1.0.0",
+    "drupal/token": "^1.0"
+  },
+  "require-dev": {
+    "drupal/amptheme": "^1.0"
   }
 }

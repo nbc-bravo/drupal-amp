@@ -455,7 +455,7 @@ class AmpHtmlResponseAttachmentsProcessor implements AttachmentsResponseProcesso
 
       if ($should_add_header) {
         // Also add a HTTP header "Link:".
-        $href = '<' . Html::escape($attributes['href'] . '>');
+        $href = '<' . Html::escape($attributes['href']) . '>';
         unset($attributes['href']);
         $attached['http_header'][] = ['Link', $href . drupal_http_header_attributes($attributes), TRUE];
       }

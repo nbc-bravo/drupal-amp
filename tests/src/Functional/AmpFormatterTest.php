@@ -115,6 +115,7 @@ class AmpFormatterTest extends BrowserTestBase {
     $this->assertSession()->pageTextContains('AMP test body');
     $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/full"');
     $this->assertSession()->responseContains('link rel="amphtml" href="' . $amp_node_url . '"');
+    $this->assertSession()->responseHeaderEquals('Link', '<' . $amp_node_url . '> rel="amphtml"');
 
     // Check the metadata of the AMP display mode.
     $this->drupalGet($amp_node_url);
