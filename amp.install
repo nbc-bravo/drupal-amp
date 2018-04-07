@@ -78,3 +78,12 @@ function amp_update_8003() {
     $config->save();
   }
 }
+
+/**
+ * Remove AMP metatadata, deferring to the Schema.org Metadata module now.
+ */
+function amp_update_8004() {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('amp.metadata');
+  $config->delete();
+}

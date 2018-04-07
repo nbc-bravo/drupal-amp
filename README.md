@@ -13,7 +13,7 @@ The AMP module is designed to convert Drupal pages into pages that comply with t
 
 When the AMP module is installed, AMP can be enabled for any node type. At that point, AMP content becomes available on URLs such as `node/1?amp=1` or `node/article-title?amp=1`. There are also special formatters for text, image, and video fields geared towards outputting the appropriate AMP components.
 
-## How to install AMP for Drupal
+## Install AMP for Drupal
 
 You should be [using Composer to manage Drupal site dependencies](https://www.drupal.org/docs/develop/using-composer/using-composer-to-manage-drupal-site-dependencies).
 
@@ -26,7 +26,7 @@ On the command line, enter the following commands in your project root directory
 
 The AMP theme provides an AMP Base theme and an ExAMPle subtheme. You can use the included ExAMPle subtheme or create your own custom subtheme that is based on the AMP Base theme. If you want to create a custom AMP subtheme, add that subtheme to the /themes directory.
 
-## How to enable AMP
+## Enable AMP
 
 * Install at least one AMP subtheme, which can be the ExAMPle subtheme included in amptheme or a custom AMP theme you create. The AMP subthemes should have AMP Base set as their base theme; because of this, you do not need to manually enable AMP Base.
   * To install an AMP subtheme through the user interface, go to /admin/appearance.
@@ -76,33 +76,12 @@ The AMP theme provides an AMP Base theme and an ExAMPle subtheme. You can use th
   * The AMP page is a simple page, with a header, content area, and footer. You should remove most blocks from this theme. We suggest just displaying the branding, title and content on the page. Start simple and add more elements later if desired.
   * If you want ads on your AMP pages, add AMP Ad blocks as desired. The ads will use the IDs provided in your AMP configuration.
 
-### How to configure Structured Data for AMP
-* Provide Structured Data for AMP through the AMP Metadata configuration screen at `/admin/config/content/amp/metadata`.
-* Please note that this metadata is optional for some platforms, while for others it is a requirement. For example, the metadata items below that are marked required are a requirement to make your content eligible to appear in the Google Search news carousel.  More details can be found at https://developers.google.com/search/docs/guides/mark-up-content#use-amp-html.
+## Configure Structured Data for AMP
 
-#### Global AMP Metadata settings
-* The first time you use the Add AMP Metadata button, you will be adding global settings for AMP Metadata.
-* These settings will be used for all AMP content unless they are specifically overridden for a particular content type.
+AMP pages require Schema.org metadata be provided as JSON-LD in the head of the page. This can be accomplished using the [Schema.org Metadata module](https://www.drupal.org/project/schema_metadata). See links to documentation and other instructions on its project page. 
 
-#### Content type overrides
-* Some AMP Metadata settings vary by content type, particularly the field used for content images.
-* Add a settings override for any content type that needs different fields than those selected in the global settings.
-* You only need to add settings for the individual fields you want to override. Content type fields left blank will use global settings (if they exist) for that field.
+That module contains numerous sub-modules that can be used to display Schema.org metadata on various kinds of content. Enable the Schema.org Metatag base module and the Schema.org Article module. Then configure your AMP content types to display article metadata.
 
-#### Organization information (required)
-* Provide organization name (can use a token to use the site name) and a specially-formatted organization logo (should be 600x60).
-* You can select the AMP Organization Logo image style to ensure your logo fits within those dimensions. Unless your logo already has a very wide aspect ratio, you may need to manually create a logo variation that fits within these dimensions.
-* Typically you will only need to provide global settings for organization information. You can override organization information in content type settings if necessary.
-
-#### Content information (required)
-* Ensure all fields are completed with appropriate token values.
-* Some fields have character length restrictions to keep in mind. Tokens like [node:title] and [node:summary] will be automatically truncated to meet those character limits. If you want more control, you may want to create fields on your content type(s) where editors can provide short titles and summaries.
-* Take special note of the image field, as that typically varies per content type. You must provide an image field for each content type if you want that content type to appear in Top Stories on Google Search.
-
-#### Verify Structured Data from JSON file
-* After all AMP Metadata settings are completed on the AMP Metadata configuration screen at `/admin/config/content/amp/metadata`, view a node for an AMP-enabled content type that has content necessary for AMP Metadata (such as an image field).
-* Make sure you are using the most recent version of AMP Theme.
-* When you view source on that node, you should see JSON in the head section of your HTML.
 * Compare the JSON with the guidelines available at https://developers.google.com/search/docs/data-types/articles.
 * You can copy the script element into the Structured Data Testing tool to verify that all information meets the requirements: https://search.google.com/structured-data/testing-tool.
 
@@ -123,7 +102,6 @@ The module is responsible for the basic functionality of providing an AMP versio
 - The theme can place AMP pixel items in the page markup where appropriate, based on the configuration options.
 - Create an AMP configuration page where users can identify which ad and analytics systems to use, and identify which theme is the AMP theme.
 - Create a way for users to identify which content types should provide AMP pages, and a way to override individual nodes to prevent them from being displayed as AMP pages (to use for odd pages that wouldn’t transform correctly).
-- Create an AMP Metadata configuration page where users can provide Structured Data necessary for an AMP page to appear in Google Top Stories carousels.
 - Make sure that paths that should not work as AMP pages generate 404s instead of broken pages.
 - Make sure that aliased paths work correctly, so if `node/1` has an alias of `my-page`, `node/1?amp=1` has an alias of `my-page?amp=1`.
 - Create a system so the user can preview the AMP page.
@@ -163,8 +141,3 @@ In particular, fields with large amounts of text (including the body field) can 
 
 The end result should be valid AMP markup, which can be verified with the AMP validation tools available through the AMP configuration page.
 
-## Current maintainers:
-
-- Marc Drummond - https://www.drupal.org/u/mdrummond
-- Matthew Tift - https://www.drupal.org/u/mtift
-- Sidharth Kshatriya - https://www.drupal.org/u/sidharth_k

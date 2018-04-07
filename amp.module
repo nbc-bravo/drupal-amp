@@ -90,28 +90,6 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
             }
           }
         }
-
-        if ($build['#view_mode'] === 'amp' && !empty($absolute_canonical)) {
-          if (!empty($amp_merged_metadata = \Drupal::service('amp.merge_metadata')->getMergedMetadata($entity->getType()))) {
-            if (!empty($amp_json_metadata = \Drupal::service('amp.prepare_metadata_json')->getJson($amp_merged_metadata, $absolute_canonical, $entity))) {
-              $build['#attached']['html_head']['amp_metadata_json'] = [
-                // The metadata script element.
-                [
-                  '#type' => 'html_tag',
-                  '#tag' => 'script',
-                  '#attributes' => [
-                    'type' => 'application/ld+json'
-                  ],
-                  '#value' => $amp_json_metadata
-                ],
-                // The render array key.
-                'amp_metadata'
-              ];
-              $build['#cache']['tags'][] = 'amp_metadata';
-              $build['#cache']['tags'][] = 'amp_available_metadata';
-            }
-          }
-        }
       }
     }
   }
@@ -418,42 +396,5 @@ function amp_view_modes_submit(&$form, \Drupal\Core\Form\FormStateInterface $for
     // If the AMP view was added, clear cache of AMP-enabled content.
     \Drupal::cache()->delete('amp_enabled_types');
     \Drupal::service('cache_tags.invalidator')->invalidateTags(['amp_types']);
-  }
-}
-
-/**
- * Implements hook_preprocess_block() for block templates.
- */
-function amp_preprocess_block(&$variables) {
-  switch ($variables['base_plugin_id']) {
-    case 'local_actions_block':
-      if (isset($variables['content']['entity.amp_metadata.add_form']) && $variables['content']['entity.amp_metadata.add_form']) {
-        $variables['content']['entity.amp_metadata.add_form']['#cache']['tags'][] = 'amp_types';
-        $message = '';
-        $has_no_amp_types = empty(\Drupal::service('amp.entity_type')->getAmpEnabledTypes());
-        $has_global_metadata = \Drupal::service('amp.metadata')->ampMetadataHasGlobal();
-        $all_types_have_metadata = empty(\Drupal::service('amp.metadata')->getAmpNodeTypesWithoutMetadataSettings());
-        if ($has_no_amp_types) {
-          $message = t('No content types have AMP enabled. Please do so before adding AMP Metadata.');
-        }
-        else {
-          $message = t('All available global and content type overrides have been added. Please edit existing settings below.');
-        }
-        if ($has_no_amp_types || ($has_global_metadata && $all_types_have_metadata)) {
-          $variables['content']['entity.amp_metadata.add_form'] = [
-            '#markup' => '<p><strong>' . $message . '</strong></p>',
-            'addmetadata' => [
-              '#theme_wrappers' => [
-                'container' => [
-                  '#attributes' => [
-                    'class' => 'hidden'
-                  ]
-                ]
-              ],
-              'addlink' => $variables['content']['entity.amp_metadata.add_form']
-            ]
-          ];
-        }
-      }
   }
 }
