@@ -37,7 +37,7 @@ class AMPService  {
       'amp-instagram' => 'amp/instagram',
       'amp-install-serviceworker' => 'amp/install-serviceworker',
       'amp-image-lightbox' => 'amp/image-lightbox',
-      'amp-jwplayer', => 'amp/jwplayer',
+      'amp-jwplayer' => 'amp/jwplayer',
       'amp-kaltura-player' => 'amp/kaltura-player',
       'amp-lightbox' => 'amp/lightbox',
       'amp-list' => 'amp/list',
