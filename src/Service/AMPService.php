@@ -24,7 +24,7 @@ class AMPService  {
       'amp-analytics' => 'amp/analytics',
       'amp-anim' => 'amp/anim',
       'amp-audio' => 'amp/audio',
-      'amp-brid-player' => 'amp/brid-player'
+      'amp-brid-player' => 'amp/brid-player',
       'amp-brightcove' => 'amp/brightcove',
       'amp-carousel' => 'amp/carousel',
       'amp-dailymotion' => 'amp/dailymotion',
