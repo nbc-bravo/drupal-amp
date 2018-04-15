@@ -5,11 +5,12 @@ namespace Drupal\amp;
 use Drupal\Core\Url;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
  * Service class for retrieving and manipulating entity type information.
  */
-class EntityTypeInfo {
+class EntityTypeInfo extends ServiceProviderBase {
 
   /**
    * The entity type manager.

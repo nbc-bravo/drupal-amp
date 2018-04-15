@@ -11,11 +11,12 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\amp\Routing\AmpContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Theme\ThemeNegotiatorInterface;
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
  * Sets the active theme on amp pages.
  */
-class AmpNegotiator implements ThemeNegotiatorInterface {
+class AmpNegotiator extends ServiceProviderBase implements ThemeNegotiatorInterface {
 
   /**
    * The config factory.

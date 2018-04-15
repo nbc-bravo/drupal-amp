@@ -8,13 +8,14 @@
 namespace Drupal\amp\Service;
 
 use Lullabot\AMP\AMP;
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
  * Class AMPService.
  *
  * @package Drupal\amp
  */
-class AMPService  {
+class AMPService extends ServiceProviderBase  {
   // amp-analytics maps to the amp/amp.amp.analytics library (and so forth) but it could be anything arbitrary in the future
   // This is why we're being extremely explicit. We're not going to employ any tricks to convert amp-xyz to amp/amp.amp.xyz
   protected $library_names = [

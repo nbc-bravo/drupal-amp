@@ -2,6 +2,8 @@
 
 namespace Drupal\amp\Utility;
 
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
+
 /**
  * Class AmpQueryParameters
  *
@@ -9,7 +11,7 @@ namespace Drupal\amp\Utility;
  *
  * @package Drupal\amp\Utility
  */
-class AmpQueryParameters {
+class AmpQueryParameters extends ServiceProviderBase {
 
   /**
    * Add amp query parameter to a URL.

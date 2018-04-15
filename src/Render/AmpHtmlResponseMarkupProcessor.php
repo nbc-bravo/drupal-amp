@@ -12,12 +12,13 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Render\HtmlResponse;
 use Lullabot\AMP\Validate\Scope;
 use Psr\Log\LoggerInterface;
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
  * Processes markup of HTML responses.
  *
  */
-class AmpHtmlResponseMarkupProcessor {
+class AmpHtmlResponseMarkupProcessor extends ServiceProviderBase  {
 
   /**
    * The original content.

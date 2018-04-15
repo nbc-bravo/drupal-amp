@@ -11,11 +11,12 @@ use Drupal\amp\EntityTypeInfo;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\node\Entity\Node;
 use Symfony\Component\Routing\Route;
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
  * Provides a helper class to determine whether the route is an amp one.
  */
-class AmpContext {
+class AmpContext extends ServiceProviderBase {
 
   /**
    * Information about AMP-enabled content types.

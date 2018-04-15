@@ -13,11 +13,12 @@ use Drupal\Core\Render\HtmlResponse;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
  * Response subscriber to handle amp HTML responses.
  */
-class AmpHtmlResponseSubscriber implements EventSubscriberInterface {
+class AmpHtmlResponseSubscriber extends ServiceProviderBase implements EventSubscriberInterface {
 
   /**
    * The AMP HTML response markup processor service.
