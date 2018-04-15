@@ -104,12 +104,7 @@ class AmpFormatterTest extends BrowserTestBase {
     $this->submitForm($edit, t('Save'));
 
     // Check the metadata of the full display mode.
-    $node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE])->toString();
-    $amp_node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE])->toString();
-    // Adding 'query' => ['amp' => TRUE] to the line above results in ?amp=1,
-    // and the tests fail, so instead we just manually append the parameter.
-    // @todo: Here is the issue to update this: https://www.drupal.org/node/2745187.
-    $amp_node_url = $amp_node_url . "?amp";
+    $amp_node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE, 'query' => ['amp' => NULL]])->toString();
     $this->drupalGet($node_url);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('AMP test body');
