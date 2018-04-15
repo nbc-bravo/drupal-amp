@@ -104,6 +104,7 @@ class AmpFormatterTest extends BrowserTestBase {
     $this->submitForm($edit, t('Save'));
 
     // Check the metadata of the full display mode.
+    $node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE])->toString();
     $amp_node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE, 'query' => ['amp' => NULL]])->toString();
     $this->drupalGet($node_url);
     $this->assertSession()->statusCodeEquals(200);
