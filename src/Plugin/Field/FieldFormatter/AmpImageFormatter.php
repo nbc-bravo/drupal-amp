@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Plugin\Field\FieldFormatter\AmpImageFormatter.
- */
-
 namespace Drupal\amp\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldItemListInterface;

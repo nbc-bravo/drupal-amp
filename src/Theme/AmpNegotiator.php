@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Theme\AmpNegotiator.
- */
-
 namespace Drupal\amp\Theme;
 
 use Drupal\Core\Config\ConfigFactoryInterface;

@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\amp\Render\AmpHtmlResponseAttachmentsProcessor.
- */
 
 namespace Drupal\amp\Render;
 

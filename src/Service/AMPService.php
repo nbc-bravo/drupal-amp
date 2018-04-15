@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\AMPService.
- */
-
 namespace Drupal\amp\Service;
 
 use Lullabot\AMP\AMP;

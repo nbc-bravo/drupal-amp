@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Routing\AmpContext.
- */
-
 namespace Drupal\amp\Routing;
 
 use Drupal\amp\EntityTypeInfo;

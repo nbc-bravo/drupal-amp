@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Element\AmpIframe.
- */
-
 namespace Drupal\amp\Element;
 
 use Drupal\filter\Element\ProcessedText;

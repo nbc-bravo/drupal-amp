@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Controller\AMPTestLibrary.
- */
-
 namespace Drupal\amp\Controller;
 
 use Drupal\Core\Controller\ControllerBase;

@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\EventSubscriber\AmpHtmlResponseSubscriber.
- */
-
 namespace Drupal\amp\EventSubscriber;
 
 use Drupal\amp\Routing\AmpContext;

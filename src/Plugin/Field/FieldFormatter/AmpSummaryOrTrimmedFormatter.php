@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Plugin\Field\FieldFormatter\AmpSummaryOrTrimmedFormatter
- */
-
 namespace Drupal\amp\Plugin\Field\FieldFormatter;
 
 /**

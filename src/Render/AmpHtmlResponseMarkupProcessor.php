@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Render\AmpHtmlResponseMarkupProcessor.
- */
-
 namespace Drupal\amp\Render;
 
 use Drupal\amp\Service\AMPService;

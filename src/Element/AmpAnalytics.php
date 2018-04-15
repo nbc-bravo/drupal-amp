@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\amp\Element\AmpAnalytics.
- */
-
 namespace Drupal\amp\Element;
 
 use Drupal\Core\Render\Element\RenderElement;
