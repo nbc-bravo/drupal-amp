@@ -56,10 +56,9 @@ class AmpFormatterTest extends BrowserTestBase {
   protected function setUp() {
     parent::setUp();
 
-    // Install the theme. It is not possible to test a contrib theme
-    // so tests are limited to things that work in the core themes.
+    // Install the theme.
     // @see https://www.drupal.org/node/2232651
-    $this->container->get('theme_installer')->install(['bartik', 'seven']);
+    $this->container->get('theme_installer')->install(['bartik', 'seven', 'ampsubtheme_example']);
     $this->container->get('config.factory')
       ->getEditable('system.theme')
       ->set('default', 'bartik')
