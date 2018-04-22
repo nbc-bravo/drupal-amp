@@ -1,3 +1,26 @@
+runtime:
+  remote: https://cdn.ampproject.org
+  header: true
+  version: 0.1
+  license:
+    name: apache
+    url: https://github.com/ampproject/amphtml/blob/master/LICENSE
+    gpl-compatible: false
+  js:
+    https://cdn.ampproject.org/v0.js: { type: external, minified: true }
+# A pseudo library to ensure amp/runtime gets loaded and provide a doc link.
+amp.image:
+  remote: https://www.ampproject.org/docs/reference/components/amp-img
+  version: 0.1
+  license:
+    name: apache
+    url: https://github.com/ampproject/amphtml/blob/master/LICENSE
+    gpl-compatible: false
+  css:
+    theme:
+      css/style.css: {}
+  dependencies:
+    - amp/runtime
 amp.ad:
   remote: https://www.ampproject.org/docs/reference/extended/amp-ad.html
   header: true
@@ -8,6 +31,8 @@ amp.ad:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-analytics-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-ad", async: true } }
+  dependencies:
+    - amp/runtime
 amp.access:
   remote: https://www.ampproject.org/docs/reference/extended/amp-access.html
   header: true
@@ -18,6 +43,8 @@ amp.access:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-analytics-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-access", async: true } }
+  dependencies:
+    - amp/runtime
 amp.accordion:
   remote: https://www.ampproject.org/docs/reference/extended/amp-accordion.html
   header: true
@@ -28,6 +55,8 @@ amp.accordion:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-analytics-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-accordion", async: true } }
+  dependencies:
+    - amp/runtime
 amp.analytics:
   remote: https://www.ampproject.org/docs/reference/extended/amp-analytics.html
   header: true
@@ -38,6 +67,8 @@ amp.analytics:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-analytics-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-analytics", async: true } }
+  dependencies:
+    - amp/runtime
 amp.anim:
   remote: https://www.ampproject.org/docs/reference/extended/amp-anim.html
   header: true
@@ -48,6 +79,8 @@ amp.anim:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-anim-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-anim", async: true } }
+  dependencies:
+    - amp/runtime
 amp.audio:
   remote: https://www.ampproject.org/docs/reference/extended/amp-audio.html
   header: true
@@ -58,6 +91,8 @@ amp.audio:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-audio-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-audio", async: true } }
+  dependencies:
+    - amp/runtime
 amp.brid-player:
   remote: https://www.ampproject.org/docs/reference/extended/amp-brid-player.html
   header: true
@@ -68,6 +103,8 @@ amp.brid-player:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-audio-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-brid-player", async: true } }
+  dependencies:
+    - amp/runtime
 amp.brightcove:
   remote: https://www.ampproject.org/docs/reference/extended/amp-brightcove.html
   header: true
@@ -78,6 +115,8 @@ amp.brightcove:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-brightcove-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-brightcove", async: true } }
+  dependencies:
+    - amp/runtime
 amp.carousel:
   remote: https://www.ampproject.org/docs/reference/extended/amp-carousel.html
   header: true
@@ -88,6 +127,8 @@ amp.carousel:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-carousel-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-carousel", async: true } }
+  dependencies:
+    - amp/runtime
 amp.dailymotion:
   remote: https://www.ampproject.org/docs/reference/extended/amp-dailymotion.html
   header: true
@@ -98,6 +139,8 @@ amp.dailymotion:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-dailymotion-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-dailymotion", async: true } }
+  dependencies:
+    - amp/runtime
 amp.dynamic-css-classes:
   remote: https://www.ampproject.org/docs/reference/extended/amp-dynamic-css-classes.html
   header: true
@@ -108,6 +151,8 @@ amp.dynamic-css-classes:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-dailymotion-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-dynamic-css-classes", async: true } }
+  dependencies:
+    - amp/runtime
 amp.embed:
   remote: https://www.ampproject.org/docs/reference/amp-embed.html
   header: true
@@ -118,6 +163,8 @@ amp.embed:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-dailymotion-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-embed", async: true } }
+  dependencies:
+    - amp/runtime
 amp.facebook:
   remote: https://www.ampproject.org/docs/reference/extended/amp-facebook.html
   header: true
@@ -128,6 +175,8 @@ amp.facebook:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-facebook-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-facebook", async: true } }
+  dependencies:
+    - amp/runtime
 amp.fit-text:
   remote: https://www.ampproject.org/docs/reference/extended/amp-fit-text.html
   header: true
@@ -138,6 +187,8 @@ amp.fit-text:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-fit-text-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-fit-text", async: true } }
+  dependencies:
+    - amp/runtime
 amp.font:
   remote: https://www.ampproject.org/docs/reference/extended/amp-font.html
   header: true
@@ -148,6 +199,20 @@ amp.font:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-font-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-font", async: true } }
+  dependencies:
+    - amp/runtime
+amp.form:
+  remote: https://www.ampproject.org/docs/reference/extended/amp-form.html
+  header: true
+  version: 0.1
+  license:
+    name: apache
+    url: https://github.com/ampproject/amphtml/blob/master/LICENSE
+    gpl-compatible: false
+  js:
+    https://cdn.ampproject.org/v0/amp-form-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-form", async: true } }
+  dependencies:
+    - amp/runtime
 amp.iframe:
   remote: https://www.ampproject.org/docs/reference/extended/amp-iframe.html
   header: true
@@ -158,6 +223,8 @@ amp.iframe:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-iframe-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-iframe", async: true } }
+  dependencies:
+    - amp/runtime
 amp.instagram:
   remote: https://www.ampproject.org/docs/reference/extended/amp-instagram.html
   header: true
@@ -168,6 +235,8 @@ amp.instagram:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-instagram-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-instagram", async: true } }
+  dependencies:
+    - amp/runtime
 amp.install-serviceworker:
   remote: https://www.ampproject.org/docs/reference/extended/amp-install-serviceworker.html
   header: true
@@ -178,6 +247,8 @@ amp.install-serviceworker:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-install-serviceworker-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-install-serviceworker", async: true } }
+  dependencies:
+    - amp/runtime
 amp.image-lightbox:
   remote: https://www.ampproject.org/docs/reference/extended/amp-image-lightbox.html
   header: true
@@ -188,6 +259,8 @@ amp.image-lightbox:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-image-lightbox-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-image-lightbox", async: true } }
+  dependencies:
+    - amp/runtime
 amp.jwplayer:
   remote: https://www.ampproject.org/docs/reference/extended/amp-jwplayer.html
   header: true
@@ -198,6 +271,8 @@ amp.jwplayer:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-lightbox-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-jwplayer", async: true } }
+  dependencies:
+    - amp/runtime
 amp.kaltura-player:
   remote: https://www.ampproject.org/docs/reference/extended/amp-kaltura-player.html
   header: true
@@ -208,6 +283,8 @@ amp.kaltura-player:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-lightbox-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-kaltura-player", async: true } }
+  dependencies:
+    - amp/runtime
 amp.lightbox:
   remote: https://www.ampproject.org/docs/reference/extended/amp-lightbox.html
   header: true
@@ -218,6 +295,8 @@ amp.lightbox:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-lightbox-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-lightbox", async: true } }
+  dependencies:
+    - amp/runtime
 amp.list:
   remote: https://www.ampproject.org/docs/reference/extended/amp-list.html
   header: true
@@ -228,6 +307,8 @@ amp.list:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-list-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-list", async: true } }
+  dependencies:
+    - amp/runtime
 amp.pinterest:
   remote: https://www.ampproject.org/docs/reference/extended/amp-pinterest.html
   header: true
@@ -238,6 +319,8 @@ amp.pinterest:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-pinterest-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-pinterest", async: true } }
+  dependencies:
+    - amp/runtime
 amp.pixel:
   remote: https://www.ampproject.org/docs/reference/extended/amp-pixel.html
   header: true
@@ -248,6 +331,8 @@ amp.pixel:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-pinterest-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-pixel", async: true } }
+  dependencies:
+    - amp/runtime
 amp.sidebar:
   remote: https://www.ampproject.org/docs/reference/extended/amp-sidebar.html
   header: true
@@ -258,6 +343,8 @@ amp.sidebar:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-sidebar", async: true } }
+  dependencies:
+    - amp/runtime
 amp.slides:
   remote: https://www.ampproject.org/docs/reference/extended/amp-slides.html
   header: true
@@ -268,6 +355,8 @@ amp.slides:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-slides", async: true } }
+  dependencies:
+    - amp/runtime
 amp.social-share:
   remote: https://www.ampproject.org/docs/reference/extended/amp-social-share.html
   header: true
@@ -278,6 +367,8 @@ amp.social-share:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-social-share", async: true } }
+  dependencies:
+    - amp/runtime
 amp.soundcloud:
   remote: https://www.ampproject.org/docs/reference/extended/amp-soundcloud.html
   header: true
@@ -288,6 +379,8 @@ amp.soundcloud:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-soundcloud", async: true } }
+  dependencies:
+    - amp/runtime
 amp.springboard-player:
   remote: https://www.ampproject.org/docs/reference/extended/amp-springboard-player.html
   header: true
@@ -298,6 +391,8 @@ amp.springboard-player:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-springboard-player", async: true } }
+  dependencies:
+    - amp/runtime
 amp.sticky-ad:
   remote: https://www.ampproject.org/docs/reference/extended/amp-sticky-ad.html
   header: true
@@ -308,6 +403,8 @@ amp.sticky-ad:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-twitter-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-sticky-ad", async: true } }
+  dependencies:
+    - amp/runtime
 amp.twitter:
   remote: https://www.ampproject.org/docs/reference/extended/amp-twitter.html
   header: true
@@ -318,6 +415,8 @@ amp.twitter:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-twitter-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-twitter", async: true } }
+  dependencies:
+    - amp/runtime
 amp.user-notification:
   remote: https://www.ampproject.org/docs/reference/extended/amp-user-notification.html
   header: true
@@ -328,6 +427,8 @@ amp.user-notification:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-user-notification-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-user-notification", async: true } }
+  dependencies:
+    - amp/runtime
 amp.video:
   remote: https://www.ampproject.org/docs/reference/amp-video.html
   header: true
@@ -337,7 +438,9 @@ amp.video:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-vine-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-video", async: true } }
+    https://cdn.ampproject.org/v0/amp-video-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-video", async: true } }
+  dependencies:
+    - amp/runtime
 amp.vine:
   remote: https://www.ampproject.org/docs/reference/extended/amp-vine.html
   header: true
@@ -348,6 +451,8 @@ amp.vine:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-vine-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-vine", async: true } }
+  dependencies:
+    - amp/runtime
 amp.vimeo:
   remote: https://www.ampproject.org/docs/reference/extended/amp-vimeo.html
   header: true
@@ -358,6 +463,8 @@ amp.vimeo:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-vimeo-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-vimeo", async: true } }
+  dependencies:
+    - amp/runtime
 amp.youtube:
   remote: https://www.ampproject.org/docs/reference/extended/amp-youtube.html
   header: true
@@ -368,6 +475,8 @@ amp.youtube:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-youtube-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-youtube", async: true } }
+  dependencies:
+    - amp/runtime
 amp.template:
   remote: https://www.ampproject.org/docs/reference/extended/amp-mustache.html
   header: true
@@ -378,3 +487,5 @@ amp.template:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-mustache-0.1.js: { type: external, minified: true, attributes: { custom-template: "amp-mustache", async: true } }
+  dependencies:
+    - amp/runtime
