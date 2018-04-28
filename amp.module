@@ -124,6 +124,9 @@ function amp_theme() {
         'attributes' => []
       ]
     ],
+    'amp_custom_style' => [
+      'render element' => 'element',
+    ],
     'amp_pixel' => [
       'variables' => [
         'domain' => NULL,

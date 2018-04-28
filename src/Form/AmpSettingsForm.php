@@ -74,10 +74,7 @@ class AmpSettingsForm extends ConfigFormBase {
       if (!empty($theme->info['hidden'])) {
         continue;
       }
-      // Only display enabled themes that are subthemes of the AMP Theme.
-      else if (!empty($theme->status) && !empty($theme->base_themes) && (array_key_exists('amptheme', $theme->base_themes) || $theme->info['name'] == 'AMP Base')) {
-        $theme_options[$theme->getName()] = $theme->info['name'];
-      }
+      $theme_options[$theme->getName()] = $theme->info['name'];
     }
 
     return $theme_options;
@@ -147,10 +144,10 @@ class AmpSettingsForm extends ConfigFormBase {
       '#default_value' => $amptheme_config->get('amptheme'),
     ];
     if (empty($this->themeOptions)) {
-      $form['amptheme']['#description'] = $this->t('To use the AMP module, the AMP Base theme must be installed. You must choose between AMP Base or an installed subtheme of AMP Base, such as the ExAMPle Subtheme, for use as the AMP Theme in order to provide custom styles on AMP pages.');
+      $form['amptheme']['#description'] = $this->t('To use the AMP module, an AMP theme must be installed. You can choose between AMP Base or an installed subtheme of AMP Base, such as the ExAMPle Subtheme, for use as the AMP Theme, or create your own AMP theme as a subtheme of your primary theme.');
     }
 
-    $form['google_analytics_id'] = [
+   $form['google_analytics_id'] = [
       '#type' => 'textfield',
       '#default_value' => $amp_config->get('google_analytics_id'),
       '#title' => $this->t('Google Analytics Web Property ID'),
@@ -266,6 +263,25 @@ class AmpSettingsForm extends ConfigFormBase {
       ),
     );
 
+    $form['experimental'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t("Experimental features"),
+    ];
+
+    $form['experimental']['amp_render_css'] = [
+      '#type' => 'checkbox',
+      '#default_value' => $amp_config->get('amp_render_css'),
+      '#title' => $this->t('Render css inline?'),
+      '#description' => $this->t('Should the AMP module render Drupal css into <style amp-custom></style>? Set this to FALSE if your AMP theme creates and populates the css <style amp-custom></style> tag. Set to TRUE if your theme uses the CSS placeholder instead (the default behavior in Drupal). If you are not sure what what this means, set it to TRUE.'),
+    ];
+
+    $form['experimental']['amp_everywhere'] = [
+      '#type' => 'checkbox',
+      '#default_value' => $amp_config->get('amp_everywhere'),
+      '#title' => $this->t('Generate all pages as AMP pages?'),
+      '#description' => $this->t('Set this to FALSE if you want AMP pages displayed as an alternative to your normal pages, on a different path (two pages for each item, the traditional way of deploying AMP). Choose TRUE if you want your normal pages to also be the AMP pages (there is only one page for each item, which is both the canonical page and the AMP page). If you are not sure what what this means, leave it set to FALSE.'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -274,7 +290,6 @@ class AmpSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
-
     // Validate the Google Analytics ID.
     if (!empty($form_state->getValue('google_analytics_id'))) {
       $form_state->setValue('google_analytics_id', trim($form_state->getValue('google_analytics_id')));
@@ -325,6 +340,9 @@ class AmpSettingsForm extends ConfigFormBase {
       $amp_config->set('amp_library_warnings_display', $form_state->getValue('amp_library_warnings_display'))->save();
       $this->tagInvalidate->invalidateTags(['amp-warnings']);
     }
+
+    $amp_config->set('amp_render_css', $form_state->getValue('amp_render_css'))->save();
+    $amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();
 
     parent::submitForm($form, $form_state);
   }

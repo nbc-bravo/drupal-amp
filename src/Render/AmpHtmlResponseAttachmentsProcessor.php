@@ -11,6 +11,7 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\amp\Routing\AmpContext;
 use Drupal\Core\Asset\AttachedAssetsInterface;
+use Drupal\Core\Render\HtmlResponse;
 
 /**
  * Processes attachments of AMP HTML responses.
@@ -32,15 +33,31 @@ use Drupal\Core\Asset\AttachedAssetsInterface;
 class AmpHtmlResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcessor {
 
   /**
-   * The route amp context to determine whether a route is an amp one.
+   * The inner service that we are decorating.
+   *
+   * @var \Drupal\Core\Render\HtmlResponseAttachmentsProcessor
+   */
+  protected $htmlResponseAttachmentsProcessor;
+
+  /**
+   * The route amp context to determine whether a route is an AMP one.
    *
    * @var \Drupal\amp\Routing\AmpContext
    */
   protected $ampContext;
 
   /**
+   * A config object for the system performance configuration.
+   *
+   * @var \Drupal\Core\Config\Config
+   */
+  protected $config;
+
+  /**
    * Constructs a HtmlResponseAttachmentsProcessor object.
    *
+   * @param \Drupal\amp\Routing\AmpContext $amp_context
+   *   The route amp context to determine whether the route is an amp one.
    * @param \Drupal\Core\Asset\AssetResolverInterface $asset_resolver
    *   An asset resolver.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
@@ -55,34 +72,38 @@ class AmpHtmlResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
    *   The renderer.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler service.
-   * @param \Drupal\amp\Routing\AmpContext $amp_context
-   *   The route amp context to determine whether the route is an amp one.
    */
-  public function __construct(AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory, AssetCollectionRendererInterface $css_collection_renderer, AssetCollectionRendererInterface $js_collection_renderer, RequestStack $request_stack, RendererInterface $renderer, ModuleHandlerInterface $module_handler, AmpContext $amp_context) {
-    parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler);
+  public function __construct(HtmlResponseAttachmentsProcessor $htmlResponseAttachmentsProcessor, AmpContext $amp_context, AssetResolverInterface $asset_resolver, ConfigFactoryInterface $config_factory, AssetCollectionRendererInterface $css_collection_renderer, AssetCollectionRendererInterface $js_collection_renderer, RequestStack $request_stack, RendererInterface $renderer, ModuleHandlerInterface $module_handler) {
+    $this->htmlResponseAttachmentsProcessor = $htmlResponseAttachmentsProcessor;
     $this->ampContext = $amp_context;
+    parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler);
   }
 
   /**
-   * Processes asset libraries into render arrays.
-   *
-   * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
-   *   The attached assets collection for the current response.
-   * @param array $placeholders
-   *   The placeholders that exist in the response.
-   *
-   * @return array
-   *   An array keyed by asset type, with keys:
-   *     - styles
-   *     - scripts
-   *     - scripts_bottom
+   * {@inheritdoc}
    */
   protected function processAssetLibraries(AttachedAssetsInterface $assets, array $placeholders) {
     $variables = [];
 
     if ($this->ampContext->isAmpRoute()) {
+
+      // Print styles - if present.
+      if (isset($placeholders['styles'])) {
+        // Optimize CSS if necessary, but only during normal site operation.
+        $optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
+        $variables['styles'] = $this->cssCollectionRenderer->render($this->assetResolver->getCssAssets($assets, $optimize_css));
+      }
+
+      // After css has been rendered, strip non-AMP libraries before rendering
+      // the javascript.
+      // @TODO This can be optional if the theme provides granular control
+      // over libraries using libraries-override, and if all javascript on the
+      // site came in through the libraries system.
       foreach ($assets->libraries as $delta => $library) {
-        if (strpos($library, 'amp/') === FALSE) {
+        // Rather than limit the libraries to ones provided by the AMP module,
+        // limit them based on an /amp. prefix, i.e. amp/amp.image. This way
+        // other modules could provide libraries that won't get stripped out.
+        if (strpos($library, '/.amp') === FALSE && $library != 'amp/runtime') {
           unset($assets->libraries[$delta]);
         }
       }
@@ -102,26 +123,7 @@ class AmpHtmlResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
   }
 
   /**
-   * Transform a html_head_link array into html_head and http_header arrays.
-   *
-   * html_head_link is a special case of html_head which can be present as
-   * a link item in the HTML head section, and also as a Link: HTTP header,
-   * depending on options in the render array. Processing it can add to both the
-   * html_head and http_header sections.
-   *
-   * @param array $html_head_link
-   *   The 'html_head_link' value of a render array. Each head link is specified
-   *   by a two-element array:
-   *   - An array specifying the attributes of the link.
-   *   - A boolean specifying whether the link should also be a Link: HTTP
-   *     header.
-   *
-   * @return array
-   *   An ['#attached'] section of a render array. This allows us to easily
-   *   merge the results with other render arrays. The array could contain the
-   *   following keys:
-   *   - http_header
-   *   - html_head
+   * {@inheritdoc}
    */
   protected function processHtmlHeadLink(array $html_head_link) {
     $attached = parent::processHtmlHeadLink($html_head_link);

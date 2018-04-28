@@ -37,4 +37,10 @@ amp.settings:
     amp_library_process_statistics:
       type: boolean
       label: 'Whether to add an HTML comment with statistics to the Drupal page output'
+    amp_render_css:
+      type: boolean
+      label: 'Render css inline?'
+    amp_everywhere:
+      type: boolean
+      label: 'Generate all pages as AMP pages?'
 

@@ -7,7 +7,7 @@ runtime:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0.js: { type: external, minified: true }
+    https://cdn.ampproject.org/v0.js: { type: external, minified: true, attributes: { async: true } }
 # A pseudo library to ensure amp/runtime gets loaded and provide a doc link.
 amp.image:
   remote: https://www.ampproject.org/docs/reference/components/amp-img
