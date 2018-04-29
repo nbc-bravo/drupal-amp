@@ -103,7 +103,7 @@ class AmpHtmlResponseAttachmentsProcessor extends HtmlResponseAttachmentsProcess
         // Rather than limit the libraries to ones provided by the AMP module,
         // limit them based on an /amp. prefix, i.e. amp/amp.image. This way
         // other modules could provide libraries that won't get stripped out.
-        if (strpos($library, '/.amp') === FALSE && $library != 'amp/runtime') {
+        if (strpos($library, '/amp.') === FALSE && $library != 'amp/runtime') {
           unset($assets->libraries[$delta]);
         }
       }

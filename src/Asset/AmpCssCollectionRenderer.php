@@ -22,7 +22,7 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
    *
    * @see https://www.ampproject.org/docs/design/responsive/custom_fonts
    */
-  protected $whitelist = [
+  protected $link_domain_whitelist = [
     'cloud.typography.com',
     'fast.fonts.net',
     'fonts.googleapis.com',
@@ -68,7 +68,6 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
    * {@inheritdoc}
    */
   public function render(array $css_assets) {
-
     // Retrieve the normal css render array.
     $elements = parent::render($css_assets);
 
@@ -78,33 +77,51 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
       return $elements;
     }
 
-    // Start a variable to measure the size of the inline css.
+    // For tracking the size and contents of the inlined css:
     $size = 0;
+    $files = [];
 
     foreach ($elements as $key => $element) {
       // Process @import url() values.
-      if (array_key_exists('#value', $element)) {
-        $url = preg_match_all('/@import url\("(.+)\?/', $element['#value'], $matches);
+      if ($element['#tag'] == 'link' && array_key_exists('#value', $element)) {
+        $urls = preg_match_all('/@import url\("(.+)\?/', $element['#value'], $matches);
         $all_css = [];
-        foreach ($matches[1] as $file) {
-          $css = file_get_contents(DRUPAL_ROOT . $file);
+        foreach ($matches[1] as $url) {
+          $css = file_get_contents(DRUPAL_ROOT . $url);
           $css = $this->minify($css);
           $size += strlen($css);
           $all_css[] = $css;
-        }
+          $files[$url] = $this->format(strlen($css));
+         }
         // Implode and minify results.
         $value = implode("", $all_css);
         $value = $this->minify($value);
 
         $element['#value'] = $value;
         $elements[$key] = $element;
+        $elements[$key]['#merged'] = TRUE;
       }
       // Process links.
-      elseif (array_key_exists('#href', $element['#attributes'])) {
-        // External files rendered as links only if they are on the whitelist.
-        $provider = parse_url($element['#attributes']['#href'], PHP_URL_HOST);
-        if (!in_array($provider, $this->whitelist)) {
-          unset($elements[$key]);
+      elseif ($element['#tag'] == 'link' && array_key_exists('href', $element['#attributes'])) {
+        $url = $element['#attributes']['href'];
+        $provider = parse_url($url, PHP_URL_HOST);
+        if (!empty($provider)) {
+          // External files rendered as links only if they are on the whitelist.
+          if (!in_array($provider, $this->link_domain_whitelist)) {
+            unset($elements[$key]);
+          }
+        }
+        else {
+          // Strip any querystring off the url.
+          list($url, $query) = explode('?', $url);
+          $css = file_get_contents(DRUPAL_ROOT . $url);
+          $css = $this->minify($css);
+          $size += strlen($css);
+          $all_css[] = $css;
+          $files[$url] = $this->format(strlen($css));
+          $element['#value'] = $css;
+          $elements[$key] = $element;
+          $elements[$key]['#merged'] = TRUE;
         }
       }
     }
@@ -113,12 +130,13 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
     $merged = '';
     $replacement_key = NULL;
     foreach ($elements as $key => $element) {
-      if (isset($element['#value'])) {
-        // Any of the original keys is fine as the replacement key.
-        // The last one found will survive.
-        $replacement_key = $key;
+      if (isset($element['#merged'])) {
         $merged .= $element['#value'];
         unset ($elements[$key]);
+        // The first key found will become the new element's key.
+        if (empty($replacement_key)) {
+          $replacement_key = $key;
+        }
       }
     }
     $elements[$replacement_key] = [
@@ -131,11 +149,13 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
     $current_page = \Drupal::request()->getRequestUri();
     if (!empty(stristr($current_page, 'warnfix'))) {
       $output = '<h2>' . 'CSS Filesize' . '</h2>';
-      $output .= t('<p>The size of the css on this page is :size. The AMP limit is 50,000. The css files and their sizes are listed for ease in finding large files to optimize.</p>', [':size' => number_format($size, 0)]);
+      $difference = ($size - 50000);
+      $over = $difference > 0 ? t('so your css is :difference too big', [':difference' => $this->format(abs($difference))]) : '';
+      $under = $difference <= 0 ? t('so you have :difference to spare', [':difference' => $this->format(abs($difference))]) : '';
+      $output .= t('<p>The size of the css on this page is :size. The AMP limit is :limit, :overunder. The included css files and their sizes are listed for ease in finding large files to optimize. For the best information about individual files sizes, visit this page while optimization is turned off.</p>', [':size' => $this->format($size), ':limit' => $this->format(50000), ':overunder' => $over . $under]);
       $files = array_flip($files);
       //krsort($files);
-      $output .= "<pre>" . var_dump($files) . "</pre>\n";
-      debug($output);
+      debug($files, $output);
     }
     return $elements;
   }
@@ -159,4 +179,16 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
     return $value;
   }
 
+  /**
+   * Format values consistently.
+   *
+   * @param string $value
+   *   The number to minify.
+   *
+   * @return string
+   *   The formatted number.
+   */
+  public function format($value) {
+    return number_format($value, 0) . ' ' . t('bytes');
+  }
 }
