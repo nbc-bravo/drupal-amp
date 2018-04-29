@@ -11,6 +11,7 @@ runtime:
 # A pseudo library to ensure amp/runtime gets loaded and provide a doc link.
 amp.image:
   remote: https://www.ampproject.org/docs/reference/components/amp-img
+  header: true
   version: 0.1
   license:
     name: apache
@@ -30,7 +31,7 @@ amp.ad:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-analytics-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-ad", async: true } }
+    https://cdn.ampproject.org/v0/amp-ad-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-ad", async: true } }
   dependencies:
     - amp/runtime
 amp.access:
@@ -42,7 +43,7 @@ amp.access:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-analytics-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-access", async: true } }
+    https://cdn.ampproject.org/v0/amp-access-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-access", async: true } }
   dependencies:
     - amp/runtime
 amp.accordion:
@@ -54,7 +55,7 @@ amp.accordion:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-analytics-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-accordion", async: true } }
+    https://cdn.ampproject.org/v0/amp-accordion-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-accordion", async: true } }
   dependencies:
     - amp/runtime
 amp.analytics:
@@ -102,7 +103,7 @@ amp.brid-player:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-audio-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-brid-player", async: true } }
+    https://cdn.ampproject.org/v0/amp-brid-player-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-brid-player", async: true } }
   dependencies:
     - amp/runtime
 amp.brightcove:
@@ -150,7 +151,7 @@ amp.dynamic-css-classes:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-dailymotion-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-dynamic-css-classes", async: true } }
+    https://cdn.ampproject.org/v0/amp-dynamic-css-classes-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-dynamic-css-classes", async: true } }
   dependencies:
     - amp/runtime
 amp.embed:
@@ -162,7 +163,7 @@ amp.embed:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-dailymotion-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-embed", async: true } }
+    https://cdn.ampproject.org/v0/amp-embed-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-embed", async: true } }
   dependencies:
     - amp/runtime
 amp.facebook:
@@ -270,7 +271,7 @@ amp.jwplayer:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-lightbox-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-jwplayer", async: true } }
+    https://cdn.ampproject.org/v0/amp-jwplayer-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-jwplayer", async: true } }
   dependencies:
     - amp/runtime
 amp.kaltura-player:
@@ -282,7 +283,7 @@ amp.kaltura-player:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-lightbox-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-kaltura-player", async: true } }
+    https://cdn.ampproject.org/v0/amp-kaltura-player-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-kaltura-player", async: true } }
   dependencies:
     - amp/runtime
 amp.lightbox:
@@ -330,7 +331,7 @@ amp.pixel:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-pinterest-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-pixel", async: true } }
+    https://cdn.ampproject.org/v0/amp-pixel-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-pixel", async: true } }
   dependencies:
     - amp/runtime
 amp.sidebar:
@@ -342,7 +343,7 @@ amp.sidebar:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-sidebar", async: true } }
+    https://cdn.ampproject.org/v0/amp-sidebar-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-sidebar", async: true } }
   dependencies:
     - amp/runtime
 amp.slides:
@@ -354,7 +355,7 @@ amp.slides:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-slides", async: true } }
+    https://cdn.ampproject.org/v0/amp-slides-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-slides", async: true } }
   dependencies:
     - amp/runtime
 amp.social-share:
@@ -366,7 +367,7 @@ amp.social-share:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-social-share", async: true } }
+    https://cdn.ampproject.org/v0/amp-social-share-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-social-share", async: true } }
   dependencies:
     - amp/runtime
 amp.soundcloud:
@@ -390,7 +391,7 @@ amp.springboard-player:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-soundcloud-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-springboard-player", async: true } }
+    https://cdn.ampproject.org/v0/amp-springboard-player-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-springboard-player", async: true } }
   dependencies:
     - amp/runtime
 amp.sticky-ad:
@@ -402,7 +403,7 @@ amp.sticky-ad:
     url: https://github.com/ampproject/amphtml/blob/master/LICENSE
     gpl-compatible: false
   js:
-    https://cdn.ampproject.org/v0/amp-twitter-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-sticky-ad", async: true } }
+    https://cdn.ampproject.org/v0/amp-sticky-ad-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-sticky-ad", async: true } }
   dependencies:
     - amp/runtime
 amp.twitter:
