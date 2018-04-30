@@ -19,7 +19,7 @@ function amp_help($route_name, RouteMatchInterface $route_match) {
     case 'help.page.amp':
       $output = '';
       $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Google AMP integration') . '</p>';
+      $output .= '<p>' . t('Accelerated Mobile Pages (AMP) integration. Read about it online at <a href=":url">AMP Documentation</a>.', [':url' => 'https://www.drupal.org/docs/8/modules/accelerated-mobile-pages-amp']) . '</p>';
       return $output;
 
     default:
@@ -100,14 +100,6 @@ function amp_entity_view_alter(array &$build, EntityInterface $entity, EntityVie
  */
 function amp_theme() {
   $theme = [
-    'amp_video' => [
-      'variables' => [
-        'file' => NULL,
-        'description' => NULL,
-        'schema' => NULL,
-        'attributes' => []
-      ],
-    ],
     'amp_iframe' => [
       'variables' => [
         'iframe' => NULL
@@ -221,10 +213,64 @@ function amp_theme() {
           ]
         ]
       ]
-    ]
+    ],
+    'amp_video' => [
+      'variables' => [
+        'attributes' => [],
+      ],
+    ],
+    'amp_image_carousel' => [
+      'variables' => [
+        'items' => [],
+        'attributes' => [],
+      ],
+    ],
+    'amp_views_carousel' => [
+      'variables' => [
+        'view' => NULL,
+        'options' => NULL,
+        'rows' => NULL,
+        'title' => NULL,
+        'attributes' => [],
+      ],
+      'file' => 'amp.theme.inc',
+    ],
   ];
 
   return $theme;
+}
+
+/**
+ * Implements hook_theme_suggestions_HOOK_alter().
+ *
+ * Add amp-image template suggestion, but only for images that have the AMP
+ * layout attribute. This will output these images as <amp-image></amp-image>.
+ * We want to control this from the module so the components will work on
+ * non-AMP pages, not just AMP pages using AMP theme. The logical name would
+ * be amp_image but that name has been used by the image formatter and is in
+ * production, it's too hard to replace it with a different implementation.
+ */
+function amp_theme_suggestions_image_alter(array &$suggestions, array $variables) {
+  if (!empty($variables['attributes']['layout'])) {
+    $suggestions[] = 'amp_image_wrapper';
+  }
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ *
+ * We still want the image_theme to process the image, just output it
+ * in a different template, and only when it used in an AMP component.
+ * A theme could do this with just theme_suggestions_alter(), but if a module
+ * provides an alternate template it won't be discovered automatically by the
+ * theme system. Using theme_register_alter() we can force the theme system to
+ * discover the alternate template by providing it in a theme we will never
+ * actually use directly, then it will be available for the suggestion.
+ */
+function amp_theme_registry_alter(&$theme_registry) {
+  $theme_registry['amp_image_wrapper'] = $theme_registry['image'];
+  $theme_registry['amp_image_wrapper']['template'] = 'amp-image-wrapper';
+  $theme_registry['amp_image_wrapper']['path'] = drupal_get_path('module', 'amp') . '/templates';
 }
 
 /**
@@ -269,38 +315,6 @@ function amp_page_bottom(array &$page_bottom) {
       }
     }
   }
-}
-
-/**
- * Prepares variables for amp video templates.
- *
- * Default template: amp-video.html.twig.
- *
- * @param array $variables
- *   An associative array containing:
- *   - file: A file object to which the link will be created.
- *   - attributes: An associative array of attributes to be placed on the
- *     amp-video tag.
- */
-function template_preprocess_amp_video(&$variables) {
-  $file = $variables['file'];
-  $file_entity = ($file instanceof File) ? $file : File::load($file->fid);
-  $variables['src'] = file_create_url($file_entity->getFileUri());
-
-  // amp-video can only be displayed if the src for the video is https.
-  $variables['scheme'] = \Drupal::service('file_system')->uriScheme($file_entity->getFileUri());
-
-  // Create attributes object.
-  $variables['attributes'] = new Attribute($variables['attributes']);
-
-  // Use the description as the title text if available.
-  if (empty($variables['description'])) {
-    $title_text = $file_entity->getFilename();
-  }
-  else {
-    $title_text = $variables['description'];
-  }
-  $variables['attributes']['title'] = $title_text;
 }
 
 /**

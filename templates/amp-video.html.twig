@@ -1,20 +1,13 @@
 {#
 /**
- * @file
- * Template for an amp-video.
- *
- * Available variables:
- * - attributes: The HTML attributes for the containing element.
- * - src: A URL for a video file.
- * - scheme: A string for the scheme of the video src URL, i.e. http or https.
- *
- * @see template_preprocess_amp_video()
- */
+* @file
+* Default theme implementation to display the file entity as a amp-video tag.
+*
+* @ingroup themeable
+*/
 #}
-{% if scheme == 'https' %}
-  <amp-video{{ attributes }} src="{{ src }}" layout="responsive" controls>
-    <div fallback>
-      <p>Your browser doesn’t support HTML5 video</p>
-    </div>
-  </amp-video>
-{% endif %}
+<amp-video {{ attributes }}>
+  <div fallback>
+    <p>Your browser doesn’t support HTML5 video</p>
+  </div>
+</amp-video>

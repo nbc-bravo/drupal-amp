@@ -5,14 +5,15 @@ namespace Drupal\amp\Plugin\Field\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
+use Drupal\amp\AmpFormTrait;
 
 /**
  * Plugin implementation of the 'amp_image' formatter.
  *
  * @FieldFormatter(
  *   id = "amp_image",
- *   label = @Translation("AMP Image"),
- *   description = @Translation("Display an AMP Image file."),
+ *   label = @Translation("AMP Image Formatter"),
+ *   description = @Translation("Display an image file as amp-image."),
  *   field_types = {
  *     "image"
  *   }
@@ -20,13 +21,42 @@ use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
  */
 class AmpImageFormatter extends ImageFormatter {
 
+  use AmpFormTrait;
+
+  /**
+   * AMP layouts
+   *
+   * Expected by AmpFormTrait.
+   *
+   * @return array
+   *   Array of layout options allowed by this component.
+   */
+  private function getLayouts() {
+    $options = $this->allLayouts();
+    unset($options['container']);
+    return $options;
+  }
+
+  /**
+   * AMP libraries
+   *
+   * Expected by AmpFormTrait.
+   *
+   * @return array
+   *   The names of the AMP libraries used by this formatter.
+   */
+  private function getLibraries() {
+    return ['amp/amp.image'];
+  }
+
  /**
    * {@inheritdoc}
    */
   public static function defaultSettings() {
     return array(
-      'amp_layout' => 'responsive',
-      'amp_fixed_height' => '300',
+      'layout' => 'responsive',
+      'width' => '',
+      'height' => '',
     ) + parent::defaultSettings();
   }
 
@@ -34,34 +64,14 @@ class AmpImageFormatter extends ImageFormatter {
    * {@inheritdoc}
    */
   public function settingsForm(array $form, FormStateInterface $form_state) {
-    $element = parent::settingsForm($form, $form_state);
+    $form = parent::settingsForm($form, $form_state);
+    $form['layout'] = $this->layoutElement();
+    $form['width'] = $this->widthElement();
+    $form['height'] = $this->heightElement();
 
-    $layout_url = 'https://www.ampproject.org/docs/guides/responsive/control_layout.html#size-and-position-elements';
-    // Add configuration options for layout.
-    $element['amp_layout'] = [
-      '#title' => t('AMP Layout'),
-      '#type' => 'select',
-      '#default_value' => $this->getSetting('amp_layout'),
-      '#empty_option' => t('None (no layout)'),
-      '#options' => $this->getLayouts(),
-      '#description' => $this->t('<a href=":url" target="_blank">Layout Information</a>', array(':url' => $layout_url)),
-    ];
+    $form['#prefix'] = '<div class="description">' . $this->libraryDescription() . '</div>';
 
-    // This information should only appear when 'fixed-height' is selected.
-    // TODO: figure out why amp_layout_height always shows.
-    $element['amp_fixed_height'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Layout Height (used for fixed-height only)'),
-      '#states' => array(
-        'visible' => array(
-          ':input[name="fields[' . $this->fieldDefinition->getName() . '][settings_edit_form][settings][amp_layout]"]' =>
-          array('value' => 'fixed-height'))
-      ),
-      '#size' => 10,
-      '#default_value' => $this->getSetting('amp_fixed_height'),
-    );
-
-    return $element;
+    return $form;
   }
 
   /**
@@ -69,50 +79,26 @@ class AmpImageFormatter extends ImageFormatter {
    */
   public function settingsSummary() {
     $summary = parent::settingsSummary();
-
-    // Display this setting only if an AMP layout is set.
-    $layout_options = $this->getLayouts();
-    $layout_setting = $this->getSetting('amp_layout');
-    if (isset($layout_options[$layout_setting])) {
-      $summary[] = t('Layout: @setting', array('@setting' => $layout_options[$layout_setting]));
-
-      if ($layout_options[$layout_setting] === 'fixed-height') {
-        $summary[] = t('Fixed height: @height', array('@height' => $this->getSetting('amp_fixed_height')));
-      }
-    }
-
-    return $summary;
+    $summary = $this->addToSummary($summary);
+    return [implode('; ', $summary)];
   }
-
-  /**
-   * Return a list of AMP layouts.
-   */
-  private function getLayouts() {
-    return [
-      'nodisplay' => 'nodisplay',
-      'fixed' => 'fixed',
-      'responsive' => 'responsive',
-      'fixed-height' => 'fixed-height',
-      'fill' => 'fill',
-      'container' => 'container',
-    ];
-  }
-
 
   /**
    * {@inheritdoc}
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = parent::viewElements($items, $langcode);
+    $layout = $this->getSetting('layout');
+    $width = $this->validWidth($this->getSetting('width'), $this->getSetting('layout'));
+    $height = $this->validHeight($this->getSetting('height'), $this->getSetting('layout'));
 
     foreach ($elements as $delta => $element) {
-      $elements[$delta]['#item_attributes']['layout'] = $this->getSetting('amp_layout');
-      if ($this->getSetting('amp_layout') == 'fixed-height') {
-        $elements[$delta]['#item_attributes']['height'] = $this->getSetting('amp_fixed_height');
-        $elements[$delta]['#item_attributes']['width'] = 'auto';
-      }
+      $elements[$delta]['#item_attributes']['layout'] = $layout;
+      $elements[$delta]['#item_attributes']['width'] = $width;
+      $elements[$delta]['#item_attributes']['height'] = $height;
+      $elements[$delta]['#item_attributes'] = array_filter($elements[$delta]['#item_attributes']);
     }
-
+    $elements['#attached']['library'] = $this->getLibraries();
     return $elements;
   }
 }

@@ -19,12 +19,12 @@ function amp_requirements($phase) {
 
   if ($phase == 'runtime') {
     $module_handler = \Drupal::service('module_handler');
-    if (!$module_handler->moduleExists('token')) {
+    if (!$module_handler->moduleExists('schema_metatag')) {
       $requirements['amp_token'] = [
-        'title' => t('Token module required for AMP'),
+        'title' => t('Schema.org Metatag module required for AMP'),
         'value' => t('Not installed'),
-        'description' => t('The AMP module requires the <a href="@module">Token</a> module as a dependency. Please download and install Token to prevent errors with AMP.', ['@module' => 'https://www.drupal.org/project/token']),
-        'severity' => REQUIREMENT_ERROR,
+        'description' => t('To create valid AMP you will also need to download, install, and configure the <a href="@module">Schema.org Metatag</a> module as a dependency.', ['@module' => 'https://www.drupal.org/project/schema_metatag']),
+        'severity' => REQUIREMENT_WARNING,
       ];
     }
 
@@ -33,8 +33,8 @@ function amp_requirements($phase) {
       $requirements['amptheme'] = [
         'title' => t('AMP Base Theme'),
         'value' => t('Not installed'),
-        'description' => t('The AMP module requires the <a href="@theme">AMP Base Theme</a> to be installed.', ['@theme' => 'https://www.drupal.org/project/amptheme']),
-        'severity' => REQUIREMENT_ERROR,
+        'description' => t('The AMP module requires an AMP theme like the <a href="@theme">AMP Base Theme</a> to be installed.', ['@theme' => 'https://www.drupal.org/project/amptheme']),
+        'severity' => REQUIREMENT_WARNING,
       ];
     }
   }
@@ -86,4 +86,86 @@ function amp_update_8004() {
   $config_factory = \Drupal::configFactory();
   $config = $config_factory->getEditable('amp.metadata');
   $config->delete();
+}
+
+/**
+ * Replace deprecated image and file formatter settings.
+ */
+function amp_update_8005() {
+  // Find all file fields that use the outdated formatters.
+  $all_fields = \Drupal::service('entity_field.manager')->getFieldMapByFieldType('file');
+  foreach ($all_fields['node'] as $field_name => $info) {
+    foreach ($info['bundles'] as $bundle) {
+      $properties = array(
+        'targetEntityType' => 'node',
+        'bundle' => $bundle
+      );
+      if ($view_displays = \Drupal::entityManager()->getStorage('entity_view_display')->loadByProperties($properties)) {
+        foreach ($view_displays as $view_display) {
+          if ($component = $view_display->getComponent($field_name)) {
+            // Map old formatter settings to new ones.
+            $changed = FALSE;
+            switch ($component['type']) {
+              case 'amp_video':
+                $type = 'amp_video';
+                $settings = array(
+                  'use_description_as_link_text' => $component['settings']['use_description_as_link_text'],
+                  'layout' => 'responsive',
+                  'width' => $component['settings']['amp_video_width'],
+                  'height' => $component['settings']['amp_video_height'],
+                  'autoplay' => FALSE,
+                  'controls' => TRUE,
+                  'loop' => FALSE,
+                );
+                $changed = TRUE;
+                break;
+            }
+            if ($changed) {
+              $view_display->setComponent($field_name, array(
+                'type' => $type,
+                'settings' => $settings,
+              ) + $component)->save();
+            }
+          }
+        }
+      }
+    }
+  }
+   // Find all image fields that use the outdated formatters.
+  $all_fields = \Drupal::service('entity_field.manager')->getFieldMapByFieldType('image');
+  foreach ($all_fields['node'] as $field_name => $info) {
+    foreach ($info['bundles'] as $bundle) {
+      $properties = array(
+        'targetEntityType' => 'node',
+        'bundle' => $bundle
+      );
+      if ($view_displays = \Drupal::entityManager()->getStorage('entity_view_display')->loadByProperties($properties)) {
+        foreach ($view_displays as $view_display) {
+          if ($component = $view_display->getComponent($field_name)) {
+            // Map old formatter settings to new ones.
+            $changed = FALSE;
+            switch ($component['type']) {
+              case 'amp_image':
+                $type = 'amp_image';
+                $settings = array(
+                  'image_style' => $component['settings']['image_style'],
+                  'image_link' => $component['settings']['image_link'],
+                  'layout' => $component['settings']['amp_layout'],
+                  'width' => NULL,
+                  'height' => $component['settings']['amp_fixed_height'],
+                );
+                $changed = TRUE;
+                break;
+            }
+            if ($changed) {
+              $view_display->setComponent($field_name, array(
+                'type' => $type,
+                'settings' => $settings,
+              ) + $component)->save();
+            }
+          }
+        }
+      }
+    }
+  }
 }
