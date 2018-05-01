@@ -63,10 +63,5 @@ class AmpViewModeTest extends AmpTestBase {
     $this->assertSession()->pageTextContains('-------------------------------------');
     $this->assertSession()->pageTextContains('PASS');
 
-    // Test that invalid routes return 404.
-    $invalid_route = str_replace($node->id(), 10000, $amp_node_url);
-    $this->drupalGet($invalid_route);
-    $this->assertSession()->statusCodeEquals(404);
-
   }
 }
