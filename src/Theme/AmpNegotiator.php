@@ -44,14 +44,8 @@ class AmpNegotiator extends ServiceProviderBase implements ThemeNegotiatorInterf
    * {@inheritdoc}
    */
   public function applies(RouteMatchInterface $routeMatch) {
-    $node = $routeMatch->getParameter('node');
-    // If we only got back the node ID, load the node.
-    if (!empty($node) && !is_object($node)) {
-      $node = Node::load($node);
-    }
-
     // See if this route and object are AMP, without checking the active theme.
-    $is_amp_route = $this->ampContext->isAmpRoute($routeMatch, $node, FALSE);
+    $is_amp_route = $this->ampContext->isAmpRoute($routeMatch, NULL, FALSE);
     if ($is_amp_route) {
       // Disable big pipe on AMP pages.
       // @todo Rely on https://www.drupal.org/node/2729441 instead, when it is
