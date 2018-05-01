@@ -99,16 +99,16 @@ class AmpContext extends ServiceProviderBase {
       return TRUE;
     }
     // If we have an entity, we can test it.
-    $entity_is_amp = $this->entityIsAmp($entity);
-    $route_entity_is_amp = $this->routeEntityIsAmp($routeMatch);
-    if ($entity_is_amp || $route_entity_is_amp) {
-      return TRUE;
+    $route_entity = $this->routeEntity($routeMatch);
+    if ($entity instanceof \Drupal\node\NodeInterface || $route_entity instanceof \Drupal\node\NodeInterface) {
+      $entity_is_amp = $this->entityIsAmp($entity);
+      $route_entity_is_amp = $this->entityIsAmp($route_entity);
+      return $entity_is_amp || $route_entity_is_amp;
     }
     // Otherwise, check the active theme.
     if ($checkTheme) {
       return $this->routeThemeisAmp($routeMatch);
     }
-
     return FALSE;
 
   }
@@ -181,16 +181,17 @@ class AmpContext extends ServiceProviderBase {
   }
 
   /**
-   * See if this route has an AMP entity.
+   * Get the entity from the route.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
    *
-   * @return boolean
+   * @return mixed
+   *   Either an entity or FALSE.
    */
-  public function routeEntityIsAmp(RouteMatchInterface $routeMatch) {
+  public function routeEntity(RouteMatchInterface $routeMatch) {
     if ($node = $routeMatch->getParameter('node')) {
-      return $this->entityIsAmp($node);
+      return $node;
     }
     return FALSE;
   }
