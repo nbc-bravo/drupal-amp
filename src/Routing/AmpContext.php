@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Route;
 use Drupal\amp\EntityTypeInfo;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Routing\AdminContext;
 
 /**
  * Provides a helper class to determine whether the route is an amp one.
@@ -44,6 +45,13 @@ class AmpContext extends ServiceProviderBase {
   protected $routeMatch;
 
   /**
+   * The admin context.
+   *
+   * @var \Drupal\Core\Routing\AdminContext
+   */
+  protected $adminContext;
+
+  /**
    * Construct a new amp context helper instance.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
@@ -54,12 +62,15 @@ class AmpContext extends ServiceProviderBase {
    *   Information about AMP-enabled content types.
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
+   * @param \Drupal\Core\Routing\AdminContext $adminContext
+   *   The admin route context.
    */
-  public function __construct(ConfigFactoryInterface $configFactory, ThemeManager $themeManager, EntityTypeInfo $entityTypeInfo, RouteMatchInterface $routeMatch) {
+  public function __construct(ConfigFactoryInterface $configFactory, ThemeManager $themeManager, EntityTypeInfo $entityTypeInfo, RouteMatchInterface $routeMatch, AdminContext $adminContext) {
     $this->configFactory = $configFactory;
     $this->themeManager = $themeManager;
     $this->entityTypeInfo = $entityTypeInfo;
     $this->routeMatch = $routeMatch;
+    $this->adminContext = $adminContext;
  }
 
   /**
@@ -79,12 +90,14 @@ class AmpContext extends ServiceProviderBase {
     if (!$routeMatch) {
       $routeMatch = $this->routeMatch;
     }
-
     // Some routes cannot be AMP.
     if ($route_is_not_amp = $this->routeIsNotAmp($routeMatch)) {
       return FALSE;
     }
-
+    // Some routes must be AMP.
+    if ($route_is_amp = $this->routeIsAmp($routeMatch)) {
+      return TRUE;
+    }
     // If we have an entity, we can test it.
     $entity_is_amp = $this->entityIsAmp($entity);
     $route_entity_is_amp = $this->routeEntityIsAmp($routeMatch);
@@ -118,9 +131,32 @@ class AmpContext extends ServiceProviderBase {
   }
 
   /**
+   * Definitely an AMP route?
+   *
+   * Some routes must be AMP.
+   *
+   * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+   *   The route match.
+   *
+   * @return boolean
+   */
+  public function routeIsAmp(RouteMatchInterface $routeMatch) {
+    $route = $routeMatch->getRouteObject();
+    if (!$route instanceof Route) {
+       return FALSE;
+    }
+    // Check if the globally-defined AMP status has been changed to TRUE (it
+    // is FALSE by default).
+    if ($route->getOption('_amp_route')) {
+      return TRUE;
+    }
+  }
+
+  /**
    * Not an AMP route?
    *
-   * Check off things that indicate this can't be an AMP route.
+   * Check off things that indicate this can't be an AMP route. TRUE means it
+   * can't be an AMP route, FALSE means we can't tell.
    *
    * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
    *   The route match.
@@ -129,16 +165,14 @@ class AmpContext extends ServiceProviderBase {
    */
   public function routeIsNotAmp(RouteMatchInterface $routeMatch) {
     $route = $routeMatch->getRouteObject();
-    if (!$route) {
+    if (!$route instanceof Route) {
        return TRUE;
     }
-    // Check if the globally-defined AMP status has been changed to TRUE (it
-    // is FALSE by default).
-    if ($route->getOption('_amp_route')) {
-      return FALSE;
+    // Is this an admin route?
+    if ($this->adminContext->isAdminRoute()) {
+      return TRUE;
     }
-    // We only want to consider path with amp in the query string, unless
-    // all pages are AMP.
+    // We only path with amp in the query string, unless all pages are AMP.
     $everywhere = $this->configFactory->get('amp.settings')->get('amp_everywhere');
     if (!$everywhere && !isset($_GET['amp'])) {
       return TRUE;
