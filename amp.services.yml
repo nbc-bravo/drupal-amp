@@ -1,7 +1,7 @@
 services:
   router.amp_context:
     class: Drupal\amp\Routing\AmpContext
-    arguments: ['@amp.entity_type', '@current_route_match']
+    arguments: ['@config.factory', '@theme.manager', '@amp.entity_type', '@current_route_match', '@router.admin_context']
   theme.negotiator.amp_theme:
     class: Drupal\amp\Theme\AmpNegotiator
     arguments: ['@config.factory', '@router.amp_context']

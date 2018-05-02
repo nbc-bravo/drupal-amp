@@ -3,10 +3,10 @@
 namespace Drupal\amp\Theme;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\amp\Routing\AmpContext;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Theme\ThemeNegotiatorInterface;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
+use Drupal\amp\Routing\AmpContext;
 
 /**
  * Sets the active theme on amp pages.
@@ -21,7 +21,7 @@ class AmpNegotiator extends ServiceProviderBase implements ThemeNegotiatorInterf
   protected $configFactory;
 
   /**
-   * The route amp context to determine whether a route is an amp one.
+   * AmpContext.
    *
    * @var \Drupal\amp\Routing\AmpContext
    */
@@ -30,26 +30,27 @@ class AmpNegotiator extends ServiceProviderBase implements ThemeNegotiatorInterf
   /**
    * Creates a new AmpNegotiator instance.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   The config factory.
-   * @param \Drupal\amp\Routing\AmpContext $amp_context
-   *   The route amp context to determine whether the route is an amp one.
+   * @param \Drupal\amp\Routing\AmpContext $ampContext
+   *   The AmpContext.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AmpContext $amp_context) {
-    $this->configFactory = $config_factory;
-    $this->ampContext = $amp_context;
+  public function __construct(ConfigFactoryInterface $configFactory, AmpContext $ampContext) {
+    $this->configFactory = $configFactory;
+    $this->ampContext = $ampContext;
   }
 
   /**
    * {@inheritdoc}
    */
-  public function applies(RouteMatchInterface $route_match) {
-    $is_amp_route = $this->ampContext->isAmpRoute($route_match->getRouteObject());
+  public function applies(RouteMatchInterface $routeMatch) {
+    // See if this route and object are AMP, without checking the active theme.
+    $is_amp_route = $this->ampContext->isAmpRoute($routeMatch, NULL, FALSE);
     if ($is_amp_route) {
       // Disable big pipe on AMP pages.
       // @todo Rely on https://www.drupal.org/node/2729441 instead, when it is
       //   resolved.
-      $route_match->getRouteObject()->setOption('_no_big_pipe', TRUE);
+      $routeMatch->getRouteObject()->setOption('_no_big_pipe', TRUE);
     }
     return $is_amp_route;
   }

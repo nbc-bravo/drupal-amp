@@ -33,7 +33,7 @@ function amp_entity_view_mode_alter(&$view_mode, EntityInterface $entity, $conte
   $amp_context = \Drupal::service('router.amp_context');
 
   // If on AMP route, and in full view mode, switch to AMP view mode.
-  if ($amp_context->isAmpRoute() && $view_mode == 'full') {
+  if ($amp_context->isAmpRoute(NULL, $entity) && $view_mode == 'full') {
     $view_mode = 'amp';
   }
 }
