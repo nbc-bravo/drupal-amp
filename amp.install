@@ -72,11 +72,13 @@ function amp_update_8003() {
     'amp_metadata_content_image_min_696px_wide',
     'amp_metadata_logo_600x60',
   ];
-  $image_style = \Drupal::entityTypeManager()->getStorage('image_style')->load($style);
-  if ($image_style) {
-    $config = $config_factory->getEditable('image.style.' . $style);
-    $config->set('dependencies.enforced.module', ['amp']);
-    $config->save();
+  foreach ($styles as $style) {
+    $image_style = \Drupal::entityTypeManager()->getStorage('image_style')->load($style);
+    if ($image_style) {
+      $config = $config_factory->getEditable('image.style.' . $style);
+      $config->set('dependencies.enforced.module', ['amp']);
+      $config->save();
+    }
   }
 }
 
