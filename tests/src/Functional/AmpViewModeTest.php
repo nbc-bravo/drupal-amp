@@ -55,13 +55,5 @@ class AmpViewModeTest extends AmpTestBase {
     $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/amp"');
     $this->assertSession()->responseContains('link rel="canonical" href="' . $node_url . '"');
 
-    // Test the warnfix parameter.
-    $this->drupalGet($amp_node_url . "&warnfix");
-    $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('AMP test body');
-    $this->assertSession()->pageTextContains('AMP-HTML Validation Issues and Fixes');
-    $this->assertSession()->pageTextContains('-------------------------------------');
-    $this->assertSession()->pageTextContains('PASS');
-
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\amp\Render;
+namespace Drupal\amp_replace\Render;
 
 use Drupal\amp\Service\AMPService;
 use Drupal\Core\Config\ConfigFactoryInterface;

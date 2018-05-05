@@ -47,7 +47,7 @@ class AMPTestLibrary extends ControllerBase {
         '<p><a style="margin: 2px;" href="http://www.cnn.com" target="_parent">CNN</a></p>' . PHP_EOL .
         '<p><a href="http://www.bbcnews.com" target="_blank">BBC</a></p>' . PHP_EOL .
         '<p><INPUT type="submit" value="submit"></p>' . PHP_EOL .
-        '<p>This is a <!-- test comment -->sample <div onmouseover="hello();">sample</div> paragraph</p>';
+        '<div>This is a <!-- test comment -->sample <div onmouseover="hello();">sample</div> paragraph</div>';
 
     $this->amp->loadHtml($html);
     $amp_html = htmlspecialchars($this->amp->convertToAmpHtml());
@@ -56,7 +56,7 @@ class AMPTestLibrary extends ControllerBase {
     $original_html .= htmlspecialchars($html);
     return [
         '#type' => 'markup',
-        '#markup' => "<h3>The Library is working fine</h3><pre>$html_header $amp_html $original_html" .  $this->amp->warningsHumanHtml() . "</pre>"
+        '#markup' => "<h3>The Library is working.</h3><pre>$html_header $amp_html $original_html" .  $this->amp->warningsHumanHtml() . "</pre>"
     ];
   }
 

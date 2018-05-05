@@ -1,0 +1,5 @@
+amp_replace.settings:
+  title: 'AMP Replace Configuration'
+  description: 'Configure the AMP Replace module.'
+  route_name: amp_replace.settings
+  parent: system.admin_config_content

@@ -15,18 +15,6 @@ services:
     arguments: []
   amp.query_parameters:
     class: Drupal\amp\Utility\AmpQueryParameters
-  html_response.amp_markup_processor:
-    class: Drupal\amp\Render\AmpHtmlResponseMarkupProcessor
-    tags:
-    arguments: ['@amp.utilities', '@logger.channel.amp', '@config.factory']
-  html_response.amp_subscriber:
-    class: Drupal\amp\EventSubscriber\AmpHtmlResponseSubscriber
-    tags:
-      - { name: event_subscriber }
-    arguments: ['@html_response.amp_markup_processor', '@router.amp_context']
-  logger.channel.amp:
-    parent: logger.channel_base
-    arguments: ['amp']
   amp_response.attachments_processor:
     class: Drupal\amp\Render\AmpHtmlResponseAttachmentsProcessor
     decorates: html_response.attachments_processor

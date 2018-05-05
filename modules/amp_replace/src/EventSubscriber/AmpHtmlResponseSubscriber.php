@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\amp\EventSubscriber;
+namespace Drupal\amp_replace\EventSubscriber;
 
 use Drupal\amp\Routing\AmpContext;
 use Drupal\amp\Render\AmpHtmlResponseMarkupProcessor;
@@ -18,7 +18,7 @@ class AmpHtmlResponseSubscriber extends ServiceProviderBase implements EventSubs
   /**
    * The AMP HTML response markup processor service.
    *
-   * @var \Drupal\amp\Render\AmpHtmlResponseMarkupProcessor
+   * @var \Drupal\amp_replace\Render\AmpHtmlResponseMarkupProcessor
    */
   protected $ampHtmlResponseMarkupProcessor;
 

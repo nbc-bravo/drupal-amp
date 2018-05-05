@@ -233,36 +233,6 @@ class AmpSettingsForm extends ConfigFormBase {
           '"warnfix=1" at end of a node url. e.g. <strong>node/12345?amp&warnfix=1</strong>'),
     );
 
-    $form['amp_library_group']['amp_library_process_full_html'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('<strong><em>Power User:</em> Run the whole HTML page through the AMP library</strong>'),
-      '#default_value' => $amp_config->get('amp_library_process_full_html'),
-      '#description' => $this->t('The AMP PHP library will fix many AMP HTML standard non-compliance issues by ' .
-          'removing illegal or disallowed attributes, tags and property value pairs. This is useful for processing the output of modules that ' .
-          'generate AMP unfriendly HTML. Please test when enabling on your site as some modules may depend on ' .
-          'the HTML removed by the library and thus break in possibly subtle ways.')
-    );
-
-    $form['amp_library_group']['amp_library_process_statistics'] = array(
-        '#type' => 'checkbox',
-        '#title' => $this->t('<em>Statistics:</em> Add an <a href="https://www.drupal.org/files/issues/time_taken.png">HTML comment</a> at the end of Drupal page output indicating various performance statistics like time taken, number of tags processed etc.'),
-        '#default_value' => $amp_config->get('amp_library_process_statistics'),
-        '#states' => array('visible' => array(
-            ':input[name="amp_library_process_full_html"]' => array('checked' => TRUE))
-        ),
-    );
-
-    $form['amp_library_group']['amp_library_process_full_html_warnings'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('<em>Debugging:</em> Add a notice in the drupal log for each processed AMP page showing the AMP warnings (and fixes) generated'),
-      '#default_value' => $amp_config->get('amp_library_process_full_html_warnings'),
-      '#description' => $this->t('A Drupal log entry will be generated for <em>each</em> non-anonymous AMP request. ' .
-          'However <em>anonymous</em> page requests will be cached by Drupal page_cache module and will not repeatedly call the AMP library.'),
-      '#states' => array('visible' => array(
-          ':input[name="amp_library_process_full_html"]' => array('checked' => TRUE))
-      ),
-    );
-
     $form['experimental'] = [
       '#type' => 'fieldset',
       '#title' => $this->t("Experimental features"),
@@ -331,10 +301,6 @@ class AmpSettingsForm extends ConfigFormBase {
     $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
     $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
     $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
-
-    $amp_config->set('amp_library_process_full_html', $form_state->getValue('amp_library_process_full_html'))->save();
-    $amp_config->set('amp_library_process_full_html_warnings', $form_state->getValue('amp_library_process_full_html_warnings'))->save();
-    $amp_config->set('amp_library_process_statistics', $form_state->getValue('amp_library_process_statistics'))->save();
 
     if ($form_state->getValue('amp_library_warnings_display') !== $amp_config->get('amp_library_warnings_display')) {
       $amp_config->set('amp_library_warnings_display', $form_state->getValue('amp_library_warnings_display'))->save();

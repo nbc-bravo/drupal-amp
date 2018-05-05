@@ -170,6 +170,8 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
    *   The minified css.
    */
   public function minify($value) {
+    // Remove !important
+    $value = str_replace('!important', '', $value);
     // Remove comments
     $value = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $value);
     // Remove space after colons
