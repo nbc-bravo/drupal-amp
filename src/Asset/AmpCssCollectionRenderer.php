@@ -70,7 +70,6 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
   public function render(array $css_assets) {
     // Retrieve the normal css render array.
     $elements = parent::render($css_assets);
-
     // Intervene only if this is AMP page and option to render the css inline.
     $amp_settings = $this->configFactory->get('amp.settings');
     if (empty($amp_settings->get('amp_render_css')) || !$this->ampContext->isAmpRoute()) {
@@ -80,21 +79,22 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
     // For tracking the size and contents of the inlined css:
     $size = 0;
     $files = [];
-
     foreach ($elements as $key => $element) {
       // Process @import url() values.
-      if ($element['#tag'] == 'link' && array_key_exists('#value', $element)) {
+      if ($element['#tag'] == 'style' && array_key_exists('#value', $element)) {
         $urls = preg_match_all('/@import url\("(.+)\?/', $element['#value'], $matches);
         $all_css = [];
         foreach ($matches[1] as $url) {
           $css = file_get_contents(DRUPAL_ROOT . $url);
           $css = $this->minify($css);
+          $css = $this->strip($css);
           $size += strlen($css);
           $all_css[] = $css;
           $files[$url] = $this->format(strlen($css));
          }
-        // Implode and minify results.
+        // Implode, wrap in @media, and minify results.
         $value = implode("", $all_css);
+        $value = '@media ' . $element['#attributes']['media'] . " {\n" . $value . "\n}\n";
         $value = $this->minify($value);
 
         $element['#value'] = $value;
@@ -116,6 +116,7 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
           list($url, $query) = explode('?', $url);
           $css = file_get_contents(DRUPAL_ROOT . $url);
           $css = $this->minify($css);
+          $css = $this->strip($css);
           $size += strlen($css);
           $all_css[] = $css;
           $files[$url] = $this->format(strlen($css));
@@ -152,10 +153,13 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
       $difference = ($size - 50000);
       $over = $difference > 0 ? t('so your css is :difference too big', [':difference' => $this->format(abs($difference))]) : '';
       $under = $difference <= 0 ? t('so you have :difference to spare', [':difference' => $this->format(abs($difference))]) : '';
-      $output .= t('<p>The size of the css on this page is :size. The AMP limit is :limit, :overunder. The included css files and their sizes are listed for ease in finding large files to optimize. For the best information about individual files sizes, visit this page while optimization is turned off.</p>', [':size' => $this->format($size), ':limit' => $this->format(50000), ':overunder' => $over . $under]);
+      $output .= t('The size of the css on this page is :size. The AMP limit is :limit, :overunder. The included css files and their sizes are listed for ease in finding large files to optimize. For the best information about individual files sizes, visit this page while optimization is turned off.', [':size' => $this->format($size), ':limit' => $this->format(50000), ':overunder' => $over . $under]);
       $files = array_flip($files);
       //krsort($files);
-      debug($files, $output);
+      if (function_exists('dpm')) {
+        dpm($output);
+        dpm($files);
+      }
     }
     return $elements;
   }
@@ -170,14 +174,30 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
    *   The minified css.
    */
   public function minify($value) {
-    // Remove !important
-    $value = str_replace('!important', '', $value);
     // Remove comments
     $value = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $value);
     // Remove space after colons
     $value = str_replace(': ', ':', $value);
     // Remove whitespace
     $value = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $value);
+    return $value;
+  }
+
+  /**
+   * Strip css which won't validate as AMPHTML.
+   *
+   * @param string $value
+   *   The css to strip.
+   *
+   * @return string
+   *   The stripped css.
+   */
+  public function strip($value) {
+    // Remove css that won't validate as AMPHTML.
+    $invalid = [
+      '!important',
+    ];
+    $value = str_replace($invalid, '', $value);
     return $value;
   }
 

@@ -2,7 +2,7 @@ name: Accelerated Mobile Pages (AMP) Replace
 type: module
 description: Replace raw HTML with AMPHTML.
 core: 8.x
-package: Other
+package: AMP
 dependencies:
   - amp
 configure: amp_replace.settings

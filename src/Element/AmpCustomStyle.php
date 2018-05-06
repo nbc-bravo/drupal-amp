@@ -37,9 +37,9 @@ class AmpCustomStyle extends HtmlTag {
     // Avoid escaping valid css attributes.
     // For instance '.content > li' would be converted to '.content &gt; li'
     $markup = $element['#value'];
-    $markup = str_replace(' > ', 'xxxxxxxxxx', $markup);
+    $markup = str_replace('>', 'xxxxxxxxxx', $markup);
     $markup = $markup instanceof MarkupInterface ? $markup : Xss::filterAdmin($markup);
-    $markup = str_replace('xxxxxxxxxx', ' > ', $markup);
+    $markup = str_replace('xxxxxxxxxx', '>', $markup);
     $markup = Markup::create($markup);
 
     // Avoid re-escaping valid css attributes in later sanitization if $markup
