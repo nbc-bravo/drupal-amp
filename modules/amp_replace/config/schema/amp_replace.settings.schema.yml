@@ -2,6 +2,9 @@ amp_replace.settings:
   type: mapping
   label: 'AMP Replace settings'
   mapping:
+    amp_library_warnings_display:
+      type: boolean
+      label: 'Whether to show AMP Library warnings in all text formatters for all users'
     amp_library_process_full_html:
       type: boolean
       label: 'If the full html should be processed by the AMP library'

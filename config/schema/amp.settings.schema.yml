@@ -25,9 +25,6 @@ amp.settings:
     amp_pixel_random_number:
       type: boolean
       label: 'Whether to include a random number in the URL'
-    amp_library_warnings_display:
-      type: boolean
-      label: 'Whether to show AMP Library warnings in all text formatters for all users'
     amp_render_css:
       type: boolean
       label: 'Render css inline?'
