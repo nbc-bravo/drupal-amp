@@ -1,6 +1,6 @@
-name: Accelerated Mobile Pages (AMP) Replace
+name: AMP Replace All
 type: module
-description: Replace raw HTML with AMPHTML.
+description: Currently broken, not recommended. Turns on Power User mode to replace all page HTML with AMPHTML.
 core: 8.x
 package: AMP
 dependencies:
