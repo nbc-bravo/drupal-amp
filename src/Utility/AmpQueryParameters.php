@@ -18,13 +18,13 @@ class AmpQueryParameters extends ServiceProviderBase {
    *
    * @param string $url
    *   The original URL value.
-   * @param boolean $warnfix
-   *   Option to append warnfix to the end of the URL.
+   * @param boolean $development
+   *   Option to append development to the end of the URL.
    *
    * @return string
    *   A url containing the additional amp query parameter(s).
    */
-  public function add($url, $warnfix = FALSE) {
+  public function add($url, $development = FALSE) {
     // Append amp query string parameter
     if (strpos($url, '?') === FALSE) {
       $amp_url = $url . "?amp";
@@ -33,9 +33,9 @@ class AmpQueryParameters extends ServiceProviderBase {
       $amp_url = $url . "&amp";
     }
 
-    // Append optional warnfix query string parameter.
-    if ($warnfix) {
-      $amp_url = $amp_url . "&warnfix";
+    // Append optional development query string parameter.
+    if ($development) {
+      $amp_url = $amp_url . "&development";
     }
 
     return $amp_url;

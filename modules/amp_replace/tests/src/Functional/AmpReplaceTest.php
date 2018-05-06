@@ -33,8 +33,8 @@ class AmpReplaceTest extends AmpTestBase {
     $node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE])->toString();
     $amp_node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE, 'query' => ['amp' => NULL]])->toString();
 
-    // Test the warnfix parameter.
-    $this->drupalGet($amp_node_url . "&warnfix");
+    // Test the development parameter.
+    $this->drupalGet($amp_node_url . "&development");
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains('AMP test body');
     $this->assertSession()->pageTextContains('AMP-HTML Validation Issues and Fixes');

@@ -41,6 +41,14 @@ class AmpReplaceSettingsForm extends ConfigFormBase {
       '#markup' => t('<a href=":url">Test that AMP is configured properly</a>', array(':url' => Url::fromRoute('amp.test_library_hello')->toString()))
     );
 
+    $form['amp_library_group']['amp_library_warnings_display'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('<em>Debugging</em>: Show AMP Library warnings in <em>all</em> AMP text formatters for <em>all</em> users'),
+      '#default_value' => $amp_config->get('amp_library_warnings_display'),
+      '#description' => $this->t('If you want to see AMP formatter specific warning for one node add query ' .
+          '"development=1" at end of a node url. e.g. <strong>node/12345?amp&development=1</strong>'),
+    );
+
     $form['amp_library_group']['amp_library_process_full_html'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('<strong><em>Power User:</em> Run the whole HTML page through the AMP library</strong>'),
@@ -84,6 +92,11 @@ class AmpReplaceSettingsForm extends ConfigFormBase {
     $amp_config->set('amp_library_process_full_html', $form_state->getValue('amp_library_process_full_html'))->save();
     $amp_config->set('amp_library_process_full_html_warnings', $form_state->getValue('amp_library_process_full_html_warnings'))->save();
     $amp_config->set('amp_library_process_statistics', $form_state->getValue('amp_library_process_statistics'))->save();
+
+    if ($form_state->getValue('amp_library_warnings_display') !== $amp_config->get('amp_library_warnings_display')) {
+      $amp_config->set('amp_library_warnings_display', $form_state->getValue('amp_library_warnings_display'))->save();
+      $this->tagInvalidate->invalidateTags(['amp-warnings']);
+    }
 
     parent::submitForm($form, $form_state);
   }

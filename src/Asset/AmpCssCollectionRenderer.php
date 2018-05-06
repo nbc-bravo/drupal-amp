@@ -145,9 +145,9 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
       '#value' => $merged,
     ];
 
-    // Display info about inline css if &warnfix is appended to url.
+    // Display info about inline css if &development is appended to url.
     $current_page = \Drupal::request()->getRequestUri();
-    if (!empty(stristr($current_page, 'warnfix'))) {
+    if (!empty(stristr($current_page, 'development'))) {
       $output = '<h2>' . 'CSS Filesize' . '</h2>';
       $difference = ($size - 50000);
       $over = $difference > 0 ? t('so your css is :difference too big', [':difference' => $this->format(abs($difference))]) : '';

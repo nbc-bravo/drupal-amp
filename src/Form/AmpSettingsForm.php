@@ -222,15 +222,9 @@ class AmpSettingsForm extends ConfigFormBase {
 
     $form['amp_library_group']['test_page'] = array(
       '#type' => 'item',
-      '#markup' => t('<a href=":url">Test that AMP is configured properly</a>', array(':url' => Url::fromRoute('amp.test_library_hello')->toString()))
-    );
-
-    $form['amp_library_group']['amp_library_warnings_display'] = array(
-      '#type' => 'checkbox',
-      '#title' => $this->t('<em>Debugging</em>: Show AMP Library warnings in <em>all</em> AMP text formatters for <em>all</em> users'),
-      '#default_value' => $amp_config->get('amp_library_warnings_display'),
-      '#description' => $this->t('If you only want to see AMP formatter specific warning for one node add query ' .
-          '"warnfix=1" at end of a node url. e.g. <strong>node/12345?amp&warnfix=1</strong>'),
+      '#markup' => t('<a href=":url">Test that AMP is configured properly</a>', array(':url' => Url::fromRoute('amp.test_library_hello')->toString())),
+      '#suffix' => $this->t('If you want to see AMP formatter specific warning for one node add query ' .
+          '"development=1" at end of a node url. e.g. <strong>node/12345?amp&development=1</strong>'),
     );
 
     $form['experimental'] = [
@@ -301,11 +295,6 @@ class AmpSettingsForm extends ConfigFormBase {
     $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
     $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
     $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
-
-    if ($form_state->getValue('amp_library_warnings_display') !== $amp_config->get('amp_library_warnings_display')) {
-      $amp_config->set('amp_library_warnings_display', $form_state->getValue('amp_library_warnings_display'))->save();
-      $this->tagInvalidate->invalidateTags(['amp-warnings']);
-    }
 
     $amp_config->set('amp_render_css', $form_state->getValue('amp_render_css'))->save();
     $amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();

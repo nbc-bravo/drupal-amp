@@ -29,7 +29,7 @@ class AmpProcessedText extends ProcessedText {
         array($class, 'preRenderAmpText'),
       ),
       '#cache' => [
-        'contexts' => ['url.query_args:amp', 'url.query_args:warnfix'],
+        'contexts' => ['url.query_args:amp', 'url.query_args:development'],
         'tags' => ['config:amp.settings']
       ]
     );
@@ -51,7 +51,7 @@ class AmpProcessedText extends ProcessedText {
     // Then check the URL if library warnings are enabled
     /** @var Request $request */
     $request = \Drupal::request();
-    $user_wants_amp_library_warnings = $request->get('warnfix');
+    $user_wants_amp_library_warnings = $request->get('development');
     if (isset($user_wants_amp_library_warnings)) {
       return true;
     }

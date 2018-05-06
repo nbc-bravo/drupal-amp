@@ -375,8 +375,8 @@ function amp_node_form_submit_with_warn(&$form, FormStateInterface $form_state) 
   // Redirect to the alias if it exists, otherwise use the node URL.
   $url = !empty($path[0]['alias']) ? $path[0]['alias'] : $path[0]['source'];
   if (isset($url)) {
-    $amp_warnfix_url = \Drupal::service('amp.query_parameters')->add($url, $warnfix = TRUE);
-    $response = new RedirectResponse($amp_warnfix_url);
+    $amp_development_url = \Drupal::service('amp.query_parameters')->add($url, $development = TRUE);
+    $response = new RedirectResponse($amp_development_url);
     $response->send();
   }
 }

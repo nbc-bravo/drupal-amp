@@ -39,7 +39,7 @@ class AmpIframe extends ProcessedText {
       ),
       '#theme' => 'amp_iframe',
       '#cache' => [
-        'contexts' => ['url.query_args:amp', 'url.query_args:warnfix'],
+        'contexts' => ['url.query_args:amp', 'url.query_args:development'],
         'tags' => ['config:amp.settings']
       ]
     );
