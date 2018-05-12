@@ -59,3 +59,28 @@ function template_preprocess_amp_views_carousel(&$variables) {
 
 }
 
+/**
+ * Prepares variables for AMP Sidebar.
+ *
+ * Default template: amp-sidebar.html.twig.
+ *
+ * @param array $variables
+ * An associative array containing:
+ * - #id: The id of the sidebar (used by the toggle and close buttons).
+ * - #tabindex: The number of the tabindex.
+ * - #attributes: Attributes for the container.
+ * - #close_attributes: Attributes for the close button.
+ */
+function template_preprocess_amp_sidebar(&$variables) {
+  $element = $variables['element'];
+
+  // Ensure #attributes are set.
+  $element += ['#attributes' => [], '#content_attributes' => []];
+
+  $variables['attributes'] = $element['#attributes'];
+  $variables['content_attributes'] = $element['#content_attributes'];
+  $variables['tabindex'] = $element['#tabindex'];
+  $variables['id'] = $element['#id'];
+  $variables['children'] = $element['#children'];
+
+}

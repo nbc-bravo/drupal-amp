@@ -153,9 +153,6 @@ function amp_theme() {
         'attributes' => []
       ],
     ],
-    'amp_custom_style' => [
-      'render element' => 'element',
-    ],
     'amp_pixel' => [
       'variables' => [
         'domain' => NULL,
@@ -251,6 +248,13 @@ function amp_theme() {
         ]
       ]
     ],
+    'block__amp_system_branding_block' => [
+      'render element' => 'elements',
+      'base hook' => 'block',
+    ],
+    'amp_custom_style' => [
+      'render element' => 'element',
+    ],
     'amp_video' => [
       'variables' => [
         'attributes' => [],
@@ -272,16 +276,13 @@ function amp_theme() {
       ],
       'file' => 'amp.theme.inc',
     ],
-    'block__amp_system_branding_block' => [
-      'render element' => 'elements',
-      'base hook' => 'block',
-    ],
     'amp_sidebar' => [
       'render element' => 'element',
       'id' => NULL,
       'tabindex' => NULL,
       'attributes' => [],
       'content_attributes' => [],
+      'file' => 'amp.theme.inc',
     ],
     'amp_sidebar_toggle' => [
       'variables' => [
@@ -496,20 +497,6 @@ function amp_preprocess_block(&$variables) {
       break;
 
   }
-
-}
-
-function template_preprocess_amp_sidebar(&$variables) {
-  $element = $variables['element'];
-
-  // Ensure #attributes are set.
-  $element += ['#attributes' => [], '#content_attributes' => []];
-
-  $variables['attributes'] = $element['#attributes'];
-  $variables['content_attributes'] = $element['#content_attributes'];
-  $variables['tabindex'] = $element['#tabindex'];
-  $variables['id'] = $element['#id'];
-  $variables['children'] = $element['#children'];
 
 }
 
