@@ -1,0 +1,60 @@
+<?php
+
+/**
+* Implements hook_preprocess_html().
+*
+* Reset toolbar classes and add sidebar toggle button to the header.
+*/
+function amp_toolbar_preprocess_html(&$variables) {
+  $amp_context = \Drupal::service('router.amp_context');
+  if ($amp_context->isAmpRoute()) {
+
+    // The template wrapped the toolbar in amp-sidebar, which is always
+    // vertical. Change the page classes to reflect that.
+    // @see toolbar.html.twig.
+    if (isset($variables['page_top']['toolbar'])) {
+      if (!empty($variables['attributes'])) {
+        if ($variables['attributes'] instanceof Attribute) {
+          $variables['attributes']->removeClass('toolbar-horizontal');
+          $variables['attributes']->addClass('toolbar-vertical');
+        }
+      }
+
+      // Wrap the toolbar in an amp-sidebar element.
+      $toolbar = $variables['page_top']['toolbar'];
+      $variables['page_top']['toolbar'] = [
+        '#type' => 'amp_sidebar',
+        '#id' => 'sidebar-toolbar',
+        '#tabindex' => 0,
+        '#attributes' => [
+          'side' => 'left',
+          'layout' => 'nodisplay',
+        ],
+        '#content_attributes' => [
+          'class' => ['sidebar-close'],
+        ],
+        'toolbar' => $toolbar,
+        '#access' => $toolbar['#access'],
+        '#cache' => $toolbar['#cache'],
+      ];
+
+      // Add hamburger button to toggle the sidebar.
+      // Added to the page top which all themes have. Any theme could move the
+      // whole thing to a different location using hook_preprocess_html().
+      // @see ampsubtheme_example.theme.
+      $variables['page_top']['sidebar-toolbar-toggle'] = [
+        '#theme' => 'amp_sidebar_toggle',
+        '#sidebarid' => 'sidebar-toolbar',
+        '#tabindex' => 0,
+        '#title' => t('Toolbar'),
+        '#attributes' => [
+          'class' => ['sidebar-toggle-left'],
+        ],
+        '#attached' => ['library' => ['amp_toolbar/amp.sidebar']],
+        '#access' => $toolbar['#access'],
+      ];
+
+    }
+  }
+
+}

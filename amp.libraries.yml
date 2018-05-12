@@ -344,6 +344,9 @@ amp.sidebar:
     gpl-compatible: false
   js:
     https://cdn.ampproject.org/v0/amp-sidebar-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-sidebar", async: true } }
+  css:
+    components:
+      css/sidebar.css: {}
   dependencies:
     - amp/runtime
 amp.slides:
