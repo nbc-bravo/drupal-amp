@@ -1,7 +1,5 @@
 <?php
 
-use Drupal\Core\Template\Attribute;
-
 /**
 * Implements hook_preprocess_html().
 *
@@ -18,22 +16,21 @@ function amp_toolbar_preprocess_html(&$variables) {
 
     // Wrap the toolbar in an amp-sidebar element.
     $toolbar = $variables['page_top']['toolbar'];
-    $variables['page_top']['amp_sidebar'] = [
-      '#type' => 'amp_sidebar',
-      '#id' => 'sidebar-toolbar',
-      '#tabindex' => 0,
-      '#attributes' => [
-        'side' => 'left',
-        'layout' => 'nodisplay',
+    $variables['page_top']['toolbar']['#theme_wrappers'] = [
+      'amp_sidebar' => [
+        '#id' => 'sidebar-toolbar',
+        '#tabindex' => 0,
+        '#attributes' => [
+          'side' => 'left',
+          'layout' => 'nodisplay',
+        ],
+        '#content_attributes' => [
+          'class' => ['sidebar-close'],
+        ],
+        '#access' => $toolbar['#access'],
+        '#cache' => $toolbar['#cache'],
       ],
-      '#content_attributes' => [
-        'class' => ['sidebar-close'],
-      ],
-      'toolbar' => $toolbar,
-      '#access' => $toolbar['#access'],
-      '#cache' => $toolbar['#cache'],
     ];
-    unset($variables['page_top']['toolbar']);
 
     // Add hamburger button to toggle the sidebar.
     // Added to the page top which all themes have. Any theme could move the
@@ -47,7 +44,6 @@ function amp_toolbar_preprocess_html(&$variables) {
       '#attributes' => [
         'class' => ['sidebar-toggle-left'],
       ],
-      '#attached' => ['library' => ['amp_toolbar/amp.sidebar']],
       '#access' => $toolbar['#access'],
     ];
 

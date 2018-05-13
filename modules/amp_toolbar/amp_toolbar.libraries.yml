@@ -1,5 +1,0 @@
-amp.sidebar:
-  version: 1.0
-  css:
-    component:
-      amp-sidebar.css: {}
