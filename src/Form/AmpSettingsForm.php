@@ -74,7 +74,9 @@ class AmpSettingsForm extends ConfigFormBase {
       if (!empty($theme->info['hidden'])) {
         continue;
       }
-      $theme_options[$theme->getName()] = $theme->info['name'];
+      elseif (!empty($theme->status)) {
+        $theme_options[$theme->getName()] = $theme->info['name'];
+      }
     }
 
     return $theme_options;
