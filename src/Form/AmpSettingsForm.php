@@ -142,7 +142,7 @@ class AmpSettingsForm extends ConfigFormBase {
       '#options' => $this->themeOptions,
       '#required' => TRUE,
       '#title' => $this->t('AMP theme'),
-      '#description' => $this->t('Choose a theme to use for AMP pages.'),
+      '#description' => $this->t('Choose a theme to use for AMP pages. Make sure the theme is installed before trying to use it.'),
       '#default_value' => $amptheme_config->get('amptheme'),
     ];
     if (empty($this->themeOptions)) {
@@ -234,13 +234,6 @@ class AmpSettingsForm extends ConfigFormBase {
       '#title' => $this->t("Experimental features"),
     ];
 
-    $form['experimental']['amp_render_css'] = [
-      '#type' => 'checkbox',
-      '#default_value' => $amp_config->get('amp_render_css'),
-      '#title' => $this->t('Render css inline?'),
-      '#description' => $this->t('Should the AMP module render Drupal css into <style amp-custom></style>? Set this to FALSE if your AMP theme creates and populates the css <style amp-custom></style> tag. Set to TRUE if your theme uses the CSS placeholder instead (the default behavior in Drupal). If you are not sure what what this means, set it to TRUE.'),
-    ];
-
     $form['experimental']['amp_everywhere'] = [
       '#type' => 'checkbox',
       '#default_value' => $amp_config->get('amp_everywhere'),
@@ -298,7 +291,6 @@ class AmpSettingsForm extends ConfigFormBase {
     $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
     $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
 
-    $amp_config->set('amp_render_css', $form_state->getValue('amp_render_css'))->save();
     $amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();
 
     parent::submitForm($form, $form_state);

@@ -25,9 +25,6 @@ amp.settings:
     amp_pixel_random_number:
       type: boolean
       label: 'Whether to include a random number in the URL'
-    amp_render_css:
-      type: boolean
-      label: 'Render css inline?'
     amp_everywhere:
       type: boolean
       label: 'Generate all pages as AMP pages?'

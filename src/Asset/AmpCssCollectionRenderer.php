@@ -70,9 +70,8 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
   public function render(array $css_assets) {
     // Retrieve the normal css render array.
     $elements = parent::render($css_assets);
-    // Intervene only if this is AMP page and option to render the css inline.
-    $amp_settings = $this->configFactory->get('amp.settings');
-    if (empty($amp_settings->get('amp_render_css')) || !$this->ampContext->isAmpRoute()) {
+    // Intervene only if this is an AMP page.
+    if (!$this->ampContext->isAmpRoute()) {
       return $elements;
     }
 
