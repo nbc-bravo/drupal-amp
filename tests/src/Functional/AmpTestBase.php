@@ -9,8 +9,6 @@ use Drupal\Tests\BrowserTestBase;
 
 /**
  * Base AMP testing setup.
- *
- * @group amp
  */
 abstract class AmpTestBase extends BrowserTestBase {
 

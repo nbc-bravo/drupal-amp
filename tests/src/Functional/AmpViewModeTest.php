@@ -5,7 +5,6 @@ namespace Drupal\Tests\amp\Functional;
 use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\Tests\BrowserTestBase;
 use Drupal\Tests\amp\Functional\AmpTestBase;
 
 /**

@@ -234,6 +234,21 @@ function amp_theme() {
         'attributes' => [],
       ],
     ],
+    'amp_social_share' => [
+      'variables' => [
+        'providers' => [],
+        'app_id' => '',
+      ],
+    ],
+    'amp_social_post_theme' => [
+      'render element' => 'element',
+      'variables' => [
+        'url' => NULL,
+        'provider' => NULL,
+        'placeholder' => NULL,
+        'attributes' => [],
+      ],
+    ],
   ];
   return $theme;
 }
