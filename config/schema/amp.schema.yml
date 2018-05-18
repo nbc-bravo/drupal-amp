@@ -122,3 +122,32 @@ views.style.html_list:
     loop:
       type: boolean
       label: 'Loop'
+
+field.formatter.settings.amp_social_post_formatter:
+  type: mapping
+  label: 'AMP social post field formatter settings'
+  mapping:
+    use_description_as_link_text:
+      type: boolean
+      label: 'Replace the file name by its description when available'
+    layout:
+      type: string
+      label: 'AMP layout'
+    width:
+      type: integer
+      label: 'Width'
+    height:
+      type: integer
+      label: 'Height'
+    data-embed-as:
+      type: string
+      label: 'Embed as'
+    data-align-center:
+      type: string
+      label: 'Align center'
+    provider:
+      type: string
+      label: 'Provider'
+    placeholder:
+      type: string
+      label: 'Placeholder'
