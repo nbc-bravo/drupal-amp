@@ -4,5 +4,5 @@ description: Helps render Adsense blocks as AMP elements
 core: 8.x
 package: AMP
 dependencies:
-  - amp
-  - adsense
+  - amp:amp
+  - adsense:adsense

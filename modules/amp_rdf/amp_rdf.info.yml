@@ -4,5 +4,5 @@ description: Required on sites that have both AMP and RDF modules enabled. Remov
 core: 8.x
 package: AMP
 dependencies:
-  - amp
-  - rdf
+  - amp:amp
+  - drupal:rdf
