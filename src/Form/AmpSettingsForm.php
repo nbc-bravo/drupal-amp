@@ -119,13 +119,62 @@ class AmpSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $amp_config = $this->config('amp.settings');
 
-    if (\Drupal::moduleHandler()->moduleExists('field_ui')) {
+    $amp_config = $this->config('amp.settings');
+    $module_handler = \Drupal::moduleHandler();
+
+    $page_prefix = $this->t('<p>This page contains configuration for AMP pages. Extensive documentation about AMP is available on the <a href=":doclink1">AMP Project</a>.</p>', [
+      ':doclink1' => 'https://www.ampproject.org',
+    ]);
+    $page_prefix .= '<ul>';
+    if (!$module_handler->moduleExists('schema_metatag')) {
+      $page_prefix .= '<li>';
+      $page_prefix .= $this->t('Valid AMP requires Schema.org markup, which can be provided by the <a href=":doclink2">Schema.org Metatag module</a>.', [':doclink2' => 'https://www.drupal.org/project/schema_metatag']);
+      $page_prefix .= '</li>';
+    }
+    if ($module_handler->moduleExists('toolbar') && !$module_handler->moduleExists('amp_toolbar')) {
+      $page_prefix .= '<li>';
+      $page_prefix .=  $this->t('If you have the Toolbar module enabled, enable the <a href=":doclink3">AMP Toolbar</a> module.', [':doclink3' => '/admin/modules']);
+      $page_prefix .= '</li>';
+    }
+    if ($module_handler->moduleExists('rdf') && !$module_handler->moduleExists('amp_rdf')) {
+      $page_prefix .= '<li>';
+      $page_prefix .=  $this->t('If you have the RDF module enabled, enable the <a href=":doclink4">AMP RDF</a> module.', [':doclink4' => '/admin/modules']);
+      $page_prefix .= '</li>';
+    }
+    $page_prefix .= '</ul>';
+
+    $page_suffix = '<h3>' . $this->t('For Administrators and Developers') . '</h3><p>';
+    $page_suffix .= $this->t('This code uses the <a href="https://github.com/Lullabot/amp-library">AMP Library</a>. This library will be installed by Composer if the AMP module is installed by Composer as follows:</p><p><code>composer install drupal/amp --with-dependencies</code></p> ');
+    $page_suffix .= $this->t('Test that the AMP library is <a href=":url">configured properly</a>. Look for the words <strong>The Library is working.</strong> at the top of the page. You will see that the library detected markup that fails AMP standards. If the library is not detected, retry adding the AMP module using Composer, as indicated above.', [':url' => Url::fromRoute('amp.test_library_hello')->toString()]);
+    $page_suffix .= '</p><p>';
+    $page_suffix .= $this->t('If you want to see AMP debugging information for any node add "&development=1" at end of the AMP node url, e.g. <em>node/12345?amp&development=1</em>. Check your javascript console and the AMP Project documentation for more information.</p>');
+    $page_suffix .= '</p>';
+
+    $amptheme_config = $this->config('amp.theme');
+    $description = $this->t("Choose a theme to use for AMP pages. Themes must installed (but not necessarily set as the default theme) before they will appear in this list and be usable by AMP. You can choose between AMP Base, an installed subtheme of AMP Base, such as the ExAMPle Subtheme, or any theme that complies with AMP rules. See <a href=':link'>AMPTheme</a> for examples and pre-configured themes.", [':link' => 'https://www.drupal.org/project/amptheme']);
+
+    $form['amptheme'] = [
+      '#type' => 'select',
+      '#options' => $this->themeOptions,
+      '#required' => TRUE,
+      '#title' => $this->t('AMP theme'),
+      '#description' => $description,
+      '#default_value' => $amptheme_config->get('amptheme'),
+      '#prefix' => $page_prefix,
+    ];
+
+    $prefix = $this->t('<p>Currently, only node pages can be displayed as AMP pages. Select the content types you want to enable for AMP in the list below.' .
+      ' Once enabled, links are provided so you can configure the fields and formatters for the AMP display of that content type.</p>', [
+        ':doclink1' => 'https://www.ampproject.org',
+    ]);
+    if ($module_handler->moduleExists('field_ui')) {
       $form['amp_content_amp_status'] = [
         '#title' => $this->t('AMP Status by Content Type'),
         '#theme' => 'item_list',
         '#items' => $this->entityTypeInfo->getFormattedAmpEnabledTypes(),
+        '#suffix' => $page_suffix,
+        '#prefix' => $prefix,
       ];
     }
     else {
@@ -136,19 +185,8 @@ class AmpSettingsForm extends ConfigFormBase {
       ];
     }
 
-    $amptheme_config = $this->config('amp.theme');
-    $form['amptheme'] = [
-      '#type' => 'select',
-      '#options' => $this->themeOptions,
-      '#required' => TRUE,
-      '#title' => $this->t('AMP theme'),
-      '#description' => $this->t('Choose a theme to use for AMP pages. Make sure the theme is installed before trying to use it.'),
-      '#default_value' => $amptheme_config->get('amptheme'),
-    ];
-    if (empty($this->themeOptions)) {
-      $form['amptheme']['#description'] = $this->t('To use the AMP module, an AMP theme must be installed. You can choose between AMP Base or an installed subtheme of AMP Base, such as the ExAMPle Subtheme, for use as the AMP Theme, or create your own AMP theme as a subtheme of your primary theme.');
-    }
-
+   // Hide these and switch to sub modules for each.
+   // @TODO Remove from this page once sub modules are created.
    $form['google_analytics_id'] = [
       '#type' => 'textfield',
       '#default_value' => $amp_config->get('google_analytics_id'),
@@ -157,8 +195,8 @@ class AmpSettingsForm extends ConfigFormBase {
       '#maxlength' => 20,
       '#size' => 15,
       '#placeholder' => 'UA-',
+      '#access' => FALSE,
     ];
-
     $form['google_adsense_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Google AdSense Publisher ID'),
@@ -167,8 +205,8 @@ class AmpSettingsForm extends ConfigFormBase {
       '#size' => 20,
       '#placeholder' => 'pub-',
       '#description' => $this->t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to pub-9999999999999'),
+      '#access' => FALSE,
     );
-
     $form['google_doubleclick_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Google DoubleClick for Publishers Network ID'),
@@ -177,11 +215,12 @@ class AmpSettingsForm extends ConfigFormBase {
       '#size' => 20,
       '#placeholder' => '/',
       '#description' => $this->t('The Network ID to use on all tags. This value should begin with a /.'),
+      '#access' => FALSE,
     );
-
     $form['pixel_group'] = array(
       '#type' => 'fieldset',
       '#title' => t('amp-pixel'),
+      '#access' => FALSE,
     );
     $form['pixel_group']['amp_pixel'] = array(
       '#type' => 'checkbox',
@@ -217,23 +256,13 @@ class AmpSettingsForm extends ConfigFormBase {
       ),
     );
 
-    $form['amp_library_group'] = array(
-      '#type' => 'fieldset',
-      '#title' => t('AMP Library Configuration <a href="https://github.com/Lullabot/amp-library">(GitHub Home and Documentation)</a>'),
-    );
-
-    $form['amp_library_group']['test_page'] = array(
-      '#type' => 'item',
-      '#markup' => t('<a href=":url">Test that AMP is configured properly</a>', array(':url' => Url::fromRoute('amp.test_library_hello')->toString())),
-      '#suffix' => $this->t('If you want to see AMP formatter specific warning for one node add query ' .
-          '"development=1" at end of a node url. e.g. <strong>node/12345?amp&development=1</strong>'),
-    );
-
+    // @TODO Display again once this is possible.
+    // The configuration option still exists so it can be used in AMP logic.
     $form['experimental'] = [
       '#type' => 'fieldset',
       '#title' => $this->t("Experimental features"),
+      '#access' => FALSE,
     ];
-
     $form['experimental']['amp_everywhere'] = [
       '#type' => 'checkbox',
       '#default_value' => $amp_config->get('amp_everywhere'),
@@ -248,6 +277,10 @@ class AmpSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+
+    return;
+
+    // @TODO Remove once moved into separate sub modules.
     parent::validateForm($form, $form_state);
     // Validate the Google Analytics ID.
     if (!empty($form_state->getValue('google_analytics_id'))) {
@@ -279,19 +312,20 @@ class AmpSettingsForm extends ConfigFormBase {
     $amptheme_config->setData(['amptheme' => $amptheme]);
     $amptheme_config->save();
 
+    // @TODO Remove once moved into sub modules.
     // Other module settings.
-    $amp_config = $this->config('amp.settings');
+    //$amp_config = $this->config('amp.settings');
 
-    $amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
-    $amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
-    $amp_config->set('google_doubleclick_id', $form_state->getValue('google_doubleclick_id'))->save();
+    //$amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
+    //$amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
+    //$amp_config->set('google_doubleclick_id', $form_state->getValue('google_doubleclick_id'))->save();
 
-    $amp_config->set('amp_pixel', $form_state->getValue('amp_pixel'))->save();
-    $amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
-    $amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
-    $amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
+    //$amp_config->set('amp_pixel', $form_state->getValue('amp_pixel'))->save();
+    //$amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
+    //$amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
+    //$amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
 
-    $amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();
+    //$amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();
 
     parent::submitForm($form, $form_state);
   }
