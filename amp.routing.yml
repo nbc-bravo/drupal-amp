@@ -1,5 +1,5 @@
-amp.settings:
-  path: '/admin/config/content/amp'
+amp.settings_tab:
+  path: '/admin/structure/amp'
   defaults:
     _form: '\Drupal\amp\Form\AmpSettingsForm'
     _title: 'Configure the AMP module'

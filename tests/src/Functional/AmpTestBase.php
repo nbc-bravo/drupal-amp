@@ -74,7 +74,7 @@ abstract class AmpTestBase extends BrowserTestBase {
     $this->drupalLogin($this->adminUser);
 
     // Configure AMP.
-    $settings_url = Url::fromRoute("amp.settings")->toString();
+    $settings_url = Url::fromRoute("amp.settings_tab")->toString();
     $this->drupalGet($settings_url);
     $edit = ['amptheme' => 'ampsubtheme_example'];
     $this->submitForm($edit, t('Save configuration'));

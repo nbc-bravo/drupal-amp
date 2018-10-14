@@ -7,4 +7,4 @@ dependencies:
   - drupal:image
   - drupal:node
   - token:token
-configure: amp.settings
+configure: amp.settings_tab
