@@ -36,30 +36,6 @@ class AmpProcessedText extends ProcessedText {
   }
 
   /**
-   * Does the user want to see AMP Library warnings?
-   *
-   * @return bool
-   */
-  public static function warningsOn()
-  {
-    // First check the config if library warnings are on
-    $amp_config = self::configFactory()->get('amp.settings');
-    if ($amp_config->get('amp_library_warnings_display')) {
-      return true;
-    }
-
-    // Then check the URL if library warnings are enabled
-    /** @var Request $request */
-    $request = \Drupal::request();
-    $user_wants_amp_library_warnings = $request->get('development');
-    if (isset($user_wants_amp_library_warnings)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
    * Pre-render callback: Processes the amp markup and attaches libraries.
    */
   public static function preRenderAmpText($element) {
@@ -71,11 +47,6 @@ class AmpProcessedText extends ProcessedText {
 
     $amp->loadHtml($element['#markup']);
     $element['#markup'] = $amp->convertToAmpHtml();
-    $warning_message = "<pre>" . $amp->warningsHumanHtml() . "</pre>";
-
-    if (self::warningsOn()) {
-      $element['#markup'] .= $warning_message;
-    }
 
     if (!empty($amp->getComponentJs())) {
       $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
