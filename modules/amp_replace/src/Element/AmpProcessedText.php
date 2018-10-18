@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\amp\Element;
+namespace Drupal\amp_replace\Element;
 
 use Drupal\filter\Element\ProcessedText;
 use Lullabot\AMP\AMP;
