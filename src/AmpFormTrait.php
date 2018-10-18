@@ -38,7 +38,19 @@ trait AmpFormTrait {
     foreach ($settings as $setting => $label) {
       $value = $this->getSetting($setting);
       if (isset($value)) {
-        $summary[] = $label . $this->t(': :value', [':value' => $value]);
+        if ($setting == 'width') {
+          if ($this->widthError($this->getSetting('width'), $this->getSetting('layout'))) {
+            $value = $this->t('INVALID!');
+          }
+        }
+        if ($setting == 'height') {
+          if ($this->heightError($this->getSetting('height'), $this->getSetting('layout'))) {
+            $value = $this->t('INVALID!');
+          }
+        }
+        if (!empty($value)) {
+          $summary[] = $label . $this->t(': :value', [':value' => $value]);
+        }
       }
     }
     return $summary;
@@ -185,6 +197,21 @@ trait AmpFormTrait {
   }
 
   /**
+   * See if selected width is invalid based on the selected layout.
+   *
+   * @param integer $width
+   *   The setting value.
+   *
+   * @return bool
+   *   Either TRUE or FALSE.
+   */
+  public function widthError($width, $layout) {
+    // If the selected layout expects a numeric value and the current value is
+    // empty, the width is invalid.
+    return empty($width) && $this->validWidth(1, $layout) == 1;
+  }
+
+  /**
    * The height form element.
    *
    * @return array
@@ -231,6 +258,21 @@ trait AmpFormTrait {
       default:
         return 'auto';
     }
+  }
+
+  /**
+   * See if selected height is invalid based on the selected layout.
+   *
+   * @param integer $height
+   *   The setting value.
+   *
+   * @return bool
+   *   Either TRUE or FALSE.
+   */
+  public function heightError($height, $layout) {
+    // If the selected layout expects a numeric value and the current value is
+    // empty, the height is invalid.
+    return empty($height) && $this->validHeight(1, $layout) == 1;
   }
 
   /**
