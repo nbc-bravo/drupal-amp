@@ -172,9 +172,11 @@ class AmpContext extends ServiceProviderBase {
     if ($this->adminContext->isAdminRoute()) {
       return TRUE;
     }
-    // We only path with amp in the query string, unless all pages are AMP.
+    // We only path with amp in the query string or amp _wrapper_format, unless all pages are AMP.
     $everywhere = $this->configFactory->get('amp.settings')->get('amp_everywhere');
-    if (!$everywhere && !isset($_GET['amp'])) {
+    $amp_wrapper_format = isset($_GET['_wrapper_format']) && $_GET['_wrapper_format'] == 'amp';
+    $amp = isset($_GET['amp']);
+    if (!$everywhere && !$amp_wrapper_format && !$amp) {
       return TRUE;
     }
     return FALSE;

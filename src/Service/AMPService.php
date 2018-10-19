@@ -2,7 +2,7 @@
 
 namespace Drupal\amp\Service;
 
-use Lullabot\AMP\AMP;
+use Drupal\amp\Service\DrupalAMP;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
@@ -38,7 +38,7 @@ class AMPService extends ServiceProviderBase  {
    * @return AMP
    */
   public function createAMPConverter() {
-    return new AMP();
+    return new DrupalAMP();
   }
 
   /**

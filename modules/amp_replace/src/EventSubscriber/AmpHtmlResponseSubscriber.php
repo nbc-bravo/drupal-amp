@@ -23,6 +23,20 @@ class AmpHtmlResponseSubscriber extends ServiceProviderBase implements EventSubs
   protected $ampHtmlResponseMarkupProcessor;
 
   /**
+   * AMP context service.
+   *
+   * @var Drupal\amp\Routing\AmpContext
+   */
+  protected $ampContext;
+
+  /**
+   * The route match service.
+   *
+   * @var \Drupal\Core\Routing\RouteMatchInterface
+   */
+  protected $routeMatch;
+
+  /**
    * The route amp context to determine whether a route is an amp one.
    *
    * @var \Drupal\amp\Routing\AmpContext

@@ -50,7 +50,7 @@ class AmpNegotiator extends ServiceProviderBase implements ThemeNegotiatorInterf
       // Disable big pipe on AMP pages.
       // @todo Rely on https://www.drupal.org/node/2729441 instead, when it is
       //   resolved.
-      $routeMatch->getRouteObject()->setOption('_no_big_pipe', TRUE);
+      //$routeMatch->getRouteObject()->setOption('_no_big_pipe', TRUE);
     }
     return $is_amp_route;
   }
