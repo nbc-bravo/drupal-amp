@@ -1,7 +1,0 @@
-amp_replace.settings:
-  path: '/admin/config/content/amp-replace'
-  defaults:
-    _form: '\Drupal\amp\Form\AmpReplaceSettingsForm'
-    _title: 'Configure the AMP Replace module'
-  requirements:
-    _permission: 'administer site configuration'

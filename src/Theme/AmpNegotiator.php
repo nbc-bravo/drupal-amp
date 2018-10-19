@@ -45,14 +45,7 @@ class AmpNegotiator extends ServiceProviderBase implements ThemeNegotiatorInterf
    */
   public function applies(RouteMatchInterface $routeMatch) {
     // See if this route and object are AMP, without checking the active theme.
-    $is_amp_route = $this->ampContext->isAmpRoute($routeMatch, NULL, FALSE);
-    if ($is_amp_route) {
-      // Disable big pipe on AMP pages.
-      // @todo Rely on https://www.drupal.org/node/2729441 instead, when it is
-      //   resolved.
-      //$routeMatch->getRouteObject()->setOption('_no_big_pipe', TRUE);
-    }
-    return $is_amp_route;
+    return $this->ampContext->isAmpRoute($routeMatch, NULL, FALSE);
   }
 
   /**

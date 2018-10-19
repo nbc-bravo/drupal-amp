@@ -8,11 +8,12 @@ use Drupal\Core\EventSubscriber\MainContentViewSubscriber;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\amp\Routing\AmpContext;
+use Drupal\Core\DependencyInjection\ServiceProviderBase;
 
 /**
  * Redirects AMP requests to ?_wrapper_format=amp if appropriate.
  */
-class AmpEventSubscriber implements EventSubscriberInterface {
+class AmpEventSubscriber extends ServiceProviderBase implements EventSubscriberInterface {
 
   /**
    * AMP context service.

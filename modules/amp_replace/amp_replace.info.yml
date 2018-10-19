@@ -1,8 +1,7 @@
 name: AMP Replace All
 type: module
-description: Currently broken, not recommended. Turns on Power User mode to replace all page HTML with AMPHTML.
+description: DEPRECATED.
 core: 8.x
 package: AMP
 dependencies:
   - amp:amp
-configure: amp_replace.settings

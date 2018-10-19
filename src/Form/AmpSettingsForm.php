@@ -185,6 +185,16 @@ class AmpSettingsForm extends ConfigFormBase {
       ];
     }
 
+    $form['process_full_html'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Run the whole HTML page through the AMP library'),
+      '#default_value' => $amp_config->get('process_full_html'),
+      '#description' => $this->t('The AMP PHP library will fix many AMP HTML standard non-compliance issues by ' .
+          'removing illegal or disallowed attributes, tags and property value pairs. This is useful for processing the output of modules that ' .
+          'generate AMP unfriendly HTML. Please test when enabling on your site as some modules may depend on ' .
+          'the HTML removed by the library. This feature is currently problematic, the library is often over-aggressive and removes some code you may still want, so use with care.')
+    );
+
    // Hide these and switch to sub modules for each.
    // @TODO Remove from this page once sub modules are created.
    $form['google_analytics_id'] = [

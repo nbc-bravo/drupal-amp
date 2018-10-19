@@ -3,28 +3,85 @@
 namespace Drupal\amp\Render;
 
 use Drupal\Core\Render\MainContent\HtmlRenderer;
+use Drupal\Core\Controller\TitleResolverInterface;
+use Drupal\Component\Plugin\PluginManagerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Render\RendererInterface;
+use Drupal\Core\Render\RenderCacheInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Render\HtmlResponse;
+use Drupal\amp\Service\AMPService;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Lullabot\AMP\Validate\Scope;
 
 /**
- * Default main content renderer for HTML requests.
+ * Default main content renderer for AMPHTML requests.
  *
- * For attachment handling of HTML responses:
  * @see template_preprocess_html()
  * @see \Drupal\Core\Render\MainContent\HtmlRenderer
  */
 class AmpHtmlRenderer extends HtmlRenderer {
 
   /**
+   * @var \Drupal\amp\Service\AMPService
+   */
+  protected $ampService;
+
+  /**
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * Constructs a new HtmlRenderer.
+   *
+   * @param \Drupal\Core\Controller\TitleResolverInterface $title_resolver
+   *   The title resolver.
+   * @param \Drupal\Component\Plugin\PluginManagerInterface $display_variant_manager
+   *   The display variant manager.
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   *   The event dispatcher.
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   *   The module handler.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer service.
+   * @param \Drupal\Core\Render\RenderCacheInterface $render_cache
+   *   The render cache service.
+   * @param array $renderer_config
+   *   The renderer configuration array.
+   * @param \Drupal\amp\Service\AMPService $amp_service
+   *   The AMP service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The configuration factory.
+   */
+  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, AMPService $amp_service, ConfigFactoryInterface $config_factory) {
+    $this->titleResolver = $title_resolver;
+    $this->displayVariantManager = $display_variant_manager;
+    $this->eventDispatcher = $event_dispatcher;
+    $this->moduleHandler = $module_handler;
+    $this->renderer = $renderer;
+    $this->renderCache = $render_cache;
+    $this->rendererConfig = $renderer_config;
+    $this->ampService = $amp_service;
+    $this->configFactory = $config_factory;
+  }
+
+  /**
    * {@inheritdoc}
    *
-   * Exact copy of Drupal\Core\Render\MainContent\HtmlRenderer:renderResponse(),
-   * except this method calls runs renderRoot() instead of render() to force
-   * placeholders to be replaced on the server because Big Pipe and other
-   * placeholder replacement javascript won't be available on the client.
+   * Copy of Drupal\Core\Render\MainContent\HtmlRenderer:renderResponse()
+   * with two important differences:
+   *
+   * - the page is run through renderRoot() instead of render() to force
+   *   placeholders to be replaced on the server, because Big Pipe and other
+   *   placeholder replacement javascript won't be available on the client.
+   *
+   * - the final page markup may be also be run through the AMP converter,
+   *   depending on configuration in the AMP Replace module.
    *
    * @TODO Need to watch for changes to parent method and mirror them here.
    */
@@ -49,24 +106,30 @@ class AmpHtmlRenderer extends HtmlRenderer {
     // page.html.twig, hence add them here, just before rendering html.html.twig.
     $this->buildPageTopAndBottom($html);
 
-    // Render and replace placeholders. To replace placeholders, we use
-    // RendererInterface::renderRoot() instead of RendererInterface::render().
+    // Render and replace placeholders using RendererInterface::renderRoot()
+    // instead of RendererInterface::render().
     // @see \Drupal\Core\Render\HtmlResponseAttachmentsProcessor.
     $render_context = new RenderContext();
     $this->renderer->executeInRenderContext($render_context, function () use (&$html) {
-      // RendererInterface::render() renders the $html render array and updates
-      // it in place. We don't care about the return value (which is just
-      // $html['#markup']), but about the resulting render array.
       // @todo Simplify this when https://www.drupal.org/node/2495001 lands.
       $this->renderer->renderRoot($html);
     });
-
     $content = $this->renderCache->getCacheableRenderArray($html);
 
-    // Also associate the required cache contexts.
-    // (Because we use ::render() above and not ::renderRoot(), we manually must
-    // ensure the HTML response varies by the required cache contexts.)
-    $content['#cache']['contexts'] = Cache::mergeContexts($content['#cache']['contexts'], $this->rendererConfig['required_cache_contexts']);
+    // See if the final page markup should be run through the AMP converter.
+    $ampReplaceConfig = $this->configFactory->get('amp.settings');
+    if (!empty($ampReplaceConfig->get('process_full_html'))) {
+      $markup = $content['#markup']->__toString();
+      $options = ['scope' => Scope::HTML_SCOPE];
+      $amp = $this->ampService->createAMPConverter();
+      $amp->clear();
+      $amp->loadHtml($markup, $options);
+      $content['#markup'] = $amp->convertToAmpHtml();
+
+      // Uncomment for debugging.
+      //dpm($amp->warningsHumanHtml());
+      //dpm($amp->getInputOutputHtmlDiff());
+    }
 
     // Also associate the "rendered" cache tag. This allows us to invalidate the
     // entire render cache, regardless of the cache bin.
