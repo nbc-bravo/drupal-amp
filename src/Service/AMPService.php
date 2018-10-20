@@ -126,7 +126,7 @@ class AMPService extends ServiceProviderBase  {
    * Passthrough to check route without also loading AmpContext.
    */
    public function isAmpRoute(RouteMatchInterface $routeMatch = NULL, $entity = NULL, $checkTheme = TRUE) {
-     return $this->ampContext->isAmpRoute(RouteMatchInterface $routeMatch, $entity, $checkTheme);
+     return $this->ampContext->isAmpRoute($routeMatch, $entity, $checkTheme);
    }
 
   /**
@@ -150,7 +150,7 @@ class AMPService extends ServiceProviderBase  {
    * then renders the message.
    *
    * @param mixed $message
-   *   Could be a render array, a string, or an array.
+   *   Could be a render array or a string.
    * @param string $method
    *   The message method to use, defaults to 'addMessage'.
    *

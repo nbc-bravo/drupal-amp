@@ -112,7 +112,6 @@ class AmpHtmlRenderer extends HtmlRenderer {
       $markup = $content['#markup']->__toString();
       $options = ['scope' => Scope::HTML_SCOPE];
       $amp = $this->ampService->createAMPConverter();
-      $amp->clear();
       $amp->loadHtml($markup, $options);
       $content['#markup'] = $amp->convertToAmpHtml();
 
