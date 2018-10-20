@@ -15,7 +15,6 @@ use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Render\HtmlResponse;
 use Drupal\amp\Service\AMPService;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Lullabot\AMP\Validate\Scope;
 
 /**
@@ -30,11 +29,6 @@ class AmpHtmlRenderer extends HtmlRenderer {
    * @var \Drupal\amp\Service\AMPService
    */
   protected $ampService;
-
-  /**
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
 
   /**
    * Constructs a new HtmlRenderer.
@@ -55,10 +49,8 @@ class AmpHtmlRenderer extends HtmlRenderer {
    *   The renderer configuration array.
    * @param \Drupal\amp\Service\AMPService $amp_service
    *   The AMP service.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
    */
-  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, AMPService $amp_service, ConfigFactoryInterface $config_factory) {
+  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, AMPService $amp_service) {
     $this->titleResolver = $title_resolver;
     $this->displayVariantManager = $display_variant_manager;
     $this->eventDispatcher = $event_dispatcher;
@@ -67,7 +59,6 @@ class AmpHtmlRenderer extends HtmlRenderer {
     $this->renderCache = $render_cache;
     $this->rendererConfig = $renderer_config;
     $this->ampService = $amp_service;
-    $this->configFactory = $config_factory;
   }
 
   /**
@@ -117,8 +108,7 @@ class AmpHtmlRenderer extends HtmlRenderer {
     $content = $this->renderCache->getCacheableRenderArray($html);
 
     // See if the final page markup should be run through the AMP converter.
-    $ampReplaceConfig = $this->configFactory->get('amp.settings');
-    if (!empty($ampReplaceConfig->get('process_full_html'))) {
+    if (!empty($this->ampService->ampConfig('process_full_html'))) {
       $markup = $content['#markup']->__toString();
       $options = ['scope' => Scope::HTML_SCOPE];
       $amp = $this->ampService->createAMPConverter();
@@ -126,9 +116,9 @@ class AmpHtmlRenderer extends HtmlRenderer {
       $amp->loadHtml($markup, $options);
       $content['#markup'] = $amp->convertToAmpHtml();
 
-      // Uncomment for debugging.
-      //dpm($amp->warningsHumanHtml());
-      //dpm($amp->getInputOutputHtmlDiff());
+      $this->ampService->devMessage('<pre>' . $amp->warningsHumanHtml() . '</pre>');
+      $this->ampService->devMessage('<pre>' . $amp->getInputOutputHtmlDiff() . '</pre>');
+
     }
 
     // Also associate the "rendered" cache tag. This allows us to invalidate the

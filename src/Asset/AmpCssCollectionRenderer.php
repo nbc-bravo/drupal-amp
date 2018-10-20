@@ -3,10 +3,11 @@
 namespace Drupal\amp\Asset;
 
 use Drupal\Core\Asset\CssCollectionRenderer;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\amp\Routing\AmpContext;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\amp\Service\AMPService;
 use Drupal\Core\State\StateInterface;
 use Drupal\Component\Utility\Html;
+use Drupal\Core\Render\RendererInterface;
 
 /**
  * Renders CSS assets.
@@ -38,29 +39,30 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
   protected $cssCollectionRenderer;
 
   /**
-   * The config factory.
+   * The renderer.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\Core\Render\RendererInterface
    */
-  protected $configFactory;
+  protected $renderer;
 
   /**
-   * The route amp context to determine whether a route is an amp one.
-   *
-   * @var \Drupal\amp\Routing\AmpContext
+   * @var \Drupal\amp\Service\AMPService
    */
-  protected $ampContext;
+  protected $ampService;
 
   /**
    * Constructs a CssCollectionRenderer.
    *
    * @param \Drupal\Core\State\StateInterface $state
    *   The state key/value store.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The renderer.
    */
-  public function __construct(CssCollectionRenderer $cssCollectionRenderer, ConfigFactoryInterface $configFactory, AmpContext $ampContext, StateInterface $state) {
+  public function __construct(CssCollectionRenderer $cssCollectionRenderer, StateInterface $state, AmpService $ampService, RendererInterface $renderer) {
     $this->cssCollectionRenderer = $cssCollectionRenderer;
-    $this->configFactory = $configFactory;
-    $this->ampContext = $ampContext;
+    $this->state = $state;
+    $this->ampService = $ampService;
+    $this->renderer = $renderer;
     parent::__construct($state);
   }
 
@@ -71,7 +73,7 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
     // Retrieve the normal css render array.
     $elements = parent::render($css_assets);
     // Intervene only if this is an AMP page.
-    if (!$this->ampContext->isAmpRoute()) {
+    if (!$this->ampService->isAmpRoute()) {
       return $elements;
     }
 
@@ -89,7 +91,7 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
           $css = $this->strip($css);
           $size += strlen($css);
           $all_css[] = $css;
-          $files[$url] = $this->format(strlen($css));
+          $files[] = [$this->format(strlen($css)), $url];
          }
         // Implode, wrap in @media, and minify results.
         $value = implode("", $all_css);
@@ -118,7 +120,7 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
           $css = $this->strip($css);
           $size += strlen($css);
           $all_css[] = $css;
-          $files[$url] = $this->format(strlen($css));
+          $files[] = [$this->format(strlen($css)), $url];
           $element['#value'] = $css;
           $elements[$key] = $element;
           $elements[$key]['#merged'] = TRUE;
@@ -146,18 +148,31 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
     ];
 
     // Display info about inline css if &development is appended to url.
+    dpm($_GET['development']);
     $current_page = \Drupal::request()->getRequestUri();
     if (!empty(stristr($current_page, 'development'))) {
-      $output = '<h2>' . 'CSS Filesize' . '</h2>';
+      $title = 'CSS Filesize';
       $difference = ($size - 50000);
       $over = $difference > 0 ? t('so your css is :difference too big', [':difference' => $this->format(abs($difference))]) : '';
       $under = $difference <= 0 ? t('so you have :difference to spare', [':difference' => $this->format(abs($difference))]) : '';
-      $output .= t('The size of the css on this page is :size. The AMP limit is :limit, :overunder. The included css files and their sizes are listed for ease in finding large files to optimize. For the best information about individual files sizes, visit this page while optimization is turned off.', [':size' => $this->format($size), ':limit' => $this->format(50000), ':overunder' => $over . $under]);
-      $files = array_flip($files);
-      //krsort($files);
-      if (function_exists('dpm')) {
-        dpm($output);
-        dpm($files);
+      $output = t('The size of the css on this page is :size. The AMP limit is :limit, :overunder. The included css files and their sizes are listed for ease in finding large files to optimize. For the best information about individual file sizes, visit this page while optimization is turned off.', [':size' => $this->format($size), ':limit' => $this->format(50000), ':overunder' => $over . $under]);
+
+      $build = [
+        '#type' => 'table',
+        '#header' => ['Size', 'File'],
+        '#rows' => $files,
+      ];
+      $table = $this->renderer->renderRoot($build);
+
+      if ($difference > 0) {
+        $this->ampService->devMessage($title, 'addError');
+        $this->ampService->devMessage($output, 'addError');
+        $this->ampService->devMessage($table, 'addError');
+      }
+      else {
+        $this->ampService->devMessage($title);
+        $this->ampService->devMessage($output);
+        $this->ampService->devMessage($table);
       }
     }
     return $elements;
@@ -210,6 +225,6 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
    *   The formatted number.
    */
   public function format($value) {
-    return number_format($value, 0) . ' ' . t('bytes');
+    return number_format($value, 0);
   }
 }

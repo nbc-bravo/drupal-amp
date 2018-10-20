@@ -12,7 +12,7 @@ services:
     arguments: ['@entity_type.manager', '@cache.default']
   amp.utilities:
     class: Drupal\amp\Service\AMPService
-    arguments: []
+    arguments: ['@messenger', '@config.factory', '@router.amp_context', '@renderer']
   amp.query_parameters:
     class: Drupal\amp\Utility\AmpQueryParameters
   amp_response.attachments_processor:
@@ -26,7 +26,7 @@ services:
     class: \Drupal\amp\Asset\AmpCssCollectionRenderer
     decorates: asset.css.collection_renderer
     decoration_inner_name: amp.css.collection_renderer.original
-    arguments: ['@amp.css.collection_renderer.original', '@config.factory', '@router.amp_context', '@state']
+    arguments: ['@amp.css.collection_renderer.original', '@state', '@amp.utilities', '@renderer']
   main_content_renderer.amp:
     class: Drupal\amp\Render\AmpHtmlRenderer
     arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache', '%renderer.config%', '@amp.utilities', '@config.factory']

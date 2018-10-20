@@ -322,9 +322,11 @@ class AmpSettingsForm extends ConfigFormBase {
     $amptheme_config->setData(['amptheme' => $amptheme]);
     $amptheme_config->save();
 
+    $amp_config = $this->config('amp.settings');
+    $amp_config->set('process_full_html', $form_state->getValue('process_full_html'))->save();
+
     // @TODO Remove once moved into sub modules.
     // Other module settings.
-    //$amp_config = $this->config('amp.settings');
 
     //$amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
     //$amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
