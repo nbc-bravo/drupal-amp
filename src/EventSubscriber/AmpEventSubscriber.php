@@ -74,7 +74,7 @@ class AmpEventSubscriber extends ServiceProviderBase implements EventSubscriberI
    */
   public static function getSubscribedEvents() {
     // Run before main_content_view_subscriber.
-    $events[KernelEvents::VIEW][] = ['onView', 1];
+    $events[KernelEvents::VIEW][] = ['onView', 100];
     return $events;
   }
 

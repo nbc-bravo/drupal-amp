@@ -3,6 +3,8 @@ amp.settings_tab:
   defaults:
     _form: '\Drupal\amp\Form\AmpSettingsForm'
     _title: 'Configure the AMP module'
+  options:
+    _admin_route: TRUE
   requirements:
     _permission: 'administer site configuration'
 

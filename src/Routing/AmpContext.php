@@ -90,6 +90,7 @@ class AmpContext extends ServiceProviderBase {
     if (!$routeMatch) {
       $routeMatch = $this->routeMatch;
     }
+
     // Some routes cannot be AMP.
     if ($route_is_not_amp = $this->routeIsNotAmp($routeMatch)) {
       return FALSE;
@@ -165,14 +166,11 @@ class AmpContext extends ServiceProviderBase {
    * @return boolean
    */
   public function routeIsNotAmp(RouteMatchInterface $routeMatch) {
-    $route = $routeMatch->getRouteObject();
-    if (!$route instanceof Route) {
-       return TRUE;
-    }
     // Is this an admin route?
     if ($this->adminContext->isAdminRoute()) {
       return TRUE;
     }
+
     // Only path with amp in the query string or amp _wrapper_format, unless all pages are AMP.
     $everywhere = $this->configFactory->get('amp.settings')->get('amp_everywhere');
     $amp_wrapper_format = isset($_GET['_wrapper_format']) && $_GET['_wrapper_format'] == 'amp';

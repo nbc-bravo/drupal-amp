@@ -35,7 +35,7 @@ class AmpQueryParameters extends ServiceProviderBase {
 
     // Append optional development query string parameter.
     if ($development) {
-      $amp_url = $amp_url . "&development";
+      $amp_url = $amp_url . "&debug#development=1";
     }
 
     return $amp_url;

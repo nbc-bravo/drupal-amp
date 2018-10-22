@@ -147,8 +147,8 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
       '#value' => $merged,
     ];
 
-    // Display info about inline css if &development is appended to url.
-    if (array_key_exists('development', $_GET)) {
+    // Display info about inline css if #development=1 is appended to url.
+    if ($this->ampService->isDevPage()) {
       $title = 'CSS Filesize';
       $difference = ($size - 50000);
       $over = $difference > 0 ? t('so your css is :difference too big', [':difference' => $this->format(abs($difference))]) : '';

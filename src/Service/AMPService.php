@@ -2,7 +2,7 @@
 
 namespace Drupal\amp\Service;
 
-use Drupal\amp\Service\DrupalAMP;
+use Drupal\amp\AMP\DrupalAMP;
 use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -57,10 +57,14 @@ class AMPService extends ServiceProviderBase  {
   protected $themeConfig;
 
   /**
-   * Constructs a CssCollectionRenderer.
+   * Constructs an AMPService instance.
    *
    * @param \Drupal\Core\Messenger\MessengerInterface $messenger
    *   Core messager service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   Configuration factory.
+   * @param \Drupal\amp\Routing\AmpContext $ampContext
+   *   AMP context.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
    */
@@ -79,7 +83,7 @@ class AMPService extends ServiceProviderBase  {
    * @return array
    *   An array keyed by library names of the javascript urls in each library.
    */
-  protected function mapJSToNames() {
+  public function mapJSToNames() {
     $libraries = [];
     $definitions = \Drupal::service('library.discovery')->getLibrariesByExtension('amp');
     foreach ($definitions as $name => $definition) {
@@ -125,9 +129,9 @@ class AMPService extends ServiceProviderBase  {
   /**
    * Passthrough to check route without also loading AmpContext.
    */
-   public function isAmpRoute(RouteMatchInterface $routeMatch = NULL, $entity = NULL, $checkTheme = TRUE) {
-     return $this->ampContext->isAmpRoute($routeMatch, $entity, $checkTheme);
-   }
+  public function isAmpRoute(RouteMatchInterface $routeMatch = NULL, $entity = NULL, $checkTheme = TRUE) {
+    return $this->ampContext->isAmpRoute($routeMatch, $entity, $checkTheme);
+  }
 
   /**
    * Helper to quickly get AMP theme config setting.
@@ -144,6 +148,14 @@ class AMPService extends ServiceProviderBase  {
   }
 
   /**
+   * Helper to see if we are on a development page.
+   */
+  public function isDevPage() {
+    $current_page = \Drupal::request()->getQueryString();
+    return !empty(stristr($current_page, 'debug')) || !empty(stristr($current_page, 'development'));
+  }
+
+  /**
    * Display a development message.
    *
    * Determines if this is a page where a message should be displayed,
@@ -153,17 +165,22 @@ class AMPService extends ServiceProviderBase  {
    *   Could be a render array or a string.
    * @param string $method
    *   The message method to use, defaults to 'addMessage'.
+   *   Set message to empty or invalid value to just return the message instead
+   *   of displaying it.
    *
-   * @return
-   *   No return, triggers a messenger message.
+   * @return string
+   *   Returns the message.
    */
   public function devMessage($message, $method = 'addMessage') {
-    $current_page = \Drupal::request()->getRequestUri();
-    if (!empty(stristr($current_page, 'development'))) {
+    $user = \Drupal::currentUser();
+    if ($this->isDevPage() && $user->hasPermission('administer nodes')) {
       $rendered_message = \Drupal\Core\Render\Markup::create($message);
-      $error_message = new TranslatableMarkup ('@message', array('@message' => $rendered_message));
-
-      $this->messenger->$method($error_message);
+      $translated_message = new TranslatableMarkup ('@message', array('@message' => $rendered_message));
+      if (method_exists($this->messenger, $method)) {
+        $this->messenger->$method($translated_message);
+      }
+      return $translated_message;
     }
   }
+
 }

@@ -31,7 +31,7 @@ services:
     class: Drupal\amp\Render\AmpHtmlRenderer
     arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache', '%renderer.config%', '@amp.utilities', '@config.factory']
     tags:
-      - { name: render.main_content_renderer, format: amp }
+      - { name: render.main_content_renderer, format: amp, priority: 1 }
   amp_event_subscriber:
     class: Drupal\amp\EventSubscriber\AmpEventSubscriber
     arguments: ['@router.amp_context', '@current_route_match']

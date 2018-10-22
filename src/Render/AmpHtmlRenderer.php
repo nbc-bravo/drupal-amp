@@ -72,7 +72,7 @@ class AmpHtmlRenderer extends HtmlRenderer {
    *   placeholder replacement javascript won't be available on the client.
    *
    * - the final page markup may be also be run through the AMP converter,
-   *   depending on configuration in the AMP Replace module.
+   *   depending on configuration in the AMP module.
    *
    * @TODO Need to watch for changes to parent method and mirror them here.
    */
@@ -93,6 +93,11 @@ class AmpHtmlRenderer extends HtmlRenderer {
       'page' => $page,
     ];
 
+    $html['page']['#cache']['contexts'] += ['url.query_args:amp'];
+    if ($this->ampService->isDevPage()) {
+      $html['page']['#cache']['contexts'] += ['url.query_args:development'];
+    }
+
     // The special page regions will appear directly in html.html.twig, not in
     // page.html.twig, hence add them here, just before rendering html.html.twig.
     $this->buildPageTopAndBottom($html);
@@ -107,16 +112,50 @@ class AmpHtmlRenderer extends HtmlRenderer {
     });
     $content = $this->renderCache->getCacheableRenderArray($html);
 
-    // See if the final page markup should be run through the AMP converter.
+    // See if the page markup should be run through the AMP converter.
     if (!empty($this->ampService->ampConfig('process_full_html'))) {
-      $markup = $content['#markup']->__toString();
-      $options = ['scope' => Scope::HTML_SCOPE];
-      $amp = $this->ampService->createAMPConverter();
-      $amp->loadHtml($markup, $options);
-      $content['#markup'] = $amp->convertToAmpHtml();
 
-      $this->ampService->devMessage('<pre>' . $amp->warningsHumanHtml() . '</pre>');
-      $this->ampService->devMessage('<pre>' . $amp->getInputOutputHtmlDiff() . '</pre>');
+      // Replacing the entire page won't work because the page head still
+      // contains placeholders for libraries and css. So replace only the
+      // contents of <body>.
+      $amp = $this->ampService->createAMPConverter();
+      $markup = $content['#markup']->__toString();
+
+      // Retrieve the internal contents of <body></body> and run it through AMP.
+      $pattern = "/<body[^>]*>(.*?)<\/body>/is";
+      preg_match($pattern, $markup, $matches);
+      $body = $matches[1];
+      $amp->loadHtml($body);
+      $replaced_body = $amp->convertToAmpHtml();
+
+      // Find the replaced body tag attributes.
+      $attr_pattern = "/<body[^>](.*?)>/is";
+      preg_match($attr_pattern, $markup, $matches);
+      $attributes = $matches[1];
+
+      // Reconstruct the page with the updated body.
+      $replaced_body = '<body ' . $attributes . '>' . $replaced_body . '<body>';
+      $content['#markup'] = preg_replace($pattern, $replaced_body, $markup);
+
+      // Add additional required javascript libraries, if found. No worry about
+      // duplication of previously-added libraries since Drupal's libraries
+      // system will properly handle that.
+      if (!empty($amp->getComponentJs())) {
+        $libraries = $this->ampService->addComponentLibraries($amp->getComponentJs());
+      }
+
+      // If development messages are displayed, display the changes made to the
+      // markup as a diff.
+      if (!empty($amp->getInputOutputHtmlDiff())) {
+        $title = '<h2>' . t('AMP converter changes') . '</h2>';
+        $pre = '<div>' . t('The AMP converter made the following changes to ' .
+          'this page. If you do not want this behavior, turn off the option ' .
+          'to <strong>Run the page body through the AMP converter</strong> ' .
+          'in the AMP settings.') .
+          '</div>';
+        $this->ampService->devMessage($title . $pre . '<pre>' . $amp->getInputOutputHtmlDiff() . '</pre>');
+      }
+      $content['#attached']['library'] = array_merge($content['#attached']['library'], $libraries);
 
     }
 

@@ -4,6 +4,15 @@ use Drupal\image\Entity\ImageStyle;
 use Drupal\image\ImageStyleInterface;
 
 /**
+ * Implements hook_install().
+ */
+function amp_install() {
+  // Assign a fairly low weight to ensure our implementation of
+  // hook_module_implements_alter() is run among the last ones.
+  module_set_weight('amp', 10);
+}
+
+/**
  * Implements hook_requirements().
  */
 function amp_requirements($phase) {
@@ -198,3 +207,9 @@ function amp_update_8007() {
   return (string) t("Removed the css everywhere setting, css is always rendered that way in 8.3.");
 }
 
+/**
+ * Set module weight to ensure AMP runs after most modules.
+ */
+function amp_update_8008() {
+  module_set_weight('amp', 10);
+}
