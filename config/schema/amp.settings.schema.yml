@@ -7,9 +7,6 @@ amp.settings:
     google_analytics_id:
       type: string
       label: 'Google Analytics Web Property ID'
-    google_adsense_id:
-      type: string
-      label: 'Google AdSense Publisher ID'
     google_doubleclick_id:
       type: string
       label: 'Google DoubleClick for Publishers Network ID'

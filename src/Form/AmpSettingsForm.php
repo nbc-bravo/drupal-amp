@@ -259,16 +259,6 @@ class AmpSettingsForm extends ConfigFormBase {
       '#placeholder' => 'UA-',
       '#access' => FALSE,
     ];
-    $form['google_adsense_id'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Google AdSense Publisher ID'),
-      '#default_value' => $amp_config->get('google_adsense_id'),
-      '#maxlength' => 25,
-      '#size' => 20,
-      '#placeholder' => 'pub-',
-      '#description' => $this->t('This is the Google AdSense Publisher ID for the site owner. Get this in your Google Adsense account. It should be similar to pub-9999999999999'),
-      '#access' => FALSE,
-    );
     $form['google_doubleclick_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('Google DoubleClick for Publishers Network ID'),
@@ -354,13 +344,6 @@ class AmpSettingsForm extends ConfigFormBase {
       }
     }
 
-    // Validate the Google Adsense ID.
-    if (!empty($form_state->getValue('google_adsense_id'))) {
-      $form_state->setValue('google_adsense_id', trim($form_state->getValue('google_adsense_id')));
-      if (!preg_match('/^pub-[0-9]+$/', $form_state->getValue('google_adsense_id'))) {
-        $form_state->setErrorByName('google_adsense_id', t('A valid Google AdSense Publisher ID is case sensitive and formatted like pub-9999999999999'));
-      }
-    }
   }
 
   /**
