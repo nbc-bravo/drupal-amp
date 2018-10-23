@@ -213,3 +213,10 @@ function amp_update_8007() {
 function amp_update_8008() {
   module_set_weight('amp', 10);
 }
+
+/**
+ * Set module weight to ensure AMP runs after most modules.
+ */
+function amp_update_8009() {
+  module_set_weight('amp', 0);
+}
