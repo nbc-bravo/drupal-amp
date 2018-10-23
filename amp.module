@@ -195,43 +195,6 @@ function amp_theme() {
         'attributes' => []
       ],
     ],
-    'amp_pixel' => [
-      'variables' => [
-        'domain' => NULL,
-        'query_string' => NULL,
-        'subs' => [
-          'AMPDOC_HOST' => ['active' => FALSE],
-          'AMPDOC_URL' => ['active' => FALSE],
-          'CANONICAL_HOST' => ['active' => FALSE],
-          'CANONICAL_PATH' => ['active' => FALSE],
-          'CANONICAL_URL' => ['active' => FALSE],
-          'SOURCE_URL' => ['active' => FALSE],
-          'SOURCE_HOST' => ['active' => FALSE],
-          'DOCUMENT_CHARSET' => ['active' => FALSE],
-          'DOCUMENT_REFERRER' => ['active' => FALSE],
-          'TITLE' => ['active' => FALSE],
-          'VIEWER' => ['active' => FALSE],
-          'CONTENT_LOAD_TIME' => ['active' => FALSE],
-          'DOMAIN_LOOKUP_TIME' => ['active' => FALSE],
-          'DOM_INTERACTIVE_TIME' => ['active' => FALSE],
-          'PAGE_DOWNLOAD_TIME' => ['active' => FALSE],
-          'PAGE_LOAD_TIME' => ['active' => FALSE],
-          'REDIRECT_TIME' => ['active' => FALSE],
-          'SERVER_RESPONSE_TIME' => ['active' => FALSE],
-          'TCP_CONNECT_TIME' => ['active' => FALSE],
-          'AVAILABLE_SCREEN_HEIGHT' => ['active' => FALSE],
-          'AVAILABLE_SCREEN_WIDTH' => ['active' => FALSE],
-          'BROWSER_LANGUAGE' => ['active' => FALSE],
-          'SCREEN_COLOR_DEPTH' => ['active' => FALSE],
-          'VIEWPORT_HEIGHT' => ['active' => FALSE],
-          'VIEWPORT_WIDTH' => ['active' => FALSE],
-          'PAGE_VIEW_ID' => ['active' => FALSE],
-          'RANDOM' => ['active' => FALSE],
-          'TIMESTAMP' => ['active' => FALSE],
-          'TOTAL_ENGAGED_TIME' => ['active' => FALSE],
-        ],
-      ],
-    ],
     'block__amp_system_branding_block' => [
       'render element' => 'elements',
       'base hook' => 'block',
@@ -291,6 +254,43 @@ function amp_theme() {
         'attributes' => [],
       ],
     ],
+    'amp_pixel' => [
+      'variables' => [
+        'domain' => NULL,
+        'query_string' => NULL,
+        'subs' => [
+          'AMPDOC_HOST' => ['active' => FALSE],
+          'AMPDOC_URL' => ['active' => FALSE],
+          'CANONICAL_HOST' => ['active' => FALSE],
+          'CANONICAL_PATH' => ['active' => FALSE],
+          'CANONICAL_URL' => ['active' => FALSE],
+          'SOURCE_URL' => ['active' => FALSE],
+          'SOURCE_HOST' => ['active' => FALSE],
+          'DOCUMENT_CHARSET' => ['active' => FALSE],
+          'DOCUMENT_REFERRER' => ['active' => FALSE],
+          'TITLE' => ['active' => FALSE],
+          'VIEWER' => ['active' => FALSE],
+          'CONTENT_LOAD_TIME' => ['active' => FALSE],
+          'DOMAIN_LOOKUP_TIME' => ['active' => FALSE],
+          'DOM_INTERACTIVE_TIME' => ['active' => FALSE],
+          'PAGE_DOWNLOAD_TIME' => ['active' => FALSE],
+          'PAGE_LOAD_TIME' => ['active' => FALSE],
+          'REDIRECT_TIME' => ['active' => FALSE],
+          'SERVER_RESPONSE_TIME' => ['active' => FALSE],
+          'TCP_CONNECT_TIME' => ['active' => FALSE],
+          'AVAILABLE_SCREEN_HEIGHT' => ['active' => FALSE],
+          'AVAILABLE_SCREEN_WIDTH' => ['active' => FALSE],
+          'BROWSER_LANGUAGE' => ['active' => FALSE],
+          'SCREEN_COLOR_DEPTH' => ['active' => FALSE],
+          'VIEWPORT_HEIGHT' => ['active' => FALSE],
+          'VIEWPORT_WIDTH' => ['active' => FALSE],
+          'PAGE_VIEW_ID' => ['active' => FALSE],
+          'RANDOM' => ['active' => FALSE],
+          'TIMESTAMP' => ['active' => FALSE],
+          'TOTAL_ENGAGED_TIME' => ['active' => FALSE],
+        ],
+      ],
+    ],
   ];
   return $theme;
 }
@@ -347,28 +347,6 @@ function amp_page_bottom(array &$page_bottom) {
       $page_bottom['amp_analytics'] = $amp_analytics;
     }
 
-    if (\Drupal::config('amp.settings')->get('amp_pixel')) {
-      $domain = \Drupal::config('amp.settings')->get('amp_pixel_domain_name');
-      $query_string = \Drupal::config('amp.settings')->get('amp_pixel_query_string');
-      if (!empty($domain) && !empty($query_string)) {
-        $subs_random = \Drupal::config('amp.settings')->get('amp_pixel_random_number');
-
-        $subs = [
-          'RANDOM' => [
-            'active' => $subs_random ? TRUE : FALSE
-          ]
-        ];
-
-        $amp_pixel = [
-          '#theme' => 'amp_pixel',
-          '#domain' => $domain,
-          '#query_string' => $query_string,
-          '#subs' => $subs
-        ];
-
-        $page_bottom['amp_pixel'] = $amp_pixel;
-      }
-    }
   }
 }
 

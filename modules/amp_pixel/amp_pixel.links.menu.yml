@@ -1,0 +1,5 @@
+amp_pixel.settings_tab:
+  title: 'AMP Pixel Configuration'
+  parent: amp.settings_tab
+  description: 'Configure the AMP Pixel module.'
+  route_name: amp_pixel.settings_tab

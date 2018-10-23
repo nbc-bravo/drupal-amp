@@ -1,0 +1,7 @@
+name: AMP Pixel
+type: module
+description: Creates and configures an amp-pixel element and adds it to the page bottom.
+core: 8.x
+package: AMP
+dependencies:
+  - amp:amp
