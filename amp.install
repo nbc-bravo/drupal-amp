@@ -7,9 +7,6 @@ use Drupal\image\ImageStyleInterface;
  * Implements hook_install().
  */
 function amp_install() {
-  // Assign a fairly low weight to ensure our implementation of
-  // hook_module_implements_alter() is run among the last ones.
-  module_set_weight('amp', 10);
 }
 
 /**
