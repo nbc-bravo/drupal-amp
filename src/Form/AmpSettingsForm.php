@@ -259,16 +259,6 @@ class AmpSettingsForm extends ConfigFormBase {
       '#placeholder' => 'UA-',
       '#access' => FALSE,
     ];
-    $form['google_doubleclick_id'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('Google DoubleClick for Publishers Network ID'),
-      '#default_value' => $amp_config->get('google_doubleclick_id'),
-      '#maxlength' => 25,
-      '#size' => 20,
-      '#placeholder' => '/',
-      '#description' => $this->t('The Network ID to use on all tags. This value should begin with a /.'),
-      '#access' => FALSE,
-    );
     $form['pixel_group'] = array(
       '#type' => 'fieldset',
       '#title' => t('amp-pixel'),

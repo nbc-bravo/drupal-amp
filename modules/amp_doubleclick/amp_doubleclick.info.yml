@@ -1,0 +1,7 @@
+name: AMP DoubleClick
+type: module
+description: Very basic integration with DoubleClick ads.
+core: 8.x
+package: AMP
+dependencies:
+  - amp:amp

@@ -7,9 +7,6 @@ amp.settings:
     google_analytics_id:
       type: string
       label: 'Google Analytics Web Property ID'
-    google_doubleclick_id:
-      type: string
-      label: 'Google DoubleClick for Publishers Network ID'
     amp_pixel:
       type: boolean
       label: 'Whether the amp-pixel should be included'
