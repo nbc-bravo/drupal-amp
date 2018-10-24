@@ -50,6 +50,13 @@ class AmpEventSubscriber extends ServiceProviderBase implements EventSubscriberI
    */
   public function onView(GetResponseForControllerResultEvent $event) {
 
+    // Don't interfere if this is a request that does not use html or amp
+    // wrapper formats.
+    $wrapper_format = isset($_GET['_wrapper_format']) ? $_GET['_wrapper_format'] : '';
+    if (!empty($wrapper_format) || !in_array($wrapper_format, ['html', 'amp'])) {
+      return;
+    }
+
     // See if this is a request that already uses the wrapper.
     $amp_wrapper_format = isset($_GET['_wrapper_format']) && $_GET['_wrapper_format'] == 'amp';
 
