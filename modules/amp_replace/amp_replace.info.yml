@@ -1,7 +1,0 @@
-name: AMP Replace All
-type: module
-description: DEPRECATED.
-core: 8.x
-package: AMP
-dependencies:
-  - amp:amp
