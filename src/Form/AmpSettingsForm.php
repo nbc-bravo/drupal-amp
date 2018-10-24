@@ -280,27 +280,6 @@ class AmpSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-
-    return;
-
-    // @TODO Remove once moved into separate sub modules.
-    parent::validateForm($form, $form_state);
-    // Validate the Google Analytics ID.
-    if (!empty($form_state->getValue('google_analytics_id'))) {
-      $form_state->setValue('google_analytics_id', trim($form_state->getValue('google_analytics_id')));
-      // Replace all type of dashes (n-dash, m-dash, minus) with normal dashes.
-      $form_state->setValue('google_analytics_id', str_replace(['–', '—', '−'], '-', $form_state->getValue('google_analytics_id')));
-      if (!preg_match('/^UA-\d+-\d+$/', $form_state->getValue('google_analytics_id'))) {
-        $form_state->setErrorByName('google_analytics_id', t('A valid Google Analytics Web Property ID is case sensitive and formatted like UA-xxxxxxx-yy.'));
-      }
-    }
-
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
 
     // AMP theme settings.
@@ -311,18 +290,6 @@ class AmpSettingsForm extends ConfigFormBase {
 
     $amp_config = $this->config('amp.settings');
     $amp_config->set('process_full_html', $form_state->getValue('process_full_html'))->save();
-
-    // @TODO Remove once moved into sub modules.
-    // Other module settings.
-
-    //$amp_config->set('google_analytics_id', $form_state->getValue('google_analytics_id'))->save();
-    //$amp_config->set('google_adsense_id', $form_state->getValue('google_adsense_id'))->save();
-    //$amp_config->set('google_doubleclick_id', $form_state->getValue('google_doubleclick_id'))->save();
-
-    //$amp_config->set('amp_pixel', $form_state->getValue('amp_pixel'))->save();
-    //$amp_config->set('amp_pixel_domain_name', $form_state->getValue('amp_pixel_domain_name'))->save();
-    //$amp_config->set('amp_pixel_query_string', $form_state->getValue('amp_pixel_query_string'))->save();
-    //$amp_config->set('amp_pixel_random_number', $form_state->getValue('amp_pixel_random_number'))->save();
 
     //$amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();
 

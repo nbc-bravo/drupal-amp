@@ -335,7 +335,9 @@ function amp_page_bottom(array &$page_bottom) {
 
   $amp_context = \Drupal::service('router.amp_context');
   if ($amp_context->isAmpRoute()) {
-    $google_analytics_id = \Drupal::config('amp.settings')->get('google_analytics_id');
+
+    $config = \Drupal::config('amp.analytics.settings');
+    $google_analytics_id = $config->get('google_analytics_id');
     if (!empty($google_analytics_id)) {
       $amp_analytics = [
         '#type' => 'amp_analytics',
@@ -347,7 +349,44 @@ function amp_page_bottom(array &$page_bottom) {
       $page_bottom['amp_analytics'] = $amp_analytics;
     }
 
+    $amp_gtm_id = $config->get('amp_gtm_id');
+    if (!empty($amp_gtm_id)) {
+
+      $amp_gtm = [
+        '#type' => 'amp_analytics',
+        '#attributes' => [
+          'config' => 'https://www.googletagmanager.com/amp.json?id=' . $amp_gtm_id . '&gtm.url=SOURCE_URL',
+          'data-credentials' => 'include',
+        ],
+      ];
+      $page_bottom['amp_gtm'] = $amp_gtm;
+    }
+
+    if ($config->get('amp_pixel')) {
+      $domain = $config->get('amp_pixel_domain_name');
+      $query_string = $config->get('amp_pixel_query_string');
+      if (!empty($domain) && !empty($query_string)) {
+        $subs_random = $config->get('amp_pixel_random_number');
+
+        $subs = [
+          'RANDOM' => [
+            'active' => $subs_random ? TRUE : FALSE
+          ]
+        ];
+
+        $amp_pixel = [
+          '#theme' => 'amp_pixel',
+          '#domain' => $domain,
+          '#query_string' => $query_string,
+          '#subs' => $subs
+        ];
+
+        $page_bottom['amp_pixel'] = $amp_pixel;
+      }
+    }
+
   }
+
 }
 
 /**

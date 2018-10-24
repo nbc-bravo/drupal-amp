@@ -12,6 +12,7 @@
  */
 #}
 <amp-analytics{{ attributes }}>
+{% if account %}
   <script type="application/json">
     {
       "vars": {
@@ -25,4 +26,5 @@
       }
     }
   </script>
+{% endif %}
 </amp-analytics>

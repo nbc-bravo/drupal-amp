@@ -1,12 +1,23 @@
-amp.settings_tab:
-  path: '/admin/structure/amp'
+amp.settings:
+  path: '/admin/config/services/amp'
   defaults:
     _form: '\Drupal\amp\Form\AmpSettingsForm'
-    _title: 'Configure the AMP module'
+    _title: 'AMP Settings'
   options:
     _admin_route: TRUE
   requirements:
     _permission: 'administer site configuration'
+
+amp.analytics.settings:
+  path: '/admin/config/services/amp/analytics'
+  defaults:
+    _form: '\Drupal\amp\Form\AmpAnalyticsSettingsForm'
+    _title: 'Configure AMP analytics'
+  options:
+    _admin_route: TRUE
+  requirements:
+    _permission: 'administer site configuration'
+
 
 amp.test_library_hello:
   path: 'admin/amp/library/test'

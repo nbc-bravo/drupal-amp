@@ -4,9 +4,6 @@ amp.settings:
   mapping:
     langcode:
       type: string
-    google_analytics_id:
-      type: string
-      label: 'Google Analytics Web Property ID'
     amp_everywhere:
       type: boolean
       label: 'Generate all pages as AMP pages?'

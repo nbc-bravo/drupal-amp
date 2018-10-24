@@ -1,9 +1,12 @@
-amp.settings:
+amp.analytics.settings:
   type: mapping
-  label: 'AMP Pixel settings'
+  label: 'AMP Analytics settings'
   mapping:
     langcode:
       type: string
+    amp_gtm:
+      type: string
+      label: 'Google Tag Manager id'
     amp_pixel:
       type: boolean
       label: 'Whether the amp-pixel should be included'
@@ -16,4 +19,7 @@ amp.settings:
     amp_pixel_random_number:
       type: boolean
       label: 'Whether to include a random number in the URL'
+    google_analytics_id:
+      type: string
+      label: 'Google Analytics Web Property ID'
 
