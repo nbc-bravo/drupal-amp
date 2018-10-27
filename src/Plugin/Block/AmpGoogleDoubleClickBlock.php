@@ -8,7 +8,7 @@
  * )
  */
 
-namespace Drupal\amp_doubleclick\Plugin\Block;
+namespace Drupal\amp\Plugin\Block;
 
 use Drupal\Core\Block\BlockBase;
 use Drupal\Core\Form\FormStateInterface;

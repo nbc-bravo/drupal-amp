@@ -185,14 +185,13 @@ class AmpSettingsForm extends ConfigFormBase {
       '#default_value' => $amptheme_config->get('amptheme'),
     ];
 
-    $prefix = $this->t('<p>Currently, only node pages can be displayed as ' .
-      'AMP pages. Select the content types you want to enable for AMP in the ' .
-      'list below. Enable them by turning on the AMP view mode for that type. '.
-      'Once enabled, links are provided so you can configure the ' .
-      'fields and formatters for the AMP display of each one. For instance, ' .
-      'replace the normal text formatter for the body field with the AMP text ' .
-      'formatter, and replace the normal image formatter with the AMP image ' .
-      'formatter on the AMP view mode.</p>', [
+    $prefix = $this->t('<p>Select the content types you want to enable for ' .
+      'AMP in the list below. Enable them by turning on the AMP view mode ' .
+      'for that type. Once enabled, links are provided so you can configure ' .
+      'the fields and formatters for the AMP display of each one. For ' .
+      'instance, replace the normal text formatter for the body field with ' .
+      'the AMP text formatter, and replace the normal image formatter with ' .
+      'the AMP image formatter on the AMP view mode.</p>', [
         ':doclink1' => 'https://www.ampproject.org',
       ]);
 
@@ -241,15 +240,22 @@ class AmpSettingsForm extends ConfigFormBase {
       'console. Check the AMP Project documentation for more information.</p>');
     $page_suffix .= '</p>';
 
+    $form['library'] = [
+      '#type' => 'details',
+      '#title' => $this->t('AMP Library'),
+      '#description' => $page_suffix,
+      '#open' => TRUE,
+    ];
+
     $form['advanced'] = [
       '#type' => 'details',
-      '#title' => $this->t('For Administrators and Developers'),
-      '#description' => $page_suffix,
+      '#title' => $this->t('Advanced/Experimental Options'),
       '#open' => TRUE,
     ];
     $form['advanced']['process_full_html'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('<strong>Advanced option</strong>: Run the page body through the AMP library'),
+      '#title' => $this->t('<strong>Advanced option</strong>: Run the page ' .
+        'body through the AMP library'),
       '#default_value' => $amp_config->get('process_full_html'),
       '#description' => $this->t('The AMP PHP library will fix some AMP HTML ' .
         'non-compliance issues by removing disallowed attributes, tags ' .
@@ -259,18 +265,21 @@ class AmpSettingsForm extends ConfigFormBase {
         'so test carefully.')
     ];
 
-    // @TODO Display again once this is possible.
-    // The configuration option still exists so it can be used in AMP logic.
-    $form['experimental'] = [
-      '#type' => 'fieldset',
-      '#title' => $this->t("Experimental features"),
-      '#access' => FALSE,
-    ];
-    $form['experimental']['amp_everywhere'] = [
+    $form['advanced']['amp_everywhere'] = [
       '#type' => 'checkbox',
       '#default_value' => $amp_config->get('amp_everywhere'),
-      '#title' => $this->t('Generate all pages as AMP pages?'),
-      '#description' => $this->t('Set this to FALSE if you want AMP pages displayed as an alternative to your normal pages, on a different path (two pages for each item, the traditional way of deploying AMP). Choose TRUE if you want your normal pages to also be the AMP pages (there is only one page for each item, which is both the canonical page and the AMP page). If you are not sure what what this means, leave it set to FALSE.'),
+      '#title' => $this->t('<strong>Experimental option</strong>: Generate all ' .
+        'pages as AMP pages'),
+      '#description' => $this->t('This is a new, experimental, option to '.
+        'display your whole site as AMP pages. This assumes you understand ' .
+        'what is required to comply with AMP rules and are using an AMP-' .
+        'friendly theme as your primary theme, and using AMP formatters and ' .
+        'blocks in your primary theme. Leave unset if you want AMP pages ' .
+        'displayed as an alternative to your normal pages, on a different ' .
+        'path, the traditional way of deploying AMP. Check the box if your ' .
+        'normal pages <em>ARE</em> AMP pages, and serve as both the canonical ' .
+        'page and the AMP page. If you are not sure what what this means, ' .
+        'leave it unchecked.'),
     ];
 
     return parent::buildForm($form, $form_state);
@@ -290,7 +299,7 @@ class AmpSettingsForm extends ConfigFormBase {
     $amp_config = $this->config('amp.settings');
     $amp_config->set('process_full_html', $form_state->getValue('process_full_html'))->save();
 
-    //$amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();
+    $amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();
 
     parent::submitForm($form, $form_state);
   }
