@@ -124,9 +124,12 @@ class AmpSettingsForm extends ConfigFormBase {
     $module_handler = \Drupal::moduleHandler();
 
     $page_prefix = $this->t('<p>This page contains configuration for AMP ' .
-      'pages. Extensive documentation about AMP is available on the <a ' .
-      'href=":doclink1">AMP Project</a>.</p>', [
-        ':doclink1' => 'https://www.ampproject.org',
+      'pages. Review <a href=":doclink1">Drupal Documentation</a> for the ' .
+      '<a href=":doclink2">Drupal AMP module</a> and the <a href=":doclink3">' .
+      'AMP Project Page</a> for more information.</p>', [
+        ':doclink1' => 'https://www.drupal.org/docs/8/modules/accelerated-mobile-pages-amp/amp-version-83',
+        ':doclink2' => 'https://www.drupal.org/project/amp',
+        ':doclink3' => 'https://www.ampproject.org',
       ]);
     $page_prefix .= '<ul>';
     if (!$module_handler->moduleExists('schema_metatag')) {
@@ -166,28 +169,46 @@ class AmpSettingsForm extends ConfigFormBase {
         ':link' => 'https://www.drupal.org/project/amptheme'
       ]);
 
-    $form['amptheme'] = [
+    $form['theme'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Theme'),
+      '#prefix' => $page_prefix,
+      '#open' => TRUE,
+    ];
+
+    $form['theme']['amptheme'] = [
       '#type' => 'select',
       '#options' => $this->themeOptions,
       '#required' => TRUE,
       '#title' => $this->t('AMP theme'),
       '#description' => $description,
       '#default_value' => $amptheme_config->get('amptheme'),
-      '#prefix' => $page_prefix,
     ];
 
     $prefix = $this->t('<p>Currently, only node pages can be displayed as ' .
       'AMP pages. Select the content types you want to enable for AMP in the ' .
-      'list below. Once enabled, links are provided so you can configure the ' .
-      'fields and formatters for the AMP display of that content type.</p>', [
+      'list below. Enable them by turning on the AMP view mode for that type. '.
+      'Once enabled, links are provided so you can configure the ' .
+      'fields and formatters for the AMP display of each one. For instance, ' .
+      'replace the normal text formatter for the body field with the AMP text ' .
+      'formatter, and replace the normal image formatter with the AMP image ' .
+      'formatter on the AMP view mode.</p>', [
         ':doclink1' => 'https://www.ampproject.org',
       ]);
+
+    $form['types'] = [
+      '#type' => 'details',
+      '#title' => $this->t('Content types'),
+      '#open' => TRUE,
+      '#description' => $prefix,
+    ];
+
     if ($module_handler->moduleExists('field_ui')) {
-      $form['amp_content_amp_status'] = [
+      $form['types']['amp_content_amp_status'] = [
         '#title' => $this->t('AMP Status by Content Type'),
-        '#theme' => 'item_list',
-        '#items' => $this->entityTypeInfo->getFormattedAmpEnabledTypes(),
-        '#prefix' => $prefix,
+        '#theme' => 'table',
+        '#header' => [t('Content type'), t('Enabled'), t('Configure'), t('Enable/Disable')],
+        '#rows' => $this->entityTypeInfo->getFormattedAmpEnabledTypes(),
       ];
     }
     else {
@@ -236,28 +257,6 @@ class AmpSettingsForm extends ConfigFormBase {
         'AMP-unfriendly HTML. This feature can be problematic, the library ' .
         'is often over-aggressive and removes some code you may still want, '.
         'so test carefully.')
-    ];
-
-    // Hide these and switch to sub modules for each.
-    // @TODO Remove from this page once sub modules are created.
-    $form['google_analytics_id'] = [
-      '#type' => 'textfield',
-      '#default_value' => $amp_config->get('google_analytics_id'),
-      '#title' => $this->t('Google Analytics Web Property ID'),
-      '#description' => $this->t('This ID is unique to each site you want to ' .
-        'track separately, and is in the form of UA-xxxxxxx-yy. To get a Web ' .
-        'Property ID, <a href=":analytics">register your site with Google ' .
-        'Analytics</a>, or if you already have registered your site, go to ' .
-        'your Google Analytics Settings page to see the ID next to every site ' .
-        'profile. <a href=":webpropertyid">Find more information in the ' .
-        'documentation</a>.', [
-          ':analytics' => 'http://www.google.com/analytics/',
-          ':webpropertyid' => Url::fromUri('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', ['fragment' => 'webProperty'])->toString()
-        ]),
-      '#maxlength' => 20,
-      '#size' => 15,
-      '#placeholder' => 'UA-',
-      '#access' => FALSE,
     ];
 
     // @TODO Display again once this is possible.

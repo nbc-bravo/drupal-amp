@@ -104,25 +104,25 @@ class EntityTypeInfo extends ServiceProviderBase {
   public function getFormattedAmpEnabledTypes() {
     $enabled_types = !empty($this->getAmpEnabledTypes()) ? $this->getAmpEnabledTypes() : array();
     $node_types = node_type_get_names();
-    $node_status_list = array();
     $destination = Url::fromRoute("amp.settings")->toString();
+    $rows = [];
     foreach ($node_types as $bundle => $label) {
       $configure = Url::fromRoute("entity.entity_view_display.node.view_mode", ['node_type' => $bundle, 'view_mode_name' => 'amp'], ['query' => ['destination' => $destination]])->toString();
       $enable_disable = Url::fromRoute("entity.entity_view_display.node.default", ['node_type' => $bundle], ['query' => ['destination' => $destination]])->toString();
+      $configure_link = t('<a href=":configure">configure</a>', [':configure' => $configure]);
+      $enable_link = t('<a href=":enable_disable">enable</a>', [':enable_disable' => $enable_disable]);
+      $disable_link = t('<a href=":enable_disable">disable</a>', [':enable_disable' => $enable_disable]);
       if (in_array($bundle, $enabled_types)) {
-        $node_status_list[] = t('@label is <em>enabled</em>: <a href=":configure">Configure AMP view mode</a> or <a href=":enable_disable">Disable AMP display</a>', array(
-            '@label' => $label,
-            ':configure' => $configure,
-            ':enable_disable' => $enable_disable,
-          ));
+        $rows[] = [
+          $label, 'X', $configure_link, $disable_link,
+        ];
       }
       else {
-        $node_status_list[] = t('@label is <em>disabled</em>: <a href=":enable_disable">Enable AMP in Custom Display Settings</a>', array(
-            '@label' => $label,
-            ':enable_disable' => $enable_disable,
-          ));
+        $rows[] = [
+          $label, '', '', $enable_link,
+        ];
       }
     }
-    return $node_status_list;
+    return $rows;
   }
 }
