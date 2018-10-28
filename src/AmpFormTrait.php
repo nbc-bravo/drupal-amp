@@ -95,39 +95,14 @@ trait AmpFormTrait {
   }
 
   /**
-   * LibraryInfo.
-   *
-   * @return array
-   *   The definitions of the AMP libraries used by this components.
-   *   Assumes getLibraries() is declared in the parent class.
-   */
-  public function libraryInfo() {
-    $library_info = [];
-    $library_discovery = \Drupal::service('library.discovery');
-    $libraries = $this->getLibraries();
-    foreach ($libraries as $library) {
-      // Explode the library name into extension and library name.
-      list($extension, $name) = explode('/', $library);
-      $library_info[$name] = $library_discovery->getLibraryByName($extension, $name);
-    }
-    return $library_info;
-  }
-
-  /**
    * LibraryDescription.
    *
    * @return array
    *   Links to information about the AMP components used by the parent class.
    */
   public function libraryDescription() {
-    $info = [];
-    $library_info = $this->libraryInfo();
-    foreach ($library_info as $name => $library_item) {
-      $name = ucfirst(str_replace('amp.', '', $name));
-      $url = $library_item['remote'];
-      $info[] = $this->t('<a href=":url" target="_blank">AMP :name</a>', [':name' => $name, ':url' => $url]);
-    }
-    return $this->t('For more information about this AMP component, see') . ' ' . implode(', ', $info);
+    $ampService = \Drupal::service('amp.utilities');
+    return $ampService->libraryDescription($this->getLibraries());
   }
 
   /**
