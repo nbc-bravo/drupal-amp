@@ -185,22 +185,24 @@ function amp_update_8005() {
  * recommended for now.
  */
 function amp_update_8006() {
-  $config_factory = \Drupal::configFactory();
-  $config = $config_factory->getEditable('amp.settings');
-  $config->clear('amp_library_process_full_html')
-    ->clear('amp_library_warnings_display')
-    ->clear('amp_library_process_full_html_warnings')
-    ->clear('amp_library_process_statistics')->save();
-  return (string) t("Power User mode has been moved to new AMP Replace module. If you want to use that please enable and configure that module. Note that the full replacement done by Power User mode is known to be outdated and won't work correctly unless the AMP library is rewritten. You can use the AMP module without this option.");
+  $config = \Drupal::configFactory()->getEditable('amp.settings');
+  if (!$config->isNew()) {
+    $config->clear('amp_library_process_full_html')
+      ->clear('amp_library_warnings_display')
+      ->clear('amp_library_process_full_html_warnings')
+      ->clear('amp_library_process_statistics')->save();
+    return (string) t("Power User mode has been moved to new AMP Replace module. If you want to use that please enable and configure that module. Note that the full replacement done by Power User mode is known to be outdated and won't work correctly unless the AMP library is rewritten. You can use the AMP module without this option.");
+  }
 }
 
 /**
  * Clear amp_render_css.
  */
 function amp_update_8007() {
-  $config_factory = \Drupal::configFactory();
-  $config = $config_factory->getEditable('amp.settings');
-  $config->clear('amp_render_css')->save();
+  $config = \Drupal::configFactory()->getEditable('amp.settings');
+  if (!$config->isNew()) {
+    $config->clear('amp_render_css')->save();
+  }
   return (string) t("Removed the css everywhere setting, css is always rendered that way in 8.3.");
 }
 
