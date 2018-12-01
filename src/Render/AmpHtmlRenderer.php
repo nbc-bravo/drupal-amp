@@ -136,12 +136,14 @@ class AmpHtmlRenderer extends HtmlRenderer {
       // Reconstruct the page with the updated body.
       $replaced_body = '<body ' . $attributes . '>' . $replaced_body . '<body>';
       $content['#markup'] = preg_replace($pattern, $replaced_body, $markup);
+      $content['#allowed_tags'] = ['amp-img'];
 
       // Add additional required javascript libraries, if found. No worry about
       // duplication of previously-added libraries since Drupal's libraries
       // system will properly handle that.
       if (!empty($amp->getComponentJs())) {
         $libraries = $this->ampService->addComponentLibraries($amp->getComponentJs());
+        $content['#allowed_tags'] = array_merge($this->ampService->getComponentTags($amp->getComponentJs()), $content['#allowed_tags']);
       }
 
       // If development messages are displayed, display the changes made to the

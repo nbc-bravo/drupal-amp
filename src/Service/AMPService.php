@@ -107,7 +107,7 @@ class AMPService extends ServiceProviderBase  {
   }
 
   /**
-   * Given an array of discovered JS requirements, add the related libraries.
+   * Given an array of discovered JS requirements, identify related libraries.
    *
    * @param array $components
    *   An array of javascript urls that the AMP library discovered.
@@ -124,6 +124,24 @@ class AMPService extends ServiceProviderBase  {
       }
     }
     return $library_names;
+  }
+
+  /**
+   * Given an array of discovered JS requirements, identify the amp tags.
+   *
+   * @param array $components
+   *   An array of javascript urls that the AMP library discovered.
+   *
+   * @return array
+   *   An array of the AMP tags used in this text.
+   */
+  public function getComponentTags(array $components) {
+    $tags = [];
+    $map = $this->mapJSToNames();
+    foreach ($components as $tag => $component_url) {
+      $tags[] = $tag;
+    }
+    return $tags;
   }
 
   /**
