@@ -21,12 +21,12 @@ class AmpViewModeTest extends AmpTestBase {
   public function testAmpViewMode() {
 
     // Create a node to test AMP field formatters.
-    $node = Node::create([
+    $text = 'AMP test view modes';
+    $node = $this->drupalCreateNode([
       'type' => 'article',
       'title' => $this->randomMachineName(),
-      'body' => 'AMP test body',
+      'body' => $text,
     ]);
-    $node->save();
 
     // Create an AMP context object.
     $amp_context = \Drupal::service('router.amp_context');
@@ -42,7 +42,7 @@ class AmpViewModeTest extends AmpTestBase {
     $amp_node_url = Url::fromRoute('entity.node.canonical', ['node' => $node->id()], ['absolute' => TRUE, 'query' => ['amp' => NULL]])->toString();
     $this->drupalGet($node_url);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('AMP test body');
+    $this->assertSession()->pageTextContains($text);
     $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/full"');
     $this->assertSession()->responseContains('link rel="amphtml" href="' . $amp_node_url . '"');
     $this->assertSession()->responseHeaderEquals('Link', '<' . $amp_node_url . '> rel="amphtml"');
@@ -50,7 +50,7 @@ class AmpViewModeTest extends AmpTestBase {
     // Check the metadata of the AMP display mode.
     $this->drupalGet($amp_node_url);
     $this->assertSession()->statusCodeEquals(200);
-    $this->assertSession()->pageTextContains('AMP test body');
+    $this->assertSession()->pageTextContains($text);
     $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/amp"');
     $this->assertSession()->responseContains('link rel="canonical" href="' . $node_url . '"');
 

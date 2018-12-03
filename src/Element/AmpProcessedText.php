@@ -6,6 +6,7 @@ use Drupal\filter\Element\ProcessedText;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\amp\AMP\DrupalAMP;
 use Drupal\amp\Service\AMPService;
+use Drupal\Component\Utility\Xss;
 
 /**
  * Provides an amp-processed text render element.
@@ -47,7 +48,7 @@ class AmpProcessedText extends ProcessedText {
 
     $amp->loadHtml($element['#markup']);
     $element['#markup'] = $amp->convertToAmpHtml();
-    $element['#allowed_tags'] = ['amp-img'];
+    $element['#allowed_tags'] = array_merge(Xss::getAdminTagList(), ['amp-img']);
 
     if (!empty($amp->getComponentJs())) {
       $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
