@@ -400,6 +400,11 @@ function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_
     return;
   }
 
+  // Exit if the AMP submit button has been disabled.
+  if (!\Drupal::config('amp.settings')->get('show_extra_save_buttons')) {
+    return;
+  }
+
   // Add another option to go to the AMP page after saving.
   $form['actions']['save_view_amp'] = array(
     '#type' => 'submit',

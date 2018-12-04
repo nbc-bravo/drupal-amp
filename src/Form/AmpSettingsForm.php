@@ -282,6 +282,13 @@ class AmpSettingsForm extends ConfigFormBase {
         'leave it unchecked.'),
     ];
 
+    $form['show_extra_save_buttons'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Add extra save options to node edit pages'),
+      '#default_value' => $amp_config->get('show_extra_save_buttons'),
+      '#description' => $this->t('Adds convenient buttons for viewing the AMP version of a node after saving it (if the content type has AMP enabled).'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -300,6 +307,8 @@ class AmpSettingsForm extends ConfigFormBase {
     $amp_config->set('process_full_html', $form_state->getValue('process_full_html'))->save();
 
     $amp_config->set('amp_everywhere', $form_state->getValue('amp_everywhere'))->save();
+
+    $amp_config->set('show_extra_save_buttons', $form_state->getValue('show_extra_save_buttons'))->save();
 
     parent::submitForm($form, $form_state);
   }
