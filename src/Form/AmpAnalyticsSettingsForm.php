@@ -11,7 +11,6 @@ use Drupal\Core\Url;
  */
 class AmpAnalyticsSettingsForm extends ConfigFormBase {
 
-
   /**
    * {@inheritdoc}
    */
@@ -32,17 +31,18 @@ class AmpAnalyticsSettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
 
     $config = $this->config('amp.analytics.settings');
+    $ampService = \Drupal::service('amp.utilities');
 
-    $form['analytics'] = array(
+    $form['google_analytics'] = array(
       '#type' => 'details',
-      '#title' => t('amp-analytics'),
-      '#open' => TRUE,
+      '#title' => t('Google Analytics'),
+      '#open' => !empty($config->get('google_analytics_id')),
     );
-    $form['analytics']['google_analytics_id'] = [
+    $form['google_analytics']['google_analytics_id'] = [
       '#type' => 'textfield',
       '#default_value' => $config->get('google_analytics_id'),
       '#title' => $this->t('Google Analytics ID'),
-      '#description' => $this->t('Enter a value to add the Google Analytics '.
+      '#description' => '<p>' . $this->t('Enter a value to add the Google Analytics '.
         'code to your AMP pages. This ID is unique to each site you want to '.
         'track separately, and is in the form of UA-xxxxxxx-yy. To get a Web ' .
         'Property ID, <a href=":analytics">register your site with Google ' .
@@ -53,17 +53,22 @@ class AmpAnalyticsSettingsForm extends ConfigFormBase {
           ':analytics' => 'http://www.google.com/analytics/',
           ':webpropertyid' => Url::fromUri('https://developers.google.com/analytics/resources/concepts/gaConceptsAccounts', ['fragment' => 'webProperty'])->toString()
         ]
-      ),
+      ) . '</p><p>' . $ampService->libraryDescription(['amp/amp.analytics']) . '</p>',
       '#maxlength' => 20,
       '#size' => 15,
       '#placeholder' => 'UA-',
     ];
 
-    $form['analytics']['amp_gtm_id'] = array(
+    $form['gtm'] = array(
+      '#type' => 'details',
+      '#title' => t('Google Tag Manager'),
+      '#open' => !empty($config->get('amp_gtm_id')),
+    );
+    $form['gtm']['amp_gtm_id'] = array(
       '#type' => 'textfield',
       '#title' => $this->t('The Google Tag Manager ID'),
       '#default_value' => $config->get('amp_gtm_id'),
-      '#description' => $this->t('Enter a value to add the Google Tag Manager '.
+      '#description' => '<p>' . $this->t('Enter a value to add the Google Tag Manager '.
         'code to your AMP pages. This is the Google Tag Manager ID for the ' .
         'site owner. Get this in your <a href=":url">Google Tag Manager</a> ' .
         'account. GTM has built-in AMP functionality. Go to the GTM ' .
@@ -72,7 +77,7 @@ class AmpAnalyticsSettingsForm extends ConfigFormBase {
         'id from that code (it looks like GTM-xxxxxxx) and paste it here.', [
           ':url' => Url::fromUri('https://tagmanager.google.com')->toString()
         ]
-      ),
+      ) . '</p><p>' . $ampService->libraryDescription(['amp/amp.analytics']) . '</p>',
       '#maxlength' => 20,
       '#size' => 15,
       '#placeholder' => 'GTM-',
@@ -81,13 +86,13 @@ class AmpAnalyticsSettingsForm extends ConfigFormBase {
     $form['pixel'] = array(
       '#type' => 'details',
       '#title' => t('amp-pixel'),
-      '#open' => TRUE,
+      '#open' => !empty($config->get('amp_pixel')),
     );
     $form['pixel']['amp_pixel'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Enable amp-pixel'),
       '#default_value' => $config->get('amp_pixel'),
-      '#description' => $this->t('The amp-pixel element is meant to be used as a typical tracking pixel -- to count page views. Find more information in the <a href="https://www.ampproject.org/docs/reference/amp-pixel.html">amp-pixel documentation</a>.'),
+      '#description' => $ampService->libraryDescription(['amp/amp.pixel']),
     );
     $form['pixel']['amp_pixel_domain_name'] = array(
       '#type' => 'textfield',

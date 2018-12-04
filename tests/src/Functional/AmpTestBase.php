@@ -6,6 +6,7 @@ use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\simpletest\ContentTypeCreationTrait;
 use Drupal\Tests\BrowserTestBase;
+use Drupal\filter\Entity\FilterFormat;
 
 /**
  * Base AMP testing setup.
@@ -25,6 +26,7 @@ abstract class AmpTestBase extends BrowserTestBase {
     'contextual',
     'field_ui',
     'quickedit',
+    'filter',
   ];
 
   /**
@@ -35,10 +37,17 @@ abstract class AmpTestBase extends BrowserTestBase {
   protected $permissions = [
     'access administration pages',
     'access in-place editing',
+    'access content overview',
+    'view all revisions',
     'administer content types',
     'administer display modes',
+    'administer node fields',
+    'administer node form display',
     'administer node display',
     'administer site configuration',
+    'administer filters',
+    'bypass node access',
+    'use text format full_html',
   ];
 
   /**
@@ -52,7 +61,18 @@ abstract class AmpTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function setUp() {
+
     parent::setUp();
+
+    // Set up full html filter.
+    $full_html_format = FilterFormat::create([
+      'format' => 'full_html',
+      'name' => 'Full HTML',
+      'weight' => 1,
+      'filters' => [],
+    ]);
+    $full_html_format->save();
+    user_role_grant_permissions('authenticated', [$full_html_format->getPermissionName()]);
 
     // Install the theme.
     // @see https://www.drupal.org/node/2232651
@@ -72,6 +92,7 @@ abstract class AmpTestBase extends BrowserTestBase {
     // Login as an admin user.
     $this->adminUser = $this->drupalCreateUser($this->permissions);
     $this->drupalLogin($this->adminUser);
+    $this->assertTrue($full_html_format->access('use', $this->adminUser), 'Admin user may use permission: ' . $full_html_format->getPermissionName());
 
     // Configure AMP.
     $settings_url = Url::fromRoute("amp.settings")->toString();

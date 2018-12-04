@@ -107,7 +107,7 @@ class AMPService extends ServiceProviderBase  {
   }
 
   /**
-   * Given an array of discovered JS requirements, add the related libraries.
+   * Given an array of discovered JS requirements, identify related libraries.
    *
    * @param array $components
    *   An array of javascript urls that the AMP library discovered.
@@ -124,6 +124,24 @@ class AMPService extends ServiceProviderBase  {
       }
     }
     return $library_names;
+  }
+
+  /**
+   * Given an array of discovered JS requirements, identify the amp tags.
+   *
+   * @param array $components
+   *   An array of javascript urls that the AMP library discovered.
+   *
+   * @return array
+   *   An array of the AMP tags used in this text.
+   */
+  public function getComponentTags(array $components) {
+    $tags = [];
+    $map = $this->mapJSToNames();
+    foreach ($components as $tag => $component_url) {
+      $tags[] = $tag;
+    }
+    return $tags;
   }
 
   /**
@@ -181,6 +199,46 @@ class AMPService extends ServiceProviderBase  {
       }
       return $translated_message;
     }
+  }
+
+  /**
+   * LibraryInfo.
+   *
+   * @param array $libraries
+   *   Array of AMP libraries to get info for.
+   *
+   * @return array
+   *   The definitions of the AMP libraries used by this components.
+   */
+  public static function libraryInfo($libraries) {
+    $library_info = [];
+    $library_discovery = \Drupal::service('library.discovery');
+    foreach ($libraries as $library) {
+      // Explode the library name into extension and library name.
+      list($extension, $name) = explode('/', $library);
+      $library_info[$name] = $library_discovery->getLibraryByName($extension, $name);
+    }
+    return $library_info;
+  }
+
+  /**
+   * LibraryDescription.
+   *
+   * @param array $libraries
+   *   Array of AMP libraries to get info for.
+   *
+   * @return array
+   *   Links to information about the AMP components used by the libraries.
+   */
+  public static function libraryDescription($libraries) {
+    $info = [];
+    $library_info = static::libraryInfo($libraries);
+    foreach ($library_info as $name => $library_item) {
+      $name = ucfirst(str_replace('amp.', '', $name));
+      $url = $library_item['remote'];
+      $info[] = t('<a href=":url" target="_blank">AMP :name</a>', [':name' => $name, ':url' => $url]);
+    }
+    return t('For more information about this AMP component, see') . ' ' . implode(', ', $info);
   }
 
 }
