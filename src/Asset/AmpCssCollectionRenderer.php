@@ -8,6 +8,7 @@ use Drupal\amp\Service\AMPService;
 use Drupal\Core\State\StateInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\RendererInterface;
+use \Drupal\Core\Asset\CssOptimizer;
 
 /**
  * Renders CSS assets.
@@ -39,6 +40,11 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
   protected $cssCollectionRenderer;
 
   /**
+   * @var \Drupal\amp\Service\AMPService
+   */
+  protected $ampService;
+
+  /**
    * The renderer.
    *
    * @var \Drupal\Core\Render\RendererInterface
@@ -46,9 +52,9 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
   protected $renderer;
 
   /**
-   * @var \Drupal\amp\Service\AMPService
+   * @var \Drupal\Core\Asset\CssOptimizer
    */
-  protected $ampService;
+  protected $optimizer;
 
   /**
    * Constructs a CssCollectionRenderer.
@@ -57,12 +63,20 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
    *   The state key/value store.
    * @param \Drupal\Core\Render\RendererInterface $renderer
    *   The renderer.
+   * @param \Drupal\Core\Asset\CssOptimizer
+   *   The CSS optimizer.
    */
-  public function __construct(CssCollectionRenderer $cssCollectionRenderer, StateInterface $state, AmpService $ampService, RendererInterface $renderer) {
+  public function __construct(
+  CssCollectionRenderer $cssCollectionRenderer,
+  StateInterface $state,
+  AmpService $ampService,
+  RendererInterface $renderer,
+  CssOptimizer $css_optimizer) {
     $this->cssCollectionRenderer = $cssCollectionRenderer;
     $this->state = $state;
     $this->ampService = $ampService;
     $this->renderer = $renderer;
+    $this->optimizer = $css_optimizer;
     parent::__construct($state);
   }
 
@@ -80,14 +94,31 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
     // For tracking the size and contents of the inlined css:
     $size = 0;
     $files = [];
+
+    // Rewrite relative css asset paths in css since they won't work correctly
+    // when css is rendered inline instead of as attachments.
+    // 1) Identify the path to where this CSS file originated from. This, when
+    //    passed through rewriteFileURI() will iteratively remove ../ values
+    //    within the css to rewrite the url relative to the web root.
+    // 2) Prepend that path with the absolute theme path. This will ensure
+    //    we end up with an absolute path to the asset instead of to the top
+    //    level of the site.
+    $config = \Drupal::config('system.theme');
+    $theme = $config->get('default');
+    $theme_path = drupal_get_path('theme', $theme) . '/';
+    $this->optimizer->rewriteFileURIBasePath = $theme_path . '/'. base_path() . dirname($theme_path) . '/';
+
     foreach ($elements as $key => $element) {
-      // Process @import url() values.
+      // This is a files that contains @import values for the css files.
       if ($element['#tag'] == 'style' && array_key_exists('#value', $element)) {
+
+        // Now split all the @imports into individual items so we can count,
+        // load, and concatenate them.
         $urls = preg_match_all('/@import url\("(.+)\?/', $element['#value'], $matches);
         $all_css = [];
         foreach ($matches[1] as $url) {
           // Skip empty and missing files.
-          if ($css = file_get_contents(DRUPAL_ROOT . $url)) {
+          if ($css = @file_get_contents(DRUPAL_ROOT . $url)) {
             $css = $this->minify($css);
             $css = $this->strip($css);
             $size += strlen($css);
@@ -99,12 +130,13 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
         $value = implode("", $all_css);
         $value = '@media ' . $element['#attributes']['media'] . " {\n" . $value . "\n}\n";
         $value = $this->minify($value);
+        $value = $this->strip($value);
 
         $element['#value'] = $value;
         $elements[$key] = $element;
         $elements[$key]['#merged'] = TRUE;
       }
-      // Process links.
+      // This is a file that contains links to css files.
       elseif ($element['#tag'] == 'link' && array_key_exists('href', $element['#attributes'])) {
         $url = $element['#attributes']['href'];
         $provider = parse_url($url, PHP_URL_HOST);
@@ -143,6 +175,13 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
         }
       }
     }
+
+    // 3) Prefix all relative paths within this CSS file with the theme path.
+    $merged = preg_replace_callback('/url\\([\'"]?(?![a-z]+:|\\/+)([^\'")]+)[\'"]?\\)/i', array(
+      $this->optimizer,
+      'rewriteFileURI',
+    ), $merged);
+
     $elements[$replacement_key] = [
       '#tag' => 'style',
       '#type' => 'amp_custom_style',
@@ -179,7 +218,10 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
   }
 
   /**
-   * Minify css.
+   * Minify and optimize css.
+   *
+   * Some code copied from color_scheme_form_submit() which rewrites css to
+   * replace colors in css files.
    *
    * @param string $value
    *   The css to minify.
@@ -187,14 +229,14 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
    * @return string
    *   The minified css.
    */
-  public function minify($value) {
+  public function minify($style) {
     // Remove comments
-    $value = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $value);
+    $style = preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!', '', $style);
     // Remove space after colons
-    $value = str_replace(': ', ':', $value);
+    $style = str_replace(': ', ':', $style);
     // Remove whitespace
-    $value = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $value);
-    return $value;
+    $style = str_replace(array("\r\n", "\r", "\n", "\t", '  ', '    ', '    '), '', $style);
+    return $style;
   }
 
   /**
