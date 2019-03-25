@@ -86,13 +86,15 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
         $urls = preg_match_all('/@import url\("(.+)\?/', $element['#value'], $matches);
         $all_css = [];
         foreach ($matches[1] as $url) {
-          $css = file_get_contents(DRUPAL_ROOT . $url);
-          $css = $this->minify($css);
-          $css = $this->strip($css);
-          $size += strlen($css);
-          $all_css[] = $css;
-          $files[] = [$this->format(strlen($css)), $url];
-         }
+          // Skip empty and missing files.
+          if ($css = file_get_contents(DRUPAL_ROOT . $url)) {
+            $css = $this->minify($css);
+            $css = $this->strip($css);
+            $size += strlen($css);
+            $all_css[] = $css;
+            $files[] = [$this->format(strlen($css)), $url];
+          }
+        }
         // Implode, wrap in @media, and minify results.
         $value = implode("", $all_css);
         $value = '@media ' . $element['#attributes']['media'] . " {\n" . $value . "\n}\n";
