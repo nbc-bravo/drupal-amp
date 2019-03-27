@@ -255,8 +255,8 @@ class AmpSettingsForm extends ConfigFormBase {
     ];
     $form['advanced']['process_full_html'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('<strong>Advanced option</strong>: Run the page ' .
-        'body through the AMP library'),
+      '#title' => $this->t('<strong>Advanced option (Not recommended)' .
+        '</strong>: Run the page body through the AMP library'),
       '#default_value' => $amp_config->get('process_full_html'),
       '#description' => $this->t('The AMP PHP library will fix some AMP HTML ' .
         'non-compliance issues by removing disallowed attributes, tags ' .
