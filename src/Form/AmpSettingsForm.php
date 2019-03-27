@@ -222,8 +222,9 @@ class AmpSettingsForm extends ConfigFormBase {
     $page_suffix = $this->t('This code uses the ' .
       '<a href="https://github.com/Lullabot/amp-library">AMP Library</a>. '.
       'This library will be installed by Composer if the AMP module is ' .
-      'installed by Composer as follows:</p><p><code>composer install ' .
-      'drupal/amp --with-dependencies</code></p> ');
+      'installed by Composer as follows:</p><p><code>composer require ' .
+      'drupal/amp</code></p><p>Update the module using this:</p><p><code>' .
+      'composer update drupal/amp --with-dependencies</code></p>');
     $page_suffix .= $this->t('Test that the AMP library is <a href=":url">' .
       'configured properly</a>. Look for the words <strong>The Library is ' .
       'working.</strong> at the top of the page. You will see that the ' .
