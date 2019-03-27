@@ -53,7 +53,7 @@ class AmpEventSubscriber extends ServiceProviderBase implements EventSubscriberI
     // Don't interfere if this is a request that does not use html or amp
     // wrapper formats.
     $wrapper_format = isset($_GET['_wrapper_format']) ? $_GET['_wrapper_format'] : '';
-    if (!empty($wrapper_format) || !in_array($wrapper_format, ['html', 'amp'])) {
+    if (!empty($wrapper_format) && !in_array($wrapper_format, ['html', 'amp'])) {
       return;
     }
 
