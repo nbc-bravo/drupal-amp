@@ -11,8 +11,7 @@
     "source": "http://cgit.drupalcode.org/amp"
   },
   "require": {
-    "lullabot/amp": "^1.0.0",
-    "drupaljedi/css-tree-shaking": "dev-master"
+    "lullabot/amp": "^1.0.0"
   },
   "require-dev": {
     "drupal/amptheme": "^1.0"
