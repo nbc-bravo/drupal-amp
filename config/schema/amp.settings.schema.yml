@@ -10,4 +10,6 @@ amp.settings:
     process_full_html:
       type: string
       label: 'Process the whole page through the AMP converter.'
-
+    show_extra_save_buttons:
+      type: boolean
+      label: 'Whether the extra save options should be shown on node edit pages'
