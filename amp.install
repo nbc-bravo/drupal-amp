@@ -24,23 +24,77 @@ function amp_requirements($phase) {
   }
 
   if ($phase == 'runtime') {
-    $module_handler = \Drupal::service('module_handler');
-    if (!$module_handler->moduleExists('schema_metatag')) {
-      $requirements['amp_token'] = [
-        'title' => t('Schema.org Metatag module required for AMP'),
+
+    $theme_handler = \Drupal::service('theme_handler');
+    // Check the version of AMPTheme by looking for a deprecated function.
+    if (function_exists('amptheme_preprocess_username')) {
+      $requirements['amptheme'] = [
+        'title' => t('AMPTheme 8.3'),
         'value' => t('Not installed'),
-        'description' => t('To create valid AMP you will also need to download, install, and configure the <a href="@module">Schema.org Metatag</a> module as a dependency.', ['@module' => 'https://www.drupal.org/project/schema_metatag']),
+        'description' => t('The AMP 8.3 will not work with <a href="@theme">AMPTheme 8.1</a>. Please confirm that the right version is installed.', ['@theme' => 'https://www.drupal.org/project/amptheme']),
         'severity' => REQUIREMENT_WARNING,
       ];
     }
-
-    $theme_handler = \Drupal::service('theme_handler');
-    if (!$theme_handler->themeExists('amptheme')) {
+    elseif ($theme_handler->themeExists('amptheme')) {
       $requirements['amptheme'] = [
-        'title' => t('AMP Base Theme'),
+        'title' => t('AMPTheme 8.3'),
+        'value' => t('Installed'),
+        'description' => t('AMP 8.3 will not work with <a href="@theme">AMPTheme 8.1</a>. ', ['@theme' => 'https://www.drupal.org/project/amptheme']),
+        'severity' => REQUIREMENT_OK,
+      ];
+    }
+
+    $module_handler = \Drupal::service('module_handler');
+
+    // Schema Metatag has been added as a dependency, but if AMP was
+    // installed earlier this could still be missing.
+    if (!$module_handler->moduleExists('schema_metatag')) {
+      $requirements['amp_schema_metatag'] = [
+        'title' => t('Schema.org Metatag'),
         'value' => t('Not installed'),
-        'description' => t('The AMP module requires an AMP theme like the <a href="@theme">AMP Base Theme</a> to be installed.', ['@theme' => 'https://www.drupal.org/project/amptheme']),
-        'severity' => REQUIREMENT_WARNING,
+        'description' => t('To create valid AMP you will also need to download, install, and configure the <a href="@module">Schema.org Metatag</a> module.', ['@module' => 'https://www.drupal.org/project/schema_metatag']),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+    else {
+       $requirements['amp_schema_metatag'] = [
+        'title' => t('Schema.org Metatag'),
+        'value' => t('Installed'),
+        'description' => t('To create valid AMP you will also need to download, install, and configure the <a href="@module">Schema.org Metatag</a> module.', ['@module' => 'https://www.drupal.org/project/schema_metatag']),
+        'severity' => REQUIREMENT_OK,
+      ];
+    }
+
+    if ($module_handler->moduleExists('rdf') && !$module_handler->moduleExists('amp_rdf')) {
+      $requirements['amp_rdf'] = [
+        'title' => t('AMP RDF'),
+        'value' => t('Not installed'),
+        'description' => t('AMP RDF required by AMP when the RDF module is enabled.'),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+    elseif($module_handler->moduleExists('rdf'))  {
+       $requirements['amp_rdf'] = [
+        'title' => t('AMP RDF'),
+        'value' => t('Installed'),
+        'description' => t('AMP RDF required by AMP when the RDF module is enabled.'),
+        'severity' => REQUIREMENT_OK,
+      ];
+    }
+    if ($module_handler->moduleExists('toolbar') && !$module_handler->moduleExists('amp_toolbar')) {
+      $requirements['amp_toolbar'] = [
+        'title' => t('AMP Toolbar'),
+        'value' => t('Not installed'),
+        'description' => t('AMP Toolbar required by AMP when the Toolbar module is enabled.'),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+    elseif($module_handler->moduleExists('toolbar')) {
+       $requirements['amp_toolbar'] = [
+        'title' => t('AMP Toolbar'),
+        'value' => t('Installed'),
+        'description' => t('AMP Toolbar required by AMP when the Toolbar module is enabled.'),
+        'severity' => REQUIREMENT_OK,
       ];
     }
   }

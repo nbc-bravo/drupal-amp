@@ -7,4 +7,5 @@ dependencies:
   - drupal:image
   - drupal:node
   - token:token
+  - schema_metatag:schema_metatag
 configure: amp.settings
