@@ -73,3 +73,10 @@ function _amp_update_create_image_style($name, $label, $effect_name, array $effe
     $image_style->save();
   }
 }
+
+/**
+ * Clear caches to pick up changed use statements.
+ */
+function amp_post_update_8011() {
+// Empty update to cause a cache rebuild to pick up changed used statements.
+}
