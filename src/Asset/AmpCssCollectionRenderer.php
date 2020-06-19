@@ -8,7 +8,7 @@ use Drupal\amp\Service\AMPService;
 use Drupal\Core\State\StateInterface;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Render\RendererInterface;
-use \Drupal\Core\Asset\CssOptimizer;
+use Drupal\Core\Asset\CssOptimizer;
 
 /**
  * Renders CSS assets.
