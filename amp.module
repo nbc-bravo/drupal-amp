@@ -406,13 +406,13 @@ function amp_form_node_form_alter(&$form, FormStateInterface $form_state, $form_
   }
 
   // Add another option to go to the AMP page after saving.
-  $form['actions']['save_view_amp'] = array(
+  $form['actions']['save_view_amp'] = [
     '#type' => 'submit',
     '#value' => t('Save and view AMP page'),
-    '#submit' => array('::submitForm', '::save'),
+    '#submit' => ['::submitForm', '::save'],
     '#access' => TRUE,
     '#weight' => 10,
-  );
+  ];
 
   // Add a submit handler to redirect to the AMP page.
   $form['actions']['save_view_amp']['#submit'][] = 'amp_node_form_submit';
@@ -446,8 +446,8 @@ function amp_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state
  * Submit handler for enabling or disabling AMP view modes.
  */
 function amp_view_modes_submit(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
-  $new_values = array();
-  $old_values = array();
+  $new_values = [];
+  $old_values = [];
   if (isset($form_state->getValues()['display_modes_custom'])) {
     $new_values = array_filter($form_state->getValues()['display_modes_custom']);
   }

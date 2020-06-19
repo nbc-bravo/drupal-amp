@@ -26,19 +26,19 @@ class AmpTextFormatter extends TextDefaultFormatter {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
 
-    $elements = array();
+    $elements = [];
 
     // The ProcessedText element already handles cache context & tag bubbling.
     // @see \Drupal\filter\Element\ProcessedText::preRenderText()
     // The AmpProcessed text element extends that to pass #markup through the
     // amp library for processing markup into AMP HTML.
     foreach ($items as $delta => $item) {
-      $elements[$delta] = array(
+      $elements[$delta] = [
         '#type' => 'amp_processed_text',
         '#text' => $item->value,
         '#format' => $item->format,
         '#langcode' => $item->getLangcode(),
-      );
+      ];
     }
     return $elements;
   }

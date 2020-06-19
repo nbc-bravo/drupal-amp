@@ -53,11 +53,11 @@ class AmpImageFormatter extends ImageFormatter {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'layout' => 'responsive',
       'width' => '',
       'height' => '',
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**

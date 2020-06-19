@@ -53,14 +53,14 @@ class AmpVideoFormatter extends GenericFileFormatter {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'height' => 175,
       'width' => 350,
       'layout' => 'responsive',
       'autoplay' => FALSE,
       'controls' => FALSE,
       'loop' => FALSE,
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -109,7 +109,6 @@ class AmpVideoFormatter extends GenericFileFormatter {
       $elements[$delta]['#cache'] = ['tags' => $file->getCacheTags()];
     }
     $elements['#attached']['library'] = $this->getLibraries();
-    dpm($elements);
     return $elements;
   }
 }

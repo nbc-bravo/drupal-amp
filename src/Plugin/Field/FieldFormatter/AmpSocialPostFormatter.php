@@ -57,7 +57,7 @@ class AmpSocialPostFormatter extends FormatterBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'layout' => 'responsive',
       'width' => '',
       'height' => '',
@@ -65,7 +65,7 @@ class AmpSocialPostFormatter extends FormatterBase {
       'data-embed-as' => 'post',
       'data-align-center' => '',
       'placeholder' => '',
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**

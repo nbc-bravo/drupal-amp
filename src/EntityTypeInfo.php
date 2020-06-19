@@ -102,7 +102,7 @@ class EntityTypeInfo extends ServiceProviderBase {
    *     - A link to configure the AMP view mode, if enabled.
    */
   public function getFormattedAmpEnabledTypes() {
-    $enabled_types = !empty($this->getAmpEnabledTypes()) ? $this->getAmpEnabledTypes() : array();
+    $enabled_types = !empty($this->getAmpEnabledTypes()) ? $this->getAmpEnabledTypes() : [];
     $node_types = node_type_get_names();
     $destination = Url::fromRoute("amp.settings")->toString();
     $rows = [];

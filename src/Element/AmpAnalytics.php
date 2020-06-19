@@ -24,17 +24,17 @@ class AmpAnalytics extends RenderElement {
    */
   public function getInfo() {
     $class = get_class($this);
-    return array(
+    return [
       '#account' => NULL,
       '#attributes' => [],
-      '#pre_render' => array(
-        array($class, 'preRenderAnalytics'),
-      ),
+      '#pre_render' => [
+        [$class, 'preRenderAnalytics'],
+      ],
       '#theme' => 'amp_analytics',
       '#cache' => [
         'contexts' => ['url.query_args:amp']
       ]
-    );
+    ];
   }
 
   /**

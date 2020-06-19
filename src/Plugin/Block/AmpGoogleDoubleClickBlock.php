@@ -27,9 +27,9 @@ class AmpGoogleDoubleClickBlock extends BlockBase {
     $width = $config['width'];
 
     if (empty($doubleclick_id)) {
-      return array(
+      return [
         '#markup' => $this->t('This block requires a Google DoubleClick Network ID.')
-      );
+      ];
     }
 
     return [
@@ -55,7 +55,7 @@ class AmpGoogleDoubleClickBlock extends BlockBase {
     // Retrieve existing configuration for this block.
     $config = $this->getConfiguration();
 
-    $form['google_doubleclick_id'] = array(
+    $form['google_doubleclick_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Google DoubleClick for Publishers Network ID'),
       '#default_value' => isset($config['google_doubleclick_id']) ? $config['google_doubleclick_id'] : '',
@@ -63,29 +63,29 @@ class AmpGoogleDoubleClickBlock extends BlockBase {
       '#size' => 20,
       '#placeholder' => '/',
       '#description' => $this->t('The Network ID to use on this tag. This value should begin with a /.'),
-    );
+    ];
 
-    $form['width'] = array(
+    $form['width'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Width'),
       '#default_value' => isset($config['width']) ? $config['width'] : '',
       '#maxlength' => 25,
       '#size' => 20,
-    );
-    $form['height'] = array(
+    ];
+    $form['height'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Height'),
       '#default_value' => isset($config['height']) ? $config['height'] : '',
       '#maxlength' => 25,
       '#size' => 20,
-    );
-    $form['data_slot'] = array(
+    ];
+    $form['data_slot'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Data-slot'),
       '#default_value' => isset($config['data_slot']) ? $config['data_slot'] : '',
       '#maxlength' => 25,
       '#size' => 20,
-    );
+    ];
     return $form;
   }
 

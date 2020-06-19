@@ -20,20 +20,20 @@ class AmpProcessedText extends ProcessedText {
    */
   public function getInfo() {
     $class = get_class($this);
-    return array(
+    return [
       '#text' => '',
       '#format' => NULL,
-      '#filter_types_to_skip' => array(),
+      '#filter_types_to_skip' => [],
       '#langcode' => '',
-      '#pre_render' => array(
-        array($class, 'preRenderText'),
-        array($class, 'preRenderAmpText'),
-      ),
+      '#pre_render' => [
+        [$class, 'preRenderText'],
+        [$class, 'preRenderAmpText'],
+      ],
       '#cache' => [
         'contexts' => ['url.query_args:amp', 'url.query_args:debug'],
         'tags' => ['config:amp.settings']
       ]
-    );
+    ];
   }
 
   /**
