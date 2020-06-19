@@ -148,7 +148,9 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
         }
         else {
           // Strip any querystring off the url.
-          list($url, $query) = explode('?', $url);
+          if (strpos($url, '?') !== FALSE) {
+            list($url, $query) = explode('?', $url);
+          }
           $css = file_get_contents(DRUPAL_ROOT . $url);
           $css = $this->minify($css);
           $css = $this->strip($css);
