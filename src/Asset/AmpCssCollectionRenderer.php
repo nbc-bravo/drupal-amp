@@ -69,7 +69,7 @@ class AmpCssCollectionRenderer extends CssCollectionRenderer {
   public function __construct(
   CssCollectionRenderer $cssCollectionRenderer,
   StateInterface $state,
-  AmpService $ampService,
+  AMPService $ampService,
   RendererInterface $renderer,
   CssOptimizer $css_optimizer) {
     $this->cssCollectionRenderer = $cssCollectionRenderer;

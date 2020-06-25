@@ -163,7 +163,7 @@ function amp_update_8005() {
         'targetEntityType' => 'node',
         'bundle' => $bundle
       );
-      if ($view_displays = \Drupal::entityManager()->getStorage('entity_view_display')->loadByProperties($properties)) {
+      if ($view_displays = \Drupal::service('entity_type.manager')->getStorage('entity_view_display')->loadByProperties($properties)) {
         foreach ($view_displays as $view_display) {
           if ($component = $view_display->getComponent($field_name)) {
             // Map old formatter settings to new ones.
@@ -202,7 +202,7 @@ function amp_update_8005() {
         'targetEntityType' => 'node',
         'bundle' => $bundle
       );
-      if ($view_displays = \Drupal::entityManager()->getStorage('entity_view_display')->loadByProperties($properties)) {
+      if ($view_displays = \Drupal::service('entity_type.manager')->getStorage('entity_view_display')->loadByProperties($properties)) {
         foreach ($view_displays as $view_display) {
           if ($component = $view_display->getComponent($field_name)) {
             // Map old formatter settings to new ones.
