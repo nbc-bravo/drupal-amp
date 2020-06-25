@@ -8,4 +8,7 @@ dependencies:
   - drupal:node
   - token:token
   - schema_metatag:schema_metatag
+dependencies_test:
+  - drupal:amptheme
+  - drupal:adsense
 configure: amp.settings

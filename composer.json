@@ -11,9 +11,19 @@
     "source": "http://cgit.drupalcode.org/amp"
   },
   "require": {
-    "lullabot/amp": "^1.0.0"
+    "lullabot/amp": "^1.0.0",
+    "drupal/schema_metatag": "^1.0",
+    "drupal/token": "^1.0"
   },
   "require-dev": {
-    "drupal/amptheme": "^3.0"
+    "drupal/amptheme": "^3.0",
+    "drupal/adsense": "^1.0",
+    "lullabot/amp": "^1.1",
+    "querypath/QueryPath": ">=3.0.4",
+    "sebastian/diff": "^1.2 || ^2 || ^3",
+    "marc1706/fast-image-size": "1.*",
+    "masterminds/html5": "~2.3.0",
+    "sabberworm/php-css-parser": "^8.0.0",
+    "guzzlehttp/guzzle": "~6.1"
   }
 }
