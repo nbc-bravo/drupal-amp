@@ -3,8 +3,7 @@
 namespace Drupal\Tests\amp\Functional;
 
 use Drupal\Core\Url;
-use Drupal\node\Entity\Node;
-use Drupal\simpletest\ContentTypeCreationTrait;
+use Drupal\Tests\node\Traits\ContentTypeCreationTrait;
 use Drupal\Tests\BrowserTestBase;
 use Drupal\filter\Entity\FilterFormat;
 
@@ -16,9 +15,12 @@ abstract class AmpTestBase extends BrowserTestBase {
   use ContentTypeCreationTrait;
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'classy';
+
+  /**
+   * {@inheritdoc}
    */
   public static $modules = [
     'amp',
@@ -76,7 +78,8 @@ abstract class AmpTestBase extends BrowserTestBase {
 
     // Install the theme.
     // @see https://www.drupal.org/node/2232651
-    $this->container->get('theme_installer')->install(['bartik', 'seven', 'ampsubtheme_example']);
+    $this->container->get('theme_installer')
+      ->install(['bartik', 'seven', 'ampsubtheme_example']);
     $this->container->get('config.factory')
       ->getEditable('system.theme')
       ->set('default', 'bartik')
@@ -86,7 +89,7 @@ abstract class AmpTestBase extends BrowserTestBase {
     // Create Article node type.
     $this->createContentType([
       'type' => 'article',
-      'name' => 'Article'
+      'name' => 'Article',
     ]);
 
     // Login as an admin user.

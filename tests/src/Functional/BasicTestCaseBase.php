@@ -14,6 +14,11 @@ abstract class BasicTestCaseBase extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'classy';
+
+  /**
+   * {@inheritdoc}
+   */
   public static $modules = [
     'amp',
     'node',

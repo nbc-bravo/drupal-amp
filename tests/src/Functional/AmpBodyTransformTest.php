@@ -3,10 +3,6 @@
 namespace Drupal\Tests\amp\Functional;
 
 use Drupal\Core\Url;
-use Drupal\node\Entity\Node;
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\Tests\amp\Functional\AmpTestBase;
-use Drupal\filter\Entity\FilterFormat;
 
 /**
  * Tests AMP view mode.
@@ -21,7 +17,7 @@ class AmpBodyTransformTest extends AmpTestBase {
   public function testAmpBodyTransform() {
 
     // Create some input/output values.
-    $path =  drupal_get_path('module', 'amp') . '/tests/fixtures/';
+    $path = drupal_get_path('module', 'amp') . '/tests/fixtures/';
     $image1 = trim(file_get_contents($path . 'img-test-fragment.html'));
     $amp_image1 = trim(file_get_contents($path . 'img-test-fragment.html.out'));
 
@@ -54,4 +50,5 @@ class AmpBodyTransformTest extends AmpTestBase {
     $this->assertSession()->responseContains($amp_image1);
 
   }
+
 }

@@ -3,9 +3,6 @@
 namespace Drupal\Tests\amp\Functional;
 
 use Drupal\Core\Url;
-use Drupal\node\Entity\Node;
-use Drupal\simpletest\ContentTypeCreationTrait;
-use Drupal\Tests\amp\Functional\AmpTestBase;
 
 /**
  * Tests AMP view mode.
@@ -13,7 +10,6 @@ use Drupal\Tests\amp\Functional\AmpTestBase;
  * @group amp
  */
 class AmpViewModeTest extends AmpTestBase {
-
 
   /**
    * Test the AMP view mode.
@@ -55,4 +51,5 @@ class AmpViewModeTest extends AmpTestBase {
     $this->assertSession()->responseContains('link rel="canonical" href="' . $node_url . '"');
 
   }
+
 }
