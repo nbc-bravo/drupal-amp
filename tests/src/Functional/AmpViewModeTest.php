@@ -18,9 +18,10 @@ class AmpViewModeTest extends AmpTestBase {
 
     // Create a node to test AMP field formatters.
     $text = 'AMP test view modes';
+    $title = $this->randomMachineName();
     $node = $this->drupalCreateNode([
       'type' => 'article',
-      'title' => $this->randomMachineName(),
+      'title' => $title,
       'body' => $text,
     ]);
 
@@ -39,7 +40,7 @@ class AmpViewModeTest extends AmpTestBase {
     $this->drupalGet($node_url);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($text);
-    $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/full"');
+    $this->assertSession()->responseContains($title);
     $this->assertSession()->responseContains('link rel="amphtml" href="' . $amp_node_url . '"');
     $this->assertSession()->responseHeaderEquals('Link', '<' . $amp_node_url . '> rel="amphtml"');
 
@@ -47,7 +48,7 @@ class AmpViewModeTest extends AmpTestBase {
     $this->drupalGet($amp_node_url);
     $this->assertSession()->statusCodeEquals(200);
     $this->assertSession()->pageTextContains($text);
-    $this->assertSession()->responseContains('data-quickedit-field-id="node/1/body/en/amp"');
+    $this->assertSession()->responseContains($title);
     $this->assertSession()->responseContains('link rel="canonical" href="' . $node_url . '"');
 
   }

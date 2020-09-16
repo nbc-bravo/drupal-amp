@@ -27,7 +27,6 @@ abstract class AmpTestBase extends BrowserTestBase {
     'node',
     'contextual',
     'field_ui',
-    'quickedit',
     'filter',
   ];
 
@@ -38,7 +37,6 @@ abstract class AmpTestBase extends BrowserTestBase {
    */
   protected $permissions = [
     'access administration pages',
-    'access in-place editing',
     'access content overview',
     'view all revisions',
     'administer content types',
@@ -50,6 +48,7 @@ abstract class AmpTestBase extends BrowserTestBase {
     'administer filters',
     'bypass node access',
     'use text format full_html',
+    'administer meta tags',
   ];
 
   /**
@@ -117,6 +116,20 @@ abstract class AmpTestBase extends BrowserTestBase {
     $edit = ["fields[field_image][type]" => 'amp_image'];
     $edit = ["fields[body][type]" => 'amp_text'];
     $this->submitForm($edit, t('Save'));
+
+    // Take a look at the saved settings.
+    $this->drupalGet($settings_url);
+    $this->assertSession()->statusCodeEquals(200);
+
+    // Make sure Metatag canonical link is configured.
+     \Drupal::configFactory()
+      ->getEditable('metatag.metatag_defaults.node')
+      ->set('tags.canonical_url', '[node:url]')
+      ->save(TRUE);
+
+    $metatag_url = Url::fromRoute("entity.metatag_defaults.edit_form", ['metatag_defaults' => 'node'])->toString();
+    $this->drupalGet($metatag_url);
+    $this->assertSession()->statusCodeEquals(200);
 
   }
 
