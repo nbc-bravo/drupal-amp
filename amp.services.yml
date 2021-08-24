@@ -29,7 +29,7 @@ services:
     arguments: ['@amp.css.collection_renderer.original', '@state', '@amp.utilities', '@renderer', '@config.factory']
   main_content_renderer.amp:
     class: Drupal\amp\Render\AmpHtmlRenderer
-    arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache', '%renderer.config%', '@amp.utilities', '@config.factory']
+    arguments: ['@title_resolver', '@plugin.manager.display_variant', '@event_dispatcher', '@module_handler', '@renderer', '@render_cache', '%renderer.config%', '@theme.manager', '@amp.utilities']
     tags:
       - { name: render.main_content_renderer, format: amp, priority: 1 }
   amp_event_subscriber:
