@@ -24,7 +24,7 @@ class AmpVideoFormatter extends GenericFileFormatter {
   use AmpFormTrait;
 
   /**
-   * AMP layouts
+   * AMP layouts.
    *
    * Expected by AmpFormTrait.
    *
@@ -38,7 +38,7 @@ class AmpVideoFormatter extends GenericFileFormatter {
   }
 
   /**
-   * AMP libraries
+   * AMP libraries.
    *
    * Expected by AmpFormTrait.
    *
@@ -53,14 +53,14 @@ class AmpVideoFormatter extends GenericFileFormatter {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return array(
+    return [
       'height' => 175,
       'width' => 350,
       'layout' => 'responsive',
       'autoplay' => FALSE,
       'controls' => FALSE,
       'loop' => FALSE,
-    ) + parent::defaultSettings();
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -105,11 +105,11 @@ class AmpVideoFormatter extends GenericFileFormatter {
       $elements[$delta]['#attributes']['layout'] = $layout;
       $elements[$delta]['#attributes']['controls'] = $this->getSetting('controls');
       $elements[$delta]['#attributes']['loop'] = $this->getSetting('loop');
-      $elements[$delta]['#attributes']['src'] = file_create_url($file->getFileUri());
+      $elements[$delta]['#attributes']['src'] = $file->createFileUrl();
       $elements[$delta]['#cache'] = ['tags' => $file->getCacheTags()];
     }
     $elements['#attached']['library'] = $this->getLibraries();
-    dpm($elements);
     return $elements;
   }
+
 }

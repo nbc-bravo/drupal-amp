@@ -12,10 +12,9 @@ use Drupal\Core\Render\RenderCacheInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Render\RenderContext;
-use Drupal\Core\Cache\Cache;
 use Drupal\Core\Render\HtmlResponse;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Drupal\amp\Service\AMPService;
-use Lullabot\AMP\Validate\Scope;
 use Drupal\Component\Utility\Xss;
 
 /**
@@ -27,6 +26,8 @@ use Drupal\Component\Utility\Xss;
 class AmpHtmlRenderer extends HtmlRenderer {
 
   /**
+   * AMP Service.
+   *
    * @var \Drupal\amp\Service\AMPService
    */
   protected $ampService;
@@ -48,17 +49,13 @@ class AmpHtmlRenderer extends HtmlRenderer {
    *   The render cache service.
    * @param array $renderer_config
    *   The renderer configuration array.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+   *   The theme manager.
    * @param \Drupal\amp\Service\AMPService $amp_service
    *   The AMP service.
    */
-  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, AMPService $amp_service) {
-    $this->titleResolver = $title_resolver;
-    $this->displayVariantManager = $display_variant_manager;
-    $this->eventDispatcher = $event_dispatcher;
-    $this->moduleHandler = $module_handler;
-    $this->renderer = $renderer;
-    $this->renderCache = $render_cache;
-    $this->rendererConfig = $renderer_config;
+  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager = NULL, AMPService $amp_service) {
+    parent::__construct($title_resolver, $display_variant_manager, $event_dispatcher, $module_handler, $renderer, $render_cache, $renderer_config, $theme_manager);
     $this->ampService = $amp_service;
   }
 
@@ -100,7 +97,8 @@ class AmpHtmlRenderer extends HtmlRenderer {
     }
 
     // The special page regions will appear directly in html.html.twig, not in
-    // page.html.twig, hence add them here, just before rendering html.html.twig.
+    // page.html.twig, hence add them here just before rendering
+    // html.html.twig.
     $this->buildPageTopAndBottom($html);
 
     // Render and replace placeholders using RendererInterface::renderRoot()
@@ -151,11 +149,8 @@ class AmpHtmlRenderer extends HtmlRenderer {
       // markup as a diff.
       if (!empty($amp->getInputOutputHtmlDiff())) {
         $title = '<h2>' . t('AMP converter changes') . '</h2>';
-        $pre = '<div>' . t('The AMP converter made the following changes to ' .
-          'this page. If you do not want this behavior, turn off the option ' .
-          'to <strong>Run the page body through the AMP converter</strong> ' .
-          'in the AMP settings.') .
-          '</div>';
+        $pre = '<div>' . t('The AMP converter made the following changes to this page. If you not want this behavior, turn off the option to <strong>Run the page body through the AMP converter</strong> in the AMP settings.') .
+        '</div>';
         $this->ampService->devMessage($title . $pre . '<pre>' . $amp->getInputOutputHtmlDiff() . '</pre>');
       }
       $content['#attached']['library'] = array_merge($content['#attached']['library'], $libraries);

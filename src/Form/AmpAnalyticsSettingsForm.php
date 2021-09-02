@@ -33,11 +33,11 @@ class AmpAnalyticsSettingsForm extends ConfigFormBase {
     $config = $this->config('amp.analytics.settings');
     $ampService = \Drupal::service('amp.utilities');
 
-    $form['google_analytics'] = array(
+    $form['google_analytics'] = [
       '#type' => 'details',
       '#title' => t('Google Analytics'),
       '#open' => !empty($config->get('google_analytics_id')),
-    );
+    ];
     $form['google_analytics']['google_analytics_id'] = [
       '#type' => 'textfield',
       '#default_value' => $config->get('google_analytics_id'),
@@ -59,12 +59,12 @@ class AmpAnalyticsSettingsForm extends ConfigFormBase {
       '#placeholder' => 'UA-',
     ];
 
-    $form['gtm'] = array(
+    $form['gtm'] = [
       '#type' => 'details',
       '#title' => t('Google Tag Manager'),
       '#open' => !empty($config->get('amp_gtm_id')),
-    );
-    $form['gtm']['amp_gtm_id'] = array(
+    ];
+    $form['gtm']['amp_gtm_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('The Google Tag Manager ID'),
       '#default_value' => $config->get('amp_gtm_id'),
@@ -81,46 +81,48 @@ class AmpAnalyticsSettingsForm extends ConfigFormBase {
       '#maxlength' => 20,
       '#size' => 15,
       '#placeholder' => 'GTM-',
-    );
+    ];
 
-    $form['pixel'] = array(
+    $form['pixel'] = [
       '#type' => 'details',
       '#title' => t('amp-pixel'),
       '#open' => !empty($config->get('amp_pixel')),
-    );
-    $form['pixel']['amp_pixel'] = array(
+    ];
+    $form['pixel']['amp_pixel'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enable amp-pixel'),
       '#default_value' => $config->get('amp_pixel'),
       '#description' => $ampService->libraryDescription(['amp/amp.pixel']),
-    );
-    $form['pixel']['amp_pixel_domain_name'] = array(
+    ];
+    $form['pixel']['amp_pixel_domain_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('amp-pixel domain name'),
       '#default_value' => $config->get('amp_pixel_domain_name'),
       '#description' => $this->t('The domain name where the tracking pixel will be loaded: do not include http or https.'),
-      '#states' => array('visible' => array(
-        ':input[name="amp_pixel"]' => array('checked' => TRUE))
-      ),
-    );
-    $form['pixel']['amp_pixel_query_string'] = array(
+      '#states' => ['visible' => [
+          ':input[name="amp_pixel"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+    $form['pixel']['amp_pixel_query_string'] = [
       '#type' => 'textfield',
       '#title' => $this->t('amp-pixel query path'),
       '#default_value' => $config->get('amp_pixel_query_string'),
       '#description' => $this->t('The path at the domain where the GET request will be received, e.g. "pixel" in example.com/pixel?RANDOM.'),
-      '#states' => array('visible' => array(
-        ':input[name="amp_pixel"]' => array('checked' => TRUE))
-      ),
-    );
-    $form['pixel']['amp_pixel_random_number'] = array(
+      '#states' => ['visible' => [
+        ':input[name="amp_pixel"]' => ['checked' => TRUE]]
+      ],
+    ];
+    $form['pixel']['amp_pixel_random_number'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Random number'),
       '#default_value' => $config->get('amp_pixel_random_number'),
       '#description' => $this->t('Use the special string RANDOM to add a random number to the URL if required. Find more information in the <a href="https://github.com/ampproject/amphtml/blob/master/spec/amp-var-substitutions.md#random">amp-pixel documentation</a>.'),
-      '#states' => array('visible' => array(
-        ':input[name="amp_pixel"]' => array('checked' => TRUE))
-      ),
-    );
+      '#states' => ['visible' => [
+          ':input[name="amp_pixel"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
 
     return parent::buildForm($form, $form_state);
   }

@@ -3,9 +3,6 @@
 namespace Drupal\amp\Element;
 
 use Drupal\filter\Element\ProcessedText;
-use Symfony\Component\HttpFoundation\Request;
-use Drupal\amp\AMP\DrupalAMP;
-use Drupal\amp\Service\AMPService;
 use Drupal\Component\Utility\Xss;
 
 /**
@@ -20,20 +17,20 @@ class AmpProcessedText extends ProcessedText {
    */
   public function getInfo() {
     $class = get_class($this);
-    return array(
+    return [
       '#text' => '',
       '#format' => NULL,
-      '#filter_types_to_skip' => array(),
+      '#filter_types_to_skip' => [],
       '#langcode' => '',
-      '#pre_render' => array(
-        array($class, 'preRenderText'),
-        array($class, 'preRenderAmpText'),
-      ),
+      '#pre_render' => [
+        [$class, 'preRenderText'],
+        [$class, 'preRenderAmpText'],
+      ],
       '#cache' => [
         'contexts' => ['url.query_args:amp', 'url.query_args:debug'],
-        'tags' => ['config:amp.settings']
-      ]
-    );
+        'tags' => ['config:amp.settings'],
+      ],
+    ];
   }
 
   /**
@@ -41,19 +38,25 @@ class AmpProcessedText extends ProcessedText {
    */
   public static function preRenderAmpText($element) {
 
-    /** @var AMPService $amp_service */
+    /**
+     * @var AMPService $amp_service
+     */
     $amp_service = \Drupal::service('amp.utilities');
-    /** @var AMP $amp */
+
+    /**
+     * @var AMP $amp
+     */
     $amp = $amp_service->createAMPConverter();
 
     $amp->loadHtml($element['#markup']);
     $element['#markup'] = $amp->convertToAmpHtml();
     $element['#allowed_tags'] = array_merge(Xss::getAdminTagList(), ['amp-img']);
-
-    if (!empty($amp->getComponentJs())) {
-      $element['#attached']['library'] = $amp_service->addComponentLibraries($amp->getComponentJs());
-      $element['#allowed_tags'] = array_merge($amp_service->getComponentTags($amp->getComponentJs()), $element['#allowed_tags']);
+    $js = $amp->getComponentJs();
+    if (!empty($js)) {
+      $element['#attached']['library'] = $amp_service->addComponentLibraries($js);
+      $element['#allowed_tags'] = array_merge($amp_service->getComponentTags($js), $element['#allowed_tags']);
     }
     return $element;
   }
+
 }
