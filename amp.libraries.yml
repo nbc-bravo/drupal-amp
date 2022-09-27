@@ -1112,6 +1112,18 @@ amp.twitter:
     https://cdn.ampproject.org/v0/amp-twitter-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-twitter", async: true } }
   dependencies:
     - amp/runtime
+amp.tiktok:
+  remote: https://amp.dev/documentation/components/amp-tiktok
+  header: true
+  version: 0.1
+  license:
+    name: apache
+    url: https://github.com/ampproject/amphtml/blob/master/LICENSE
+    gpl-compatible: false
+  js:
+    https://cdn.ampproject.org/v0/amp-tiktok-0.1.js: { type: external, minified: true, attributes: { custom-element: "amp-tiktok", async: true } }
+  dependencies:
+    - amp/runtime
 amp.vine:
   remote: https://www.ampproject.org/docs/reference/extended/amp-vine.html
   header: true
